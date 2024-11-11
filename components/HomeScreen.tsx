@@ -27,7 +27,7 @@ export function HomeScreen() {
     <FlatList
       data={items}
       renderItem={eachItem}
-      keyExtractor={(item) => item.id.toString()}
+      // keyExtractor={(item) => item.id.toString()}
       contentContainerStyle={styles.container}
       numColumns={2}
     />
@@ -39,6 +39,7 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'space-between',
     paddingHorizontal: 20,
+    backgroundColor: 'red',
   },
   itemContainer: {
     flex: 1,
@@ -46,7 +47,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     padding: 0,
     paddingBottom: 5,
-    backgroundColor: '#fff',
+    backgroundColor: 'gray',
   },
   textItemName: {
     paddingTop: 2,
