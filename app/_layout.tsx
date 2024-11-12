@@ -1,12 +1,34 @@
 import { Stack } from "expo-router";
+import { View, Text, StyleSheet } from "react-native";
+
 
 function RootLayout() {
   return (
-    <Stack>
-      <Stack.Screen name="index" />
-    </Stack>
+    <>
+      <View style={layoutStyles.topNavBar}>
+        <Text style={layoutStyles.title}>Dippity</Text>
+      </View>
+      <Stack screenOptions={{ headerShown : false }}>
+        <Stack.Screen name="index" />
+      </Stack>
+    </>
   );
 }
+
+const layoutStyles = StyleSheet.create({
+  topNavBar: {
+    height: 50,
+    backgroundColor: "#4CAF50",  // Customize color
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+  },
+  title: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+});
 
 
 export default RootLayout

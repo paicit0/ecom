@@ -32,21 +32,23 @@ export function HomeScreen() {
       numColumns={2}
     />
   );
-
 }
 
 const styles = StyleSheet.create({
   container: {
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
+    paddingHorizontal: 15,
     backgroundColor: 'red',
+    paddingTop: 10,
+    paddingBottom: 10,
   },
   itemContainer: {
     flex: 1,
-    marginVertical: 5,
-    marginHorizontal: 5,
+    marginVertical: 2,
+    marginHorizontal: 2,
     padding: 0,
     paddingBottom: 5,
+    paddingTop: 5,
     backgroundColor: 'gray',
   },
   textItemName: {
