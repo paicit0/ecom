@@ -6,7 +6,7 @@ function RootLayout() {
   return (
     <>
       <View style={layoutStyles.topNavBar}>
-        <Text style={layoutStyles.title}>Dippity</Text>
+        {/* <Text style={layoutStyles.title}>Dippity</Text> */}
       </View>
       <Stack screenOptions={{ headerShown : false }}>
         <Stack.Screen name="index" />
@@ -18,8 +18,8 @@ function RootLayout() {
 const layoutStyles = StyleSheet.create({
   topNavBar: {
     height: 50,
-    backgroundColor: "#4CAF50",  // Customize color
-    justifyContent: "center",
+    backgroundColor: "green",
+    justifyContent: "flex-end",
     alignItems: "center",
     width: "100%",
   },
@@ -27,6 +27,7 @@ const layoutStyles = StyleSheet.create({
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
+    paddingBottom: 10
   },
 });
 

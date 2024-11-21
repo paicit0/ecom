@@ -1,44 +1,81 @@
-import { useNavigation } from 'expo-router';
-import { StyleSheet, View, Text, Pressable, FlatList } from 'react-native';
+import { useNavigation } from "expo-router";
+import { StyleSheet, View, Text, Pressable, FlatList } from "react-native";
+import { useEffect, useState } from "react";
+import { SearchBar } from "react-native-screens";
+import { TextInput, Image } from "react-native";
 
-// mock item data 1 to 100 items.
-const items = Array.from({ length: 100 }, (_, i) => ({
-  id: i + 1,
-  name: `Item${i + 1}`,
-  price: (i + 1) * 0.99,
-}));
+interface ItemProps {
+  item: any;
+}
 
-export function HomeScreen() {
-  const navigation = useNavigation<any>();
+const fetchPokemonData = async () => {
+  const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=100"); // name and url to a more detailed page
+  const data = await response.json(); // name, url
 
-  const eachItem = ({ item }: { item: typeof items[number] }) => (
-    <Pressable
-      key={item.id}
-      style={styles.itemContainer}
-      onPress={() => navigation.navigate('ItemScreen', { item })}
-    >
-      <Text style={styles.textItemName}>{item.name}</Text>
-      <Text style={styles.textItemPrice}>${item.price.toFixed(2)}</Text>
-    </Pressable>
+  const detailedPokemons = await Promise.all(
+    data.results.map(async (pokemon: { url: string | URL | Request }) => {
+      const response2 = await fetch(pokemon.url); // fetch the detailed page
+      return response2.json(); // everything about the pokemon
+    })
   );
 
+  return detailedPokemons;
+};
+
+export function HomeScreen() {
+  const [pokemons, setPokemons] = useState<any[]>([]);
+  const navigation = useNavigation<any>();
+
+  useEffect(() => {
+    const getPokemons = async () => {
+      const data = await fetchPokemonData();
+      setPokemons(data);
+    };
+    getPokemons();
+  }, []);
+
+  const eachItem = ({ item }: ItemProps) => {
+    // console.log(item);
+    // console.log(item.sprites.front_default);
+    return (
+      <Pressable
+        key={item.id}
+        style={styles.itemContainer}
+        onPress={() => navigation.navigate("ItemScreen", { item })}
+      >
+        <Image style={styles.imageItem} source={{ uri: item.sprites.front_default }} />
+        <Text style={styles.textItemName}>{item.name}</Text>
+      </Pressable>
+    );
+  };
 
   return (
-    <FlatList
-      data={items}
-      renderItem={eachItem}
-      // keyExtractor={(item) => item.id.toString()}
-      contentContainerStyle={styles.container}
-      numColumns={2}
-    />
+    <>
+      <View>
+        <Text>Home</Text>
+        <TextInput // This is the search bar
+          placeholder="Type Here..."
+        />
+        <Pressable onPress={() => console.log("pressed")}>
+          <Text>Hey</Text>
+        </Pressable>
+      </View>
+      <FlatList
+        data={pokemons}
+        renderItem={eachItem}
+        keyExtractor={(item) => item.name}
+        contentContainerStyle={styles.container}
+        numColumns={2}
+      />
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
     paddingHorizontal: 15,
-    backgroundColor: 'red',
+    backgroundColor: "red",
     paddingTop: 10,
     paddingBottom: 10,
   },
@@ -49,19 +86,22 @@ const styles = StyleSheet.create({
     padding: 0,
     paddingBottom: 5,
     paddingTop: 5,
-    backgroundColor: 'gray',
+    backgroundColor: "gray",
   },
   textItemName: {
     paddingTop: 2,
     paddingBottom: 20,
     paddingLeft: 10,
-    textAlign: 'left',
+    textAlign: "left",
   },
   textItemPrice: {
     paddingTop: 2,
     paddingBottom: 2,
     paddingLeft: 10,
-    textAlign: 'left',
+    textAlign: "left",
   },
+  imageItem: {
+    width: 100,
+    height: 100,
+  }
 });
-

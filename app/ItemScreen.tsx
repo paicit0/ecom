@@ -5,13 +5,17 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { StyleSheet } from 'react-native';
 
 type RootStackParamList = {
-  Item: { item: { name: string; price: number } };
+  Item: { item: { name: string; url: string } };
 };
 
 function ItemScreen() {
   const route = useRoute<RouteProp<RootStackParamList, 'Item'>>();
   const { item } = route.params;
   const Stack = createStackNavigator();
+
+  useEffect(() => {
+    console.log(item);
+  }, [])
 
   return (
     <View style={itemStyles.itemContainer}>
@@ -20,7 +24,7 @@ function ItemScreen() {
         <Text>Sold: {item.name}</Text>
       </View>
       <View>
-        <Text>Price: ${item.price.toFixed(2)}</Text>
+        <Text>Price: {item.url}</Text>
       </View>
       <View>
         <Text>Seller Info: </Text>
@@ -40,10 +44,7 @@ const itemStyles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'flex-start',
     backgroundColor: 'red',
-
   }
-
-
 });
 
 
