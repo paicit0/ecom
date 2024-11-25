@@ -2,8 +2,8 @@ import { Button, Text, View } from "react-native";
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { ProfileScreen } from "@/components/ProfileScreen";
-import { HomeScreen } from "@/components/HomeScreen";
+import { ProfileScreen } from "@/app/ProfileScreen";
+import { HomeScreen } from "@/app/HomeScreen";
 
 
 const Tab = createBottomTabNavigator();
