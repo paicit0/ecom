@@ -69,7 +69,7 @@ function ItemScreen() {
       
       <View style={[styles.ItemFooter, { backgroundColor: getTypeColor(item.types?.[0].type.name || 'normal') }]}>
         <Pressable style={styles.FooterCart}>
-          <Ionicons name="cart-outline"  size={20} color="#666" style={{alignSelf: 'center'}} />
+          <Ionicons name="cart-outline"  size={20} color="white" style={{alignSelf: 'center'}} />
           <Text style={{color: 'white'}}>Add to Cart</Text>
         </Pressable>
         <Pressable style={styles.FooterBuy}>
