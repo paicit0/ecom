@@ -69,11 +69,11 @@ function ItemScreen() {
       
       <View style={[styles.ItemFooter, { backgroundColor: getTypeColor(item.types?.[0].type.name || 'normal') }]}>
         <Pressable style={styles.FooterCart}>
+          <Ionicons name="cart-outline"  size={20} color="#666" style={{alignSelf: 'center'}} />
           <Text style={{color: 'white'}}>Add to Cart</Text>
-          <Ionicons name="cart-outline"  size={20} color="#666" />
         </Pressable>
         <Pressable style={styles.FooterBuy}>
-          <Text style={{color: 'white'}}>Buy Now</Text>
+          <Text style={{color: 'white', alignSelf: 'center'}}>Buy Now</Text>
         </Pressable>
       </View>
 
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
   },
   FooterCart: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     justifyContent: 'space-between',
     padding: 8,
   },
