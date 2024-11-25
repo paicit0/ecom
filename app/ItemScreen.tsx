@@ -1,7 +1,9 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { Pokemon } from "./type/types";
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 
 type RootStackParamList = {
   Item: { item: Pokemon };
@@ -12,57 +14,71 @@ function ItemScreen() {
   const { item } = route.params;
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Image
-          style={styles.image}
-          source={{ uri: item.sprites.front_default }}
-        />
-        <Text style={styles.name}>{item.name.toUpperCase()}</Text>
-        <View style={styles.idContainer}>
-          <Text style={styles.idText}>#{item.id.toString().padStart(3, '0')}</Text>
-        </View>
-      </View>
-
-      <View style={styles.statsContainer}>
-        <Text style={styles.sectionTitle}>Base Stats</Text>
-        {item.stats?.map((stat, index) => (
-          <View key={index} style={styles.statRow}>
-            <Text style={styles.statLabel}>{stat.stat.name}:</Text>
-            <View style={styles.statBarContainer}>
-              <View 
-                style={[
-                  styles.statBar, 
-                  { width: `${(stat.base_stat / 255) * 100}%` }
-                ]} 
-              />
-              <Text style={styles.statValue}>{stat.base_stat}</Text>
-            </View>
+    <SafeAreaView style={styles.container}>
+      <ScrollView>
+        <View style={styles.header}>
+          <Image
+            style={styles.image}
+            source={{ uri: item.sprites.front_default }}
+          />
+          <Text style={styles.name}>{item.name.toUpperCase()}</Text>
+          <View style={styles.idContainer}>
+            <Text style={styles.idText}>#{item.id.toString().padStart(3, '0')}</Text>
           </View>
-        ))}
-      </View>
+        </View>
 
-      <View style={styles.typesContainer}>
-        <Text style={styles.sectionTitle}>Types</Text>
-        <View style={styles.typesList}>
-          {item.types?.map((type, index) => (
-            <View key={index} style={[styles.typeTag, { backgroundColor: getTypeColor(type.type.name) }]}>
-              <Text style={styles.typeText}>{type.type.name}</Text>
+        <View style={styles.statsContainer}>
+          <Text style={styles.sectionTitle}>Base Stats</Text>
+          {item.stats?.map((stat, index) => (
+            <View key={index} style={styles.statRow}>
+              <Text style={styles.statLabel}>{stat.stat.name.toUpperCase()}:</Text>
+              <View style={styles.statBarContainer}>
+                <View 
+                  style={[
+                    styles.statBar, 
+                    { width: `${(stat.base_stat / 255) * 100}%` }
+                  ]} 
+                />
+                <Text style={styles.statValue}>{stat.base_stat}</Text>
+              </View>
             </View>
           ))}
         </View>
+
+        <View style={styles.typesContainer}>
+          <Text style={styles.sectionTitle}>Types</Text>
+          <View style={styles.typesList}>
+            {item.types?.map((type, index) => (
+              <View key={index} style={[styles.typeTag, { backgroundColor: getTypeColor(type.type.name) }]}>
+                <Text style={styles.typeText}>{type.type.name}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+
+        <View style={styles.abilitiesContainer}>
+          <Text style={styles.sectionTitle}>Abilities</Text>
+          {item.abilities?.map((ability, index) => (
+            <Text key={index} style={styles.abilityText}>
+              {ability.ability.name.replace('-', ' ')}
+              {ability.is_hidden && ' (Hidden)'}
+            </Text>
+          ))}
+        </View>
+      </ScrollView>
+      
+      <View style={[styles.ItemFooter, { backgroundColor: getTypeColor(item.types?.[0].type.name || 'normal') }]}>
+        <Pressable style={styles.FooterCart}>
+          <Text style={{color: 'white'}}>Add to Cart</Text>
+          <Ionicons name="cart-outline"  size={20} color="#666" />
+        </Pressable>
+        <Pressable style={styles.FooterBuy}>
+          <Text style={{color: 'white'}}>Buy Now</Text>
+        </Pressable>
       </View>
 
-      <View style={styles.abilitiesContainer}>
-        <Text style={styles.sectionTitle}>Abilities</Text>
-        {item.abilities?.map((ability, index) => (
-          <Text key={index} style={styles.abilityText}>
-            {ability.ability.name.replace('-', ' ')}
-            {ability.is_hidden && ' (Hidden)'}
-          </Text>
-        ))}
-      </View>
-    </ScrollView>
+    </SafeAreaView>
+    
   );
 }
 
@@ -147,9 +163,10 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   statLabel: {
-    width: 100,
+    width: 150,
     fontSize: 16,
     color: '#666',
+    marginRight: 8,
   },
   statBarContainer: {
     flex: 1,
@@ -160,9 +177,10 @@ const styles = StyleSheet.create({
     height: 8,
     backgroundColor: '#6890F0',
     borderRadius: 4,
+    
   },
   statValue: {
-    marginLeft: 8,
+    marginLeft: 16,
     fontSize: 16,
     color: '#333',
   },
@@ -200,6 +218,22 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     textTransform: 'capitalize',
   },
+  ItemFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 12,
+    backgroundColor: 'black',
+  },
+  FooterCart: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 8,
+  },
+  FooterBuy: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 8,
+  }
 });
 
 export default ItemScreen;

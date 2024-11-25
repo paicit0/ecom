@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 interface SearchBarProps {
@@ -22,6 +22,9 @@ function SearchBar({ value, onChangeText, placeholder = "Search..." }: SearchBar
         autoCapitalize="none"
         autoCorrect={false}
       />
+      <Pressable>
+        <Ionicons name="cart-outline"  size={20} color="#666" style={styles.icon}/>
+      </Pressable>
     </View>
   );
 }

@@ -82,7 +82,7 @@ export function HomeScreen() {
   return (
     <View style={styles.mainContainer}>
       <View style={styles.header}>
-        <Text style={styles.title}>Pokédex</Text>
+        <Text style={styles.title}>Pokéshop</Text>
         <SearchBar
           value={searchQuery}
           onChangeText={handleSearch}
