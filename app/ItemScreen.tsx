@@ -4,12 +4,7 @@ import { useRoute, RouteProp } from '@react-navigation/native';
 import { Pokemon } from "./type/types";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-
-type RootStackParamList = {
-  HomeScreen: undefined;
-  ItemScreen: { item: Pokemon };
-};
-
+import { RootStackParamList } from './type/types';
 
 function ItemScreen() {
   const route = useRoute<RouteProp<RootStackParamList, 'ItemScreen'>>();

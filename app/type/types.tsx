@@ -1,3 +1,5 @@
+import { NativeStackNavigationProp } from "react-native-screens/lib/typescript/native-stack/types";
+
 export interface Pokemon {
     id: number;
     name: string;
@@ -22,3 +24,10 @@ export interface Pokemon {
       is_hidden: boolean;
     }>;
   }
+
+export type RootStackParamList = {
+  HomeScreen: undefined;
+  ItemScreen: { item: Pokemon };
+};
+
+export type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'HomeScreen'>;
