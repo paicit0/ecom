@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { Pokemon } from "./type/types";
@@ -6,10 +6,18 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList } from './type/types';
 
+interface PokemonCart {
+  id: number,
+  name: string,
+}
+
+
 function ItemScreen() {
   const route = useRoute<RouteProp<RootStackParamList, 'ItemScreen'>>();
   const { item } = route.params;
-  console.log('ItemScreen: ' + item.name);
+  const [cartItems, setCartItems] = useState<PokemonCart[]>([]);
+  // console.log('ItemScreen: ' + item.name);
+  console.log('Current Cart: ' + cartItems);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -66,7 +74,7 @@ function ItemScreen() {
       </ScrollView>
       
       <View style={[styles.ItemFooter, { backgroundColor: getTypeColor(item.types?.[0].type.name || 'normal') }]}>
-        <Pressable style={styles.FooterCart}>
+        <Pressable style={styles.FooterCart} onPress={() => setCartItems([...cartItems, item.name])}>
           <Ionicons name="cart-outline"  size={20} color="white" style={{alignSelf: 'center'}} />
           <Text style={{color: 'white'}}>Add to Cart</Text>
         </Pressable>
