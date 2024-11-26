@@ -6,12 +6,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
 type RootStackParamList = {
-  Item: { item: Pokemon };
+  HomeScreen: undefined;
+  ItemScreen: { item: Pokemon };
 };
 
+
 function ItemScreen() {
-  const route = useRoute<RouteProp<RootStackParamList, 'Item'>>();
+  const route = useRoute<RouteProp<RootStackParamList, 'ItemScreen'>>();
   const { item } = route.params;
+  console.log('ItemScreen: ' + item.name);
 
   return (
     <SafeAreaView style={styles.container}>

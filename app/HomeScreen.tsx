@@ -4,6 +4,12 @@ import { useEffect, useState } from "react";
 import { Image } from "react-native";
 import SearchBar from "@/components/SearchBar";
 import { Pokemon } from "./type/types";
+import { NativeStackNavigationProp } from "react-native-screens/lib/typescript/native-stack/types";
+
+type RootStackParamList = {
+  HomeScreen: undefined;
+  ItemScreen: { item: Pokemon };
+};
 
 
 const fetchPokemonData = async (): Promise<Pokemon[]> => {
@@ -21,7 +27,8 @@ const fetchPokemonData = async (): Promise<Pokemon[]> => {
 };
 
 export function HomeScreen() {
-  const navigation = useNavigation();
+  type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'HomeScreen'>;
+  const navigation = useNavigation<HomeScreenNavigationProp>();
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
   const [filteredPokemons, setFilteredPokemons] = useState<Pokemon[]>([]);
   const [isLoading, setIsLoading] = useState(true);
