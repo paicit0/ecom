@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { memo, useState } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { useRoute, RouteProp } from '@react-navigation/native';
-import { Pokemon } from "./type/types";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList } from './type/types';
@@ -12,7 +11,7 @@ interface PokemonCart {
 }
 
 
-function ItemScreen() {
+export const ItemScreen = memo(function ItemScreen() {
   const route = useRoute<RouteProp<RootStackParamList, 'ItemScreen'>>();
   const { item } = route.params;
   const [cartItems, setCartItems] = useState<PokemonCart[]>([]);
@@ -74,7 +73,7 @@ function ItemScreen() {
       </ScrollView>
       
       <View style={[styles.ItemFooter, { backgroundColor: getTypeColor(item.types?.[0].type.name || 'normal') }]}>
-        <Pressable style={styles.FooterCart} onPress={() => setCartItems([...cartItems, item.name])}>
+        <Pressable style={styles.FooterCart}>
           <Ionicons name="cart-outline"  size={20} color="white" style={{alignSelf: 'center'}} />
           <Text style={{color: 'white'}}>Add to Cart</Text>
         </Pressable>
@@ -86,7 +85,7 @@ function ItemScreen() {
     </SafeAreaView>
     
   );
-}
+});
 
 const getTypeColor = (type: string): string => {
   const colors: { [key: string]: string } = {

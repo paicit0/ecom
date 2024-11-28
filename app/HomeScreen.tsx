@@ -1,6 +1,6 @@
+import React, { memo, useEffect, useState } from "react";
 import { useNavigation } from "expo-router";
 import { StyleSheet, View, Text, Pressable, FlatList, ActivityIndicator } from "react-native";
-import { useEffect, useState } from "react";
 import { Image } from "react-native";
 import SearchBar from "@/components/SearchBar";
 import { Pokemon } from "./type/types";
@@ -20,7 +20,7 @@ const fetchPokemonData = async (): Promise<Pokemon[]> => {
   return detailedPokemons;
 };
 
-export function HomeScreen() {
+export const HomeScreen = memo(function HomeScreen() {
   
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
@@ -101,6 +101,7 @@ export function HomeScreen() {
     </View>
   );
 }
+);
 
 const styles = StyleSheet.create({
   mainContainer: {

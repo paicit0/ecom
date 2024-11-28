@@ -1,5 +1,5 @@
-import React from 'react'
-import { View } from 'react-native'
+import React from 'react';
+import { View } from 'react-native';
 
 function Cart() {
   return (
@@ -7,4 +7,4 @@ function Cart() {
   )
 }
 
-export default Cart
+export default Cart;
