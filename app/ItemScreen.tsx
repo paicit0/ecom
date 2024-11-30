@@ -5,18 +5,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList } from './type/types';
 
-interface PokemonCart {
-  id: number,
-  name: string,
-}
+
 
 
 export const ItemScreen = memo(function ItemScreen() {
   const route = useRoute<RouteProp<RootStackParamList, 'ItemScreen'>>();
   const { item } = route.params;
-  const [cartItems, setCartItems] = useState<PokemonCart[]>([]);
+  
   // console.log('ItemScreen: ' + item.name);
-  console.log('Current Cart: ' + cartItems);
+  
 
   return (
     <SafeAreaView style={styles.container}>

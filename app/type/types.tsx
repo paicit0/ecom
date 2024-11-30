@@ -28,6 +28,14 @@ export interface Pokemon {
 export type RootStackParamList = {
   HomeScreen: undefined;
   ItemScreen: { item: Pokemon };
+  CartScreen: undefined;
 };
 
+export interface PokemonCart {
+  id: number,
+  name: string,
+  quantity: number
+}
+
 export type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'HomeScreen'>;
+export type CartScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'CartScreen'>;

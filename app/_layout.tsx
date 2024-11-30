@@ -1,3 +1,4 @@
+import React from "react";
 import { Stack } from "expo-router";
 import { View, Text, StyleSheet } from "react-native";
 
@@ -6,7 +7,6 @@ function RootLayout() {
   return (
     <>
       <View style={layoutStyles.topNavBar}>
-        {/* <Text style={layoutStyles.title}>Dippity</Text> */}
       </View>
       <Stack screenOptions={{ headerShown : false }}>
         <Stack.Screen name="index" />

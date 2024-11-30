@@ -3,7 +3,7 @@ import { useNavigation } from "expo-router";
 import { StyleSheet, View, Text, Pressable, FlatList, ActivityIndicator } from "react-native";
 import { Image } from "react-native";
 import SearchBar from "@/components/SearchBar";
-import { Pokemon } from "./type/types";
+import { Pokemon, PokemonCart } from "./type/types";
 import { HomeScreenNavigationProp } from "./type/types";
 
 const fetchPokemonData = async (): Promise<Pokemon[]> => {
@@ -21,12 +21,13 @@ const fetchPokemonData = async (): Promise<Pokemon[]> => {
 };
 
 export const HomeScreen = memo(function HomeScreen() {
-  
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
   const [filteredPokemons, setFilteredPokemons] = useState<Pokemon[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [cartItems, setCartItems] = useState<PokemonCart[]>([]);
+  // console.log('Current Cart: ' + cartItems);
 
   useEffect(() => {
     const getPokemons = async () => {
@@ -45,8 +46,8 @@ export const HomeScreen = memo(function HomeScreen() {
 
   const handleSearch = (text: string) => {
     setSearchQuery(text);
-    const filtered = pokemons.filter(pokemon =>
-      pokemon.name.toLowerCase().includes(text.toLowerCase())
+    const filtered = pokemons.filter(
+      pokemon => pokemon.name.toLowerCase().includes(text.toLowerCase())
     );
     setFilteredPokemons(filtered);
   };
