@@ -3,7 +3,8 @@ import { View, Text, Image, StyleSheet, ScrollView, Pressable } from 'react-nati
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { RootStackParamList } from './type/types';
+import { Pokemon, RootStackParamList } from './type/types';
+import { useCart } from './store';
 
 
 
@@ -11,8 +12,12 @@ import { RootStackParamList } from './type/types';
 export const ItemScreen = memo(function ItemScreen() {
   const route = useRoute<RouteProp<RootStackParamList, 'ItemScreen'>>();
   const { item } = route.params;
-  
-  // console.log('ItemScreen: ' + item.name);
+  const addItem = useCart((state) => state.addItem);
+  const cart = useCart((state) => state.cartItems);
+
+  console.log('ItemScreen: ' + item.name);
+  console.log('Current Cart: ' + cart);
+  console.log('Current Cart: ' + cart.length);
   
 
   return (
@@ -72,7 +77,7 @@ export const ItemScreen = memo(function ItemScreen() {
       <View style={[styles.ItemFooter, { backgroundColor: getTypeColor(item.types?.[0].type.name || 'normal') }]}>
         <Pressable style={styles.FooterCart}>
           <Ionicons name="cart-outline"  size={20} color="white" style={{alignSelf: 'center'}} />
-          <Text style={{color: 'white'}}>Add to Cart</Text>
+          <Text style={{color: 'white'}} onPress={() => addItem(item.name)}>Add to Cart</Text>
         </Pressable>
         <Pressable style={styles.FooterBuy}>
           <Text style={{color: 'white', alignSelf: 'center'}}>Buy Now</Text>

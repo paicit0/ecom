@@ -26,7 +26,7 @@ export const HomeScreen = memo(function HomeScreen() {
   const [filteredPokemons, setFilteredPokemons] = useState<Pokemon[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [cartItems, setCartItems] = useState<PokemonCart[]>([]);
+  // const [cartItems, setCartItems] = useState<PokemonCart[]>([]);
   // console.log('Current Cart: ' + cartItems);
 
   useEffect(() => {
