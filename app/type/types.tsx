@@ -31,11 +31,7 @@ export type RootStackParamList = {
   CartScreen: undefined;
 };
 
-export interface PokemonCart {
-  id: number,
-  name: string,
-  quantity: number
-}
+
 
 export type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'HomeScreen'>;
 export type CartScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'CartScreen'>;

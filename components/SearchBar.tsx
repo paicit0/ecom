@@ -1,10 +1,10 @@
-import React from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { memo } from 'react';
+import React from "react";
+import { Pressable, StyleSheet, TextInput, View, Text } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { memo } from "react";
 import { useNavigation } from "expo-router";
-import { CartScreenNavigationProp } from '@/app/type/types';
-
+import { CartScreenNavigationProp } from "@/app/type/types";
+import { useCart } from "@/app/store";
 
 interface SearchBarProps {
   value: string;
@@ -12,13 +12,13 @@ interface SearchBarProps {
   placeholder?: string;
 }
 
-const SearchBar = memo(function SearchBar({ 
-  value, 
-  onChangeText, 
-  placeholder = "Search..." 
+const SearchBar = memo(function SearchBar({
+  value,
+  onChangeText,
+  placeholder = "Search...",
 }: SearchBarProps) {
-
   const navigation = useNavigation<CartScreenNavigationProp>();
+  const cart = useCart((state) => state.cartItems);
   return (
     <View style={styles.container}>
       <Ionicons name="search" size={20} color="#666" style={styles.icon} />
@@ -32,13 +32,28 @@ const SearchBar = memo(function SearchBar({
         autoCapitalize="none"
         autoCorrect={false}
       />
-      {value !== '' && (
-        <Pressable onPress={() => onChangeText('')}>
-          <Ionicons name="close-sharp" size={20} color="#666" style={styles.icon}/>
+      {cart.length > 0 && (
+        <Pressable onPress={() => onChangeText("")}>
+          <Ionicons
+            name="close-sharp"
+            size={20}
+            color="#666"
+            style={styles.icon}
+          />
         </Pressable>
       )}
-      <Pressable onPress={() => navigation.navigate('CartScreen')}>
-        <Ionicons name="cart-outline" size={20} color="#666" style={styles.icon}/>
+      <Pressable onPress={() => navigation.navigate("CartScreen")}>
+        {cart.length > 0 && (
+          <Text style={styles.badge}>
+            {cart.length > 99 ? '99+' : cart.length}
+          </Text>
+        )}
+        <Ionicons
+          name="cart-outline"
+          size={20}
+          color="#666"
+          style={styles.icon}
+        />
       </Pressable>
     </View>
   );
@@ -46,9 +61,9 @@ const SearchBar = memo(function SearchBar({
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f0f0f0",
     borderRadius: 10,
     paddingHorizontal: 12,
     marginVertical: 8,
@@ -60,9 +75,23 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     fontSize: 16,
-    color: '#333',
+    color: "#333",
+  },
+  badge: {
+    position: 'absolute', // Position it relative to the parent
+    top: -12,             // Adjust position
+    right: -6,          // Adjust position
+    backgroundColor: 'red', // Typically red for visibility
+    color: 'white',       // Text color
+    borderRadius: 10,     // Rounded shape
+    width: 18,            // Fixed size for uniformity
+    height: 18,           // Fixed size for uniformity
+    textAlign: 'center',  // Center the text
+    fontSize: 12,         // Small font
+    fontWeight: 'bold',   // Bold for clarity
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
 export default SearchBar;
-

@@ -3,8 +3,9 @@ import { useNavigation } from "expo-router";
 import { StyleSheet, View, Text, Pressable, FlatList, ActivityIndicator } from "react-native";
 import { Image } from "react-native";
 import SearchBar from "@/components/SearchBar";
-import { Pokemon, PokemonCart } from "./type/types";
+import { Pokemon} from "./type/types";
 import { HomeScreenNavigationProp } from "./type/types";
+import { useCart } from "./store";
 
 const fetchPokemonData = async (): Promise<Pokemon[]> => {
   const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=100");
@@ -26,8 +27,9 @@ export const HomeScreen = memo(function HomeScreen() {
   const [filteredPokemons, setFilteredPokemons] = useState<Pokemon[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  // const [cartItems, setCartItems] = useState<PokemonCart[]>([]);
-  // console.log('Current Cart: ' + cartItems);
+  const cart = useCart((state) => state.cartItems);
+
+
 
   useEffect(() => {
     const getPokemons = async () => {
