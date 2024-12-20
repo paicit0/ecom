@@ -1,10 +1,5 @@
 import { create } from 'zustand';
-
-interface CartItem {
-    name: string;
-    id: number;
-    sprite: string;
-}
+import { CartItem } from './type/types';
 
 interface useCartArray {
     cartItems: CartItem[];
@@ -17,6 +12,6 @@ export const useCart = create<useCartArray>((set) => ({
     cartItems: [],
     addItem: (item) => set((state) => ({ cartItems: [...state.cartItems, item] })),
     deleteItem: (index) => set((state) => ({ cartItems: state.cartItems.filter((item, i) => i !== index) })),
-    deleteAll: () => set((state) => ({ cartItems: state.cartItems = [] }))
+    deleteAll: () => set({ cartItems: [] })
     
 }))

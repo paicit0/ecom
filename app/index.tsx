@@ -5,9 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { ProfileScreen } from "@/app/ProfileScreen";
 import { HomeScreen } from "@/app/HomeScreen";
 
-
 const Tab = createBottomTabNavigator();
-const Stack = createStackNavigator();
 
 function Index() {
   return (

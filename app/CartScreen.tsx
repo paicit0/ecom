@@ -4,13 +4,19 @@ import { RootStackParamList } from "./type/types";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { Text, Image } from "react-native";
 import { useCart } from "./store";
+import { addData } from "./firestore/cartFireStore";
 import { Ionicons } from "@expo/vector-icons";
+import { CartItem } from "./type/types";
 
 const CartScreen = memo(() => {
   const route = useRoute<RouteProp<RootStackParamList, "CartScreen">>();
   const cart = useCart((state) => state.cartItems);
   const deleteItem = useCart((state) => state.deleteItem);
   const deleteAll = useCart((state) => state.deleteAll);
+
+  const handleCartSubmit = (cart: CartItem) => {
+    addData(cart);
+  }
 
   return (
     <>
@@ -28,9 +34,11 @@ const CartScreen = memo(() => {
                 color="#666"
                 style={styles.icon}
               />
+              <Text>Remove</Text>
             </Pressable>
           </View>
         ))}
+        <Pressable onPress={() => handleCartSubmit(cart[0])}><Text>Checkout</Text></Pressable>
       </View>
     </>
   );

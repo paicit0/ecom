@@ -7,30 +7,27 @@ import { Pokemon} from "./type/types";
 import { HomeScreenNavigationProp } from "./type/types";
 import { useCart } from "./store";
 
-const fetchPokemonData = async (): Promise<Pokemon[]> => {
-  const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=100");
-  const data = await response.json();
-
-  const detailedPokemons = await Promise.all(
-    data.results.map(async (pokemon: { url: string }) => {
-      const response2 = await fetch(pokemon.url);
-      return response2.json();
-    })
-  );
-
-  return detailedPokemons;
-};
-
 export const HomeScreen = memo(function HomeScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
   const [filteredPokemons, setFilteredPokemons] = useState<Pokemon[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const cart = useCart((state) => state.cartItems);
 
-
-
+  const fetchPokemonData = async (): Promise<Pokemon[]> => {
+    const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=100");
+    const data = await response.json();
+  
+    const detailedPokemons = await Promise.all(
+      data.results.map(async (pokemon: { url: string }) => {
+        const response2 = await fetch(pokemon.url);
+        return response2.json();
+      })
+    );
+  
+    return detailedPokemons;
+  };
+  
   useEffect(() => {
     const getPokemons = async () => {
       try {

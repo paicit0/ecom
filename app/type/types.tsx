@@ -1,29 +1,36 @@
 import { NativeStackNavigationProp } from "react-native-screens/lib/typescript/native-stack/types";
 
-export interface Pokemon {
-    id: number;
-    name: string;
-    sprites: {
-      front_default: string;
+
+export type Pokemon = {
+  id: number;
+  name: string;
+  sprites: {
+    front_default: string;
+  };
+  stats?: Array<{
+    base_stat: number;
+    stat: {
+      name: string;
     };
-    stats?: Array<{
-      base_stat: number;
-      stat: {
-        name: string;
-      };
-    }>;
-    types?: Array<{
-      type: {
-        name: string;
-      };
-    }>;
-    abilities?: Array<{
-      ability: {
-        name: string;
-      };
-      is_hidden: boolean;
-    }>;
-  }
+  }>;
+  types?: Array<{
+    type: {
+      name: string;
+    };
+  }>;
+  abilities?: Array<{
+    ability: {
+      name: string;
+    };
+    is_hidden: boolean;
+  }>;
+}
+
+export interface CartItem {
+  name: string;
+  id: number;
+  sprite: string;
+}
 
 export type RootStackParamList = {
   HomeScreen: undefined;
@@ -31,7 +38,11 @@ export type RootStackParamList = {
   CartScreen: undefined;
 };
 
-
-
-export type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'HomeScreen'>;
-export type CartScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'CartScreen'>;
+export type HomeScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "HomeScreen"
+>;
+export type CartScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "CartScreen"
+>;
