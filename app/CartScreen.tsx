@@ -1,5 +1,5 @@
 import React, { useState, memo } from "react";
-import { View, StyleSheet, Pressable } from "react-native";
+import { View, StyleSheet, Pressable, ScrollView } from "react-native";
 import { RootStackParamList } from "./type/types";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { Text, Image } from "react-native";
@@ -8,21 +8,23 @@ import { addData } from "./firestore/cartFireStore";
 import { Ionicons } from "@expo/vector-icons";
 import { CartItem } from "./type/types";
 
-const CartScreen = memo(() => {
+export const CartScreen = memo(() => {
   const route = useRoute<RouteProp<RootStackParamList, "CartScreen">>();
   const cart = useCart((state) => state.cartItems);
   const deleteItem = useCart((state) => state.deleteItem);
   const deleteAll = useCart((state) => state.deleteAll);
-
-  const handleCartSubmit = (cart: CartItem) => {
-    addData(cart);
+  
+  const handleCartSubmit = (cart: CartItem[]) => {
+    cart.forEach(item => {
+      addData(item);
+    });
+    deleteAll();
   }
 
   return (
-    <>
+    <ScrollView>
       <View>
         <Text style={{textAlign: 'center'}}>Your Cart</Text>
-        {cart.length > 0 && <Pressable onPress={deleteAll}><Text>Delete All</Text></Pressable>}
         {cart.map((item, index) => (
           <View key={index}>
             <Text>{item.name}</Text>
@@ -34,15 +36,17 @@ const CartScreen = memo(() => {
                 color="#666"
                 style={styles.icon}
               />
-              <Text>Remove</Text>
             </Pressable>
           </View>
         ))}
-        <Pressable onPress={() => handleCartSubmit(cart[0])}><Text>Checkout</Text></Pressable>
+        {cart.length > 0 && <Pressable onPress={() => handleCartSubmit(cart)}><Text>Checkout</Text></Pressable>}
+        {cart.length === 0 && <Text style={{textAlign: 'center'}}>Your cart is empty!</Text>}
+        {cart.length > 0 && <Pressable onPress={deleteAll}><Text>Delete All</Text></Pressable>}
       </View>
-    </>
+    </ScrollView>
   );
 });
+
 
 const styles = StyleSheet.create({
   imageItem: {

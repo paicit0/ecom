@@ -1,9 +1,16 @@
 import React, { memo, useEffect, useState } from "react";
 import { useNavigation } from "expo-router";
-import { StyleSheet, View, Text, Pressable, FlatList, ActivityIndicator } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  Pressable,
+  FlatList,
+  ActivityIndicator,
+} from "react-native";
 import { Image } from "react-native";
 import SearchBar from "@/components/SearchBar";
-import { Pokemon} from "./type/types";
+import { Pokemon } from "./type/types";
 import { HomeScreenNavigationProp } from "./type/types";
 import { useCart } from "./store";
 
@@ -17,17 +24,17 @@ export const HomeScreen = memo(function HomeScreen() {
   const fetchPokemonData = async (): Promise<Pokemon[]> => {
     const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=100");
     const data = await response.json();
-  
+
     const detailedPokemons = await Promise.all(
       data.results.map(async (pokemon: { url: string }) => {
         const response2 = await fetch(pokemon.url);
         return response2.json();
       })
     );
-  
+
     return detailedPokemons;
   };
-  
+
   useEffect(() => {
     const getPokemons = async () => {
       try {
@@ -45,8 +52,8 @@ export const HomeScreen = memo(function HomeScreen() {
 
   const handleSearch = (text: string) => {
     setSearchQuery(text);
-    const filtered = pokemons.filter(
-      pokemon => pokemon.name.toLowerCase().includes(text.toLowerCase())
+    const filtered = pokemons.filter((pokemon) =>
+      pokemon.name.toLowerCase().includes(text.toLowerCase())
     );
     setFilteredPokemons(filtered);
   };
@@ -55,22 +62,51 @@ export const HomeScreen = memo(function HomeScreen() {
     return string.charAt(0).toUpperCase() + string.slice(1);
   };
 
-  const renderItem = ({ item }: { item: Pokemon }) => (
-    <Pressable
-      style={styles.itemContainer}
-      onPress={() => navigation.navigate("ItemScreen", { item })}
-    >
-      <View style={styles.cardContent}>
-        <Image
-          style={styles.imageItem}
-          source={{ uri: item.sprites.front_default }}
-        />
+  const renderItem = ({ item }: { item: Pokemon }) => {
+    const lowerName = item.name.toLowerCase();
+    const lowerQuery = searchQuery.toLowerCase();
+    const index = lowerName.indexOf(lowerQuery);
+
+    let nameDisplay;
+
+    if (index >= 0 && searchQuery) {
+      const before = item.name.slice(0, index);
+      const match = item.name.slice(index, index + searchQuery.length);
+      const after = item.name.slice(index + searchQuery.length);
+
+      nameDisplay = (
+        <Text style={styles.textItemName}>
+          {capitalizeFirstLetter(before)}
+          <Text style={[styles.textItemName, { fontWeight: "bold" }]}>
+
+            {index === 0 ? capitalizeFirstLetter(match) : match}
+          </Text>
+          {after}
+        </Text>
+      );
+    } else {
+      nameDisplay = (
         <Text style={styles.textItemName}>
           {capitalizeFirstLetter(item.name)}
         </Text>
-      </View>
-    </Pressable>
-  );
+      );
+    }
+
+    return (
+      <Pressable
+        style={styles.itemContainer}
+        onPress={() => navigation.navigate("ItemScreen", { item })}
+      >
+        <View style={styles.cardContent}>
+          <Image
+            style={styles.imageItem}
+            source={{ uri: item.sprites.front_default }}
+          />
+          {nameDisplay}
+        </View>
+      </Pressable>
+    );
+  };
 
   if (isLoading) {
     return (
@@ -83,7 +119,9 @@ export const HomeScreen = memo(function HomeScreen() {
   return (
     <View style={styles.mainContainer}>
       <View style={styles.header}>
-        <Text style={styles.title}>Pokéshop</Text>
+        <View>
+          <Text style={styles.title}>Pokéshop</Text>
+        </View>
         <SearchBar
           value={searchQuery}
           onChangeText={handleSearch}
@@ -100,30 +138,31 @@ export const HomeScreen = memo(function HomeScreen() {
       />
     </View>
   );
-}
-);
+});
 
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   header: {
+    // flex: 1,
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: "#e0e0e0",
   },
   title: {
+    // flex: 1,
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 12,
-    color: '#333',
+    color: "#333",
   },
   container: {
     padding: 8,
@@ -131,10 +170,10 @@ const styles = StyleSheet.create({
   itemContainer: {
     flex: 1,
     margin: 4,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -144,17 +183,17 @@ const styles = StyleSheet.create({
   },
   cardContent: {
     padding: 8,
-    alignItems: 'center',
+    alignItems: "center",
   },
   imageItem: {
     width: 120,
     height: 120,
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
   textItemName: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "normal",
+    color: "#333",
     marginTop: 8,
   },
 });

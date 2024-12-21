@@ -32,7 +32,7 @@ const SearchBar = memo(function SearchBar({
         autoCapitalize="none"
         autoCorrect={false}
       />
-      {cart.length > 0 && (
+      {value.length > 0 && (
         <Pressable onPress={() => onChangeText("")}>
           <Ionicons
             name="close-sharp"
@@ -78,17 +78,17 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   badge: {
-    position: 'absolute', // Position it relative to the parent
-    top: -12,             // Adjust position
-    right: -6,          // Adjust position
-    backgroundColor: 'red', // Typically red for visibility
-    color: 'white',       // Text color
-    borderRadius: 10,     // Rounded shape
-    width: 18,            // Fixed size for uniformity
-    height: 18,           // Fixed size for uniformity
-    textAlign: 'center',  // Center the text
-    fontSize: 12,         // Small font
-    fontWeight: 'bold',   // Bold for clarity
+    position: 'absolute',
+    top: -12,             
+    right: -6,          
+    backgroundColor: 'red', 
+    color: 'white',      
+    borderRadius: 10,     
+    width: 18,            
+    height: 18,         
+    textAlign: 'center',  
+    fontSize: 12,         
+    fontWeight: 'bold',
     justifyContent: 'center',
     alignItems: 'center',
   },
