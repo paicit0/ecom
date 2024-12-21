@@ -36,6 +36,8 @@ export type RootStackParamList = {
   HomeScreen: undefined;
   ItemScreen: { item: Pokemon };
   CartScreen: undefined;
+  LoginScreen: undefined;
+  RegisterScreen: undefined;
 };
 
 export type HomeScreenNavigationProp = NativeStackNavigationProp<
@@ -45,4 +47,12 @@ export type HomeScreenNavigationProp = NativeStackNavigationProp<
 export type CartScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "CartScreen"
+>;
+export type LoginScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "LoginScreen"
+>;
+export type RegisterScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "RegisterScreen"
 >;

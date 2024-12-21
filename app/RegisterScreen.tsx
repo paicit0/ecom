@@ -1,15 +1,28 @@
-import React, { useState } from 'react'
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
+import { RootStackParamList } from "./type/types";
+import { useRoute, RouteProp } from "@react-navigation/native";
 
 function RegisterScreen() {
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
+  const route = useRoute<RouteProp<RootStackParamList, "RegisterScreen">>();
+  const [userName, setUserName] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleRegister = () => {
-    console.log('Register', { name, email, password, confirmPassword })
-  }
+    if (password !== confirmPassword) {
+      console.log("Passwords do not match");
+      return; 
+    }
+
+    console.log("Register", { userName, password, confirmPassword });
+  };
 
   return (
     <View style={styles.container}>
@@ -17,14 +30,8 @@ function RegisterScreen() {
       <TextInput
         style={styles.input}
         placeholder="Name"
-        value={name}
-        onChangeText={(text) => setName(text)}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={(text) => setEmail(text)}
+        value={userName}
+        onChangeText={(text) => setUserName(text)}
       />
       <TextInput
         style={styles.input}
@@ -44,14 +51,14 @@ function RegisterScreen() {
         <Text style={styles.buttonText}>Register</Text>
       </TouchableOpacity>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
   title: {
@@ -60,24 +67,24 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 40,
-    borderColor: 'gray',
+    borderColor: "gray",
     borderWidth: 1,
     marginVertical: 10,
     paddingHorizontal: 10,
     width: 300,
   },
   button: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: "#4CAF50",
     padding: 10,
     borderRadius: 5,
     marginVertical: 10,
     width: 300,
-    alignItems: 'center',
+    alignItems: "center",
   },
   buttonText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
   },
-})
+});
 
-export default RegisterScreen
+export default RegisterScreen;

@@ -4,7 +4,7 @@ import { RootStackParamList } from "./type/types";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { Text, Image } from "react-native";
 import { useCart } from "./store";
-import { addData } from "./firestore/cartFireStore";
+import { addData } from "./firestore/cartFirestore";
 import { Ionicons } from "@expo/vector-icons";
 import { CartItem } from "./type/types";
 

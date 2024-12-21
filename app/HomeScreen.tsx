@@ -120,6 +120,12 @@ export const HomeScreen = memo(function HomeScreen() {
       <View style={styles.header}>
         <View>
           <Text style={styles.title}>Pokéshop</Text>
+          <Pressable onPress={() => navigation.navigate("LoginScreen")}>
+            <Text>Login</Text>
+          </Pressable>
+          <Pressable onPress={() => navigation.navigate("RegisterScreen")}>
+            <Text>Register</Text>
+          </Pressable>
         </View>
         <SearchBar
           value={searchQuery}

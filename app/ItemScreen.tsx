@@ -6,10 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList } from './type/types';
 import { useCart } from './store';
 
-
-
-
-export const ItemScreen = memo(function ItemScreen() {
+const ItemScreen = memo(function ItemScreen() {
   const route = useRoute<RouteProp<RootStackParamList, 'ItemScreen'>>();
   const { item } = route.params;
   const addItem = useCart((state) => state.addItem);
