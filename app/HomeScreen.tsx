@@ -78,7 +78,6 @@ export const HomeScreen = memo(function HomeScreen() {
         <Text style={styles.textItemName}>
           {capitalizeFirstLetter(before)}
           <Text style={[styles.textItemName, { fontWeight: "bold" }]}>
-
             {index === 0 ? capitalizeFirstLetter(match) : match}
           </Text>
           {after}
