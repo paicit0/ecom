@@ -1,7 +1,8 @@
 import { collection, addDoc, deleteDoc, doc, getDocs } from "firebase/firestore";
-import { db } from "../../firebaseConfig";
+import { db } from "../firebaseConfig";
 
-const loginFirestore = (username, password) => {
+export const loginFirestore = async (username, password) => {
+    const user = await db.collection(db, "users").doc(username);
     try {
         if (username === "admin" && password === "admin") {
             console.log("Admin logged in");
@@ -11,6 +12,4 @@ const loginFirestore = (username, password) => {
     } catch (error) {
         console.error("Error logging in: ", error);
     }
-
-
 };

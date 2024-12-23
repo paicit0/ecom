@@ -28,7 +28,8 @@ export const HomeScreen = memo(function HomeScreen() {
     const detailedPokemons = await Promise.all(
       data.results.map(async (pokemon: { url: string }) => {
         const response2 = await fetch(pokemon.url);
-        return response2.json();
+        const pokemonData = await response2.json();
+        return { ...pokemonData, price: Math.floor(Math.random() * 100) };
       })
     );
 
@@ -102,6 +103,7 @@ export const HomeScreen = memo(function HomeScreen() {
             source={{ uri: item.sprites.front_default }}
           />
           {nameDisplay}
+          <Text>${item.price}</Text>
         </View>
       </Pressable>
     );

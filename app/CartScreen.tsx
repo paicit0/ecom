@@ -4,7 +4,7 @@ import { RootStackParamList } from "./type/types";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { Text, Image } from "react-native";
 import { useCart } from "./store";
-import { addData } from "./firestore/cartFirestore";
+import { addData } from "../functions/cartFirestore";
 import { Ionicons } from "@expo/vector-icons";
 import { CartItem } from "./type/types";
 
@@ -13,21 +13,26 @@ export const CartScreen = memo(() => {
   const cart = useCart((state) => state.cartItems);
   const deleteItem = useCart((state) => state.deleteItem);
   const deleteAll = useCart((state) => state.deleteAll);
-  
+
   const handleCartSubmit = (cart: CartItem[]) => {
-    cart.forEach(item => {
+    cart.forEach((item) => {
       addData(item);
     });
     deleteAll();
-  }
+  };
+
+  const capitalizeFirstLetter = (string: string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
 
   return (
     <ScrollView>
       <View>
-        <Text style={{textAlign: 'center'}}>Your Cart</Text>
+        <Text style={{ textAlign: "center" }}>Your Cart</Text>
         {cart.map((item, index) => (
-          <View key={index}>
-            <Text>{item.name}</Text>
+          <View style={styles.cartContainer} key={index}>
+            <Text>{capitalizeFirstLetter(item.name)}</Text>
+            <Text>${item.price}</Text>
             <Image style={styles.imageItem} source={{ uri: item.sprite }} />
             <Pressable onPress={() => deleteItem(index)}>
               <Ionicons
@@ -39,16 +44,30 @@ export const CartScreen = memo(() => {
             </Pressable>
           </View>
         ))}
-        {cart.length > 0 && <Pressable onPress={() => handleCartSubmit(cart)}><Text>Checkout</Text></Pressable>}
-        {cart.length === 0 && <Text style={{textAlign: 'center'}}>Your cart is empty!</Text>}
-        {cart.length > 0 && <Pressable onPress={deleteAll}><Text>Delete All</Text></Pressable>}
+
+        {cart.length === 0 && (
+          <Text style={{ textAlign: "center" }}>Your cart is empty!</Text>
+        )}
+
+        {cart.length > 0 && (
+          <View>
+            <Pressable onPress={deleteAll}>
+              <Text>Delete All</Text>
+            </Pressable>
+            <Pressable onPress={() => handleCartSubmit(cart)}>
+              <Text>Checkout</Text>
+            </Pressable>
+          </View>
+        )}
       </View>
     </ScrollView>
   );
 });
 
-
 const styles = StyleSheet.create({
+  cartContainer: {
+    flex: 1,
+  },
   imageItem: {
     width: 100,
     height: 100,

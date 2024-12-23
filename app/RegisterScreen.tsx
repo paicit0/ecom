@@ -1,3 +1,4 @@
+// @ts-ignore
 import React, { useState } from "react";
 import {
   View,
@@ -8,6 +9,9 @@ import {
 } from "react-native";
 import { RootStackParamList } from "./type/types";
 import { useRoute, RouteProp } from "@react-navigation/native";
+// @ts-ignore
+import { registerFirestore } from "../functions/registerFirestore";
+import { https } from 'firebase-functions';
 
 function RegisterScreen() {
   const route = useRoute<RouteProp<RootStackParamList, "RegisterScreen">>();
@@ -15,13 +19,37 @@ function RegisterScreen() {
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
+    console.log("Trying to Register: ", {
+      userName,
+      password // delete before using
+    });
+
     if (password !== confirmPassword) {
       console.log("Passwords do not match");
-      return; 
+      return;
+    } else if (password.length < 6) {
+      console.log("Password must be at least 6 characters");
+      return;
+    } else if (userName.length < 5) {
+      console.log("Username must be at least 5 characters");
+      return;
     }
 
-    console.log("Register", { userName, password, confirmPassword });
+    try {
+      const req = https.Request({
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: userName, password: password }),
+      });
+    
+      const register = await registerFirestore(req);
+      console.log("User registered with ID: ", register);
+    } catch (error) {
+      console.error("Error registering user: ", error);
+    }
   };
 
   return (

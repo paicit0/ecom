@@ -1,5 +1,8 @@
 import { View, Text } from "react-native";
 import { StyleSheet } from "react-native";
+// @ts-ignore
+import { loginFirestore } from "../functions/loginFirestore";
+
 
 export function ProfileScreen() {
     return (

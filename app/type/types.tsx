@@ -2,6 +2,7 @@ import { NativeStackNavigationProp } from "react-native-screens/lib/typescript/n
 
 
 export type Pokemon = {
+  price: number; // randomized. (didn't come from apis).
   id: number;
   name: string;
   sprites: {
@@ -27,6 +28,7 @@ export type Pokemon = {
 }
 
 export interface CartItem {
+  price: number;
   name: string;
   id: number;
   sprite: string;
