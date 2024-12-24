@@ -24,3 +24,7 @@ android
 
 #firebase
 firebaseConfig.js
+firecloud/firebaseConfig.ts
+firecloud/functions/src/index.ts
+
+
