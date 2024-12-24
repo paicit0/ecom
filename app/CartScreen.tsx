@@ -4,7 +4,6 @@ import { RootStackParamList } from "./type/types";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { Text, Image } from "react-native";
 import { useCart } from "./store";
-import { addData } from "../functions/cartFirestore";
 import { Ionicons } from "@expo/vector-icons";
 import { CartItem } from "./type/types";
 
@@ -15,10 +14,12 @@ export const CartScreen = memo(() => {
   const deleteAll = useCart((state) => state.deleteAll);
 
   const handleCartSubmit = (cart: CartItem[]) => {
-    cart.forEach((item) => {
-      addData(item);
-    });
-    deleteAll();
+    try {
+
+    } catch(error) {
+      console.error("Error submitting cart: ", error);
+    }
+
   };
 
   const capitalizeFirstLetter = (string: string) => {

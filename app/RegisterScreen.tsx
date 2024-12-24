@@ -10,8 +10,7 @@ import {
 import { RootStackParamList } from "./type/types";
 import { useRoute, RouteProp } from "@react-navigation/native";
 // @ts-ignore
-import { registerFirestore } from "../functions/registerFirestore";
-import { https } from 'firebase-functions';
+
 
 function RegisterScreen() {
   const route = useRoute<RouteProp<RootStackParamList, "RegisterScreen">>();
@@ -36,20 +35,6 @@ function RegisterScreen() {
       return;
     }
 
-    try {
-      const req = https.Request({
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username: userName, password: password }),
-      });
-    
-      const register = await registerFirestore(req);
-      console.log("User registered with ID: ", register);
-    } catch (error) {
-      console.error("Error registering user: ", error);
-    }
   };
 
   return (
