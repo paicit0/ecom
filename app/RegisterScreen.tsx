@@ -1,4 +1,3 @@
-// @ts-ignore
 import React, { useState } from "react";
 import {
   View,
@@ -9,37 +8,57 @@ import {
 } from "react-native";
 import { RootStackParamList } from "./type/types";
 import { useRoute, RouteProp } from "@react-navigation/native";
-// @ts-ignore
-
 
 function RegisterScreen() {
   const route = useRoute<RouteProp<RootStackParamList, "RegisterScreen">>();
   const [userName, setUserName] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [dataMessage, setDataMessage] = useState<string>("");
 
   const handleRegister = async () => {
-    console.log("Trying to Register: ", {
-      userName,
-      password // delete before using
-    });
+    try {
+      if (password !== confirmPassword) {
+        console.log("Passwords do not match");
+        return;
+      } else if (password.length < 6) {
+        console.log("Password must be at least 6 characters");
+        return;
+      } else if (userName.length < 5) {
+        console.log("Username must be at least 5 characters");
+        return;
+      } else {
+        console.log("Registering with payload: " + JSON.stringify({ userName, password }));
+        const response = await fetch(
+          "https://register-g42pohnrxa-uc.a.run.app",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userName,
+              password,
+            }),
+          }
+        );
+        console.log(await response.text());
+        const dataMessage = await response.json();
+        setDataMessage(dataMessage.message);
 
-    if (password !== confirmPassword) {
-      console.log("Passwords do not match");
-      return;
-    } else if (password.length < 6) {
-      console.log("Password must be at least 6 characters");
-      return;
-    } else if (userName.length < 5) {
-      console.log("Username must be at least 5 characters");
-      return;
+        if (dataMessage.userName) {
+          console.log("Username from backend" + dataMessage.username);
+        }
+      }
+    } catch (error) {
+      console.log(error);
     }
-
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Register</Text>
+      <Text>{dataMessage}</Text>
       <TextInput
         style={styles.input}
         placeholder="Name"
