@@ -17,6 +17,8 @@ function RegisterScreen() {
   const [dataMessage, setDataMessage] = useState<string>("");
 
   const handleRegister = async () => {
+    const registerUsersURL = "https://registerusers-g42pohnrxa-uc.a.run.app";
+
     try {
       if (password !== confirmPassword) {
         console.log("Passwords do not match");
@@ -28,20 +30,19 @@ function RegisterScreen() {
         console.log("Username must be at least 5 characters");
         return;
       } else {
-        console.log("Registering with payload: " + JSON.stringify({ userName, password }));
-        const response = await fetch(
-          "https://register-g42pohnrxa-uc.a.run.app",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              userName,
-              password,
-            }),
-          }
+        console.log(
+          "Registering with payload: " + JSON.stringify({ userName, password })
         );
+        const response = await fetch(registerUsersURL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userName,
+            password,
+          }),
+        });
         console.log(await response.text());
         const dataMessage = await response.json();
         setDataMessage(dataMessage.message);

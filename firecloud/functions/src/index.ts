@@ -19,10 +19,8 @@ import {getFirestore} from "firebase-admin/firestore";
 
 // functions
 
-import {firebaseConfig} from "../../firebaseConfig";
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+initializeApp();
+const db = getFirestore();
 
 export {db};
 
