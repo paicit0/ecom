@@ -1,42 +1,24 @@
 import { NativeStackNavigationProp } from "react-native-screens/lib/typescript/native-stack/types";
 
-
-export type Pokemon = {
-  price: number; // randomized. (didn't come from apis).
+export type Product = {
   id: number;
-  name: string;
-  sprites: {
-    front_default: string;
-  };
-  stats?: Array<{
-    base_stat: number;
-    stat: {
-      name: string;
-    };
-  }>;
-  types?: Array<{
-    type: {
-      name: string;
-    };
-  }>;
-  abilities?: Array<{
-    ability: {
-      name: string;
-    };
-    is_hidden: boolean;
-  }>;
-}
+  title: string;
+  description: string;
+  category: string;
+  price: number;
+  images: string[];
+};
 
 export interface CartItem {
   price: number;
-  name: string;
+  title: string;
   id: number;
-  sprite: string;
+  images: string[];
 }
 
 export type RootStackParamList = {
   HomeScreen: undefined;
-  ItemScreen: { item: Pokemon };
+  ItemScreen: { item: Product };
   CartScreen: undefined;
   LoginScreen: undefined;
   RegisterScreen: undefined;

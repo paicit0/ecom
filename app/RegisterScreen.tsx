@@ -8,17 +8,28 @@ import {
 } from "react-native";
 import { RootStackParamList } from "./type/types";
 import { useRoute, RouteProp } from "@react-navigation/native";
+import firebase from "firebase/compat/app";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import "firebase/compat/database";
+import { firebaseConfig } from "../firecloud/firebaseConfig";
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 
 function RegisterScreen() {
   const route = useRoute<RouteProp<RootStackParamList, "RegisterScreen">>();
-  const [userName, setUserName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [dataMessage, setDataMessage] = useState<string>("");
 
-  const handleRegister = async () => {
-    const registerUsersURL = "https://registerusers-g42pohnrxa-uc.a.run.app";
+  // const auth = initializeAuth(app, {
+  //   persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+  // });
 
+  const handleRegister = async () => {
+    // const registerUsersURL = "https://registerusers-g42pohnrxa-uc.a.run.app";
     try {
       if (password !== confirmPassword) {
         console.log("Passwords do not match");
@@ -26,30 +37,43 @@ function RegisterScreen() {
       } else if (password.length < 6) {
         console.log("Password must be at least 6 characters");
         return;
-      } else if (userName.length < 5) {
-        console.log("Username must be at least 5 characters");
+      } else if (email.length < 5) {
+        console.log("Email must be at least 5 characters");
         return;
       } else {
         console.log(
-          "Registering with payload: " + JSON.stringify({ userName, password })
+          "Registering with payload: " + JSON.stringify({ email, password })
         );
-        const response = await fetch(registerUsersURL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userName,
-            password,
-          }),
-        });
-        console.log(await response.text());
-        const dataMessage = await response.json();
-        setDataMessage(dataMessage.message);
+        const auth = getAuth();
+        createUserWithEmailAndPassword(auth, email, password)
+          .then((userCredential) => {
+            // Signed up
+            const user = userCredential.user;
+            // ...
+          })
+          .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            // ..
+          });
 
-        if (dataMessage.userName) {
-          console.log("Username from backend" + dataMessage.username);
-        }
+        // const response = await fetch(registerUsersURL, {
+        //   method: "POST",
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //   },
+        //   body: JSON.stringify({
+        //     email,
+        //     password,
+        //   }),
+        // });
+
+        // const dataMessage = await response.json();
+        // setDataMessage(dataMessage.message);
+
+        // if (dataMessage.email) {
+        //   console.log("Email from backend" + dataMessage.email);
+        // }
       }
     } catch (error) {
       console.log(error);
@@ -62,9 +86,9 @@ function RegisterScreen() {
       <Text>{dataMessage}</Text>
       <TextInput
         style={styles.input}
-        placeholder="Name"
-        value={userName}
-        onChangeText={(text) => setUserName(text)}
+        placeholder="Email"
+        value={email}
+        onChangeText={(text) => setEmail(text)}
       />
       <TextInput
         style={styles.input}

@@ -10,76 +10,66 @@ import {
 } from "react-native";
 import { Image } from "react-native";
 import SearchBar from "@/components/SearchBar";
-import { Pokemon } from "./type/types";
+import { Product } from "./type/types";
 import { HomeScreenNavigationProp } from "./type/types";
 import { useCart } from "./store";
+import FastImage from 'react-native-fast-image';
 
 export const HomeScreen = memo(function HomeScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
-  const [pokemons, setPokemons] = useState<Pokemon[]>([]);
-  const [filteredPokemons, setFilteredPokemons] = useState<Pokemon[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const fetchPokemonData = async (): Promise<Pokemon[]> => {
-    const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=100");
+  const fetchProductData = async (): Promise<Product[]> => {
+    const response = await fetch("https://dummyjson.com/products");
     const data = await response.json();
-
-    const detailedPokemons = await Promise.all(
-      data.results.map(async (pokemon: { url: string }) => {
-        const response2 = await fetch(pokemon.url);
-        const pokemonData = await response2.json();
-        return { ...pokemonData, price: Math.floor(Math.random() * 100) };
-      })
-    );
-
-    return detailedPokemons;
+    return data.products;
   };
 
   useEffect(() => {
-    const getPokemons = async () => {
+    const getProducts = async () => {
       try {
-        const data = await fetchPokemonData();
-        setPokemons(data);
-        setFilteredPokemons(data);
+        const data = await fetchProductData();
+        setProducts(data);
+        setFilteredProducts(data);
+        console.log("Filtered Products: " + JSON.stringify(filteredProducts));
       } catch (error) {
-        console.error("Error fetching Pokemon:", error);
+        console.error("Error fetching Products:", error);
       } finally {
         setIsLoading(false);
       }
     };
-    getPokemons();
+    console.log("Getting Products: " + getProducts);
+    getProducts();
   }, []);
 
   const handleSearch = (text: string) => {
     setSearchQuery(text);
-    const filtered = pokemons.filter((pokemon) =>
-      pokemon.name.toLowerCase().includes(text.toLowerCase())
+    const filtered = products.filter((product) =>
+      product.title.toLowerCase().includes(text.toLowerCase())
     );
-    setFilteredPokemons(filtered);
+    setFilteredProducts(filtered);
   };
 
-  const capitalizeFirstLetter = (string: string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  };
-
-  const renderItem = ({ item }: { item: Pokemon }) => {
-    const lowerName = item.name.toLowerCase();
+  const renderItem = ({ item }: { item: Product }) => {
+    const lowerName = item.title.toLowerCase();
     const lowerQuery = searchQuery.toLowerCase();
     const index = lowerName.indexOf(lowerQuery);
 
     let nameDisplay;
 
     if (index >= 0 && searchQuery) {
-      const before = item.name.slice(0, index);
-      const match = item.name.slice(index, index + searchQuery.length);
-      const after = item.name.slice(index + searchQuery.length);
+      const before = item.title.slice(0, index);
+      const match = item.title.slice(index, index + searchQuery.length);
+      const after = item.title.slice(index + searchQuery.length);
 
       nameDisplay = (
         <Text style={styles.textItemName}>
-          {capitalizeFirstLetter(before)}
+          {before}
           <Text style={[styles.textItemName, { fontWeight: "bold" }]}>
-            {index === 0 ? capitalizeFirstLetter(match) : match}
+            {match}
           </Text>
           {after}
         </Text>
@@ -87,7 +77,7 @@ export const HomeScreen = memo(function HomeScreen() {
     } else {
       nameDisplay = (
         <Text style={styles.textItemName}>
-          {capitalizeFirstLetter(item.name)}
+          {item.title}
         </Text>
       );
     }
@@ -98,10 +88,7 @@ export const HomeScreen = memo(function HomeScreen() {
         onPress={() => navigation.navigate("ItemScreen", { item })}
       >
         <View style={styles.cardContent}>
-          <Image
-            style={styles.imageItem}
-            source={{ uri: item.sprites.front_default }}
-          />
+          <Image style={styles.imageItem} source={{ uri: item.images[0] }} />
           {nameDisplay}
           <Text>${item.price}</Text>
         </View>
@@ -121,7 +108,7 @@ export const HomeScreen = memo(function HomeScreen() {
     <View style={styles.mainContainer}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.title}>Pokéshop</Text>
+          <Text style={styles.title}>Shop</Text>
           <Pressable onPress={() => navigation.navigate("LoginScreen")}>
             <Text>Login</Text>
           </Pressable>
@@ -132,11 +119,11 @@ export const HomeScreen = memo(function HomeScreen() {
         <SearchBar
           value={searchQuery}
           onChangeText={handleSearch}
-          placeholder="Search Pokémon..."
+          placeholder="Search Items..."
         />
       </View>
       <FlatList
-        data={filteredPokemons}
+        data={filteredProducts}
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.container}

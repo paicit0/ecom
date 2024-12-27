@@ -20,93 +20,34 @@ const ItemScreen = memo(function ItemScreen() {
   const deleteItem = useCart((state) => state.deleteItem);
   const cart = useCart((state) => state.cartItems);
 
-  console.log("ItemScreen: " + item.name);
-  console.log("Current Cart: " + cart);
-  console.log("Current Cart: " + cart.length);
+  console.log("ItemScreen: " + item.title);
+  console.log("Current Cart: " + JSON.stringify(cart.map(({ title }) => ({ title }))));
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={styles.header}>
-          <Image
-            style={styles.image}
-            source={{ uri: item.sprites.front_default }}
-          />
-          <Text style={styles.name}>{item.name.toUpperCase()}</Text>
+          <Image style={styles.image} source={{ uri: item.images[0] }} />
+          <Text style={styles.name}>{item.title.toUpperCase()}</Text>
           <View style={styles.idContainer}>
             <Text style={styles.idText}>
               #{item.id.toString().padStart(3, "0")}
             </Text>
           </View>
         </View>
-
-        <View style={styles.statsContainer}>
-          <Text style={styles.sectionTitle}>Base Stats</Text>
-          {item.stats?.map((stat, index) => (
-            <View key={index} style={styles.statRow}>
-              <Text style={styles.statLabel}>
-                {stat.stat.name.toUpperCase()}:
-              </Text>
-              <View style={styles.statBarContainer}>
-                <View
-                  style={[
-                    styles.statBar,
-                    { width: `${(stat.base_stat / 255) * 100}%` },
-                  ]}
-                />
-                <Text style={styles.statValue}>{stat.base_stat}</Text>
-              </View>
-            </View>
-          ))}
-        </View>
-
-        <View style={styles.typesContainer}>
-          <Text style={styles.sectionTitle}>Types</Text>
-          <View style={styles.typesList}>
-            {item.types?.map((type, index) => (
-              <View
-                key={index}
-                style={[
-                  styles.typeTag,
-                  { backgroundColor: getTypeColor(type.type.name) },
-                ]}
-              >
-                <Text style={styles.typeText}>{type.type.name}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
-
-        <View style={styles.abilitiesContainer}>
-          <Text style={styles.sectionTitle}>Abilities</Text>
-          {item.abilities?.map((ability, index) => (
-            <Text key={index} style={styles.abilityText}>
-              {ability.ability.name.replace("-", " ")}
-              {ability.is_hidden && " (Hidden)"}
-            </Text>
-          ))}
-        </View>
       </ScrollView>
 
-      <View
-        style={[
-          styles.ItemFooter,
-          {
-            backgroundColor: getTypeColor(
-              item.types?.[0].type.name || "normal"
-            ),
-          },
-        ]}
-      >
+      <View style={[styles.ItemFooter, {}]}>
         <Pressable
-          onPress={() =>
+          onPress={() => {
+            console.log("Adding to cart: " + item.title);
             addItem({
-              name: item.name,
+              title: item.title,
               id: item.id,
-              sprite: item.sprites.front_default,
+              images: item.images,
               price: item.price,
-            })
-          }
+            });
+          }}
           style={styles.FooterCart}
         >
           <Ionicons
@@ -124,30 +65,6 @@ const ItemScreen = memo(function ItemScreen() {
     </SafeAreaView>
   );
 });
-
-const getTypeColor = (type: string): string => {
-  const colors: { [key: string]: string } = {
-    normal: "#A8A878",
-    fire: "#F08030",
-    water: "#6890F0",
-    electric: "#F8D030",
-    grass: "#78C850",
-    ice: "#98D8D8",
-    fighting: "#C03028",
-    poison: "#A040A0",
-    ground: "#E0C068",
-    flying: "#A890F0",
-    psychic: "#F85888",
-    bug: "#A8B820",
-    rock: "#B8A038",
-    ghost: "#705898",
-    dragon: "#7038F8",
-    dark: "#705848",
-    steel: "#B8B8D0",
-    fairy: "#EE99AC",
-  };
-  return colors[type] || "#777777";
-};
 
 const styles = StyleSheet.create({
   container: {

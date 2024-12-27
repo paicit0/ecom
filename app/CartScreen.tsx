@@ -15,15 +15,9 @@ export const CartScreen = memo(() => {
 
   const handleCartSubmit = (cart: CartItem[]) => {
     try {
-
-    } catch(error) {
+    } catch (error) {
       console.error("Error submitting cart: ", error);
     }
-
-  };
-
-  const capitalizeFirstLetter = (string: string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1);
   };
 
   return (
@@ -32,9 +26,9 @@ export const CartScreen = memo(() => {
         <Text style={{ textAlign: "center" }}>Your Cart</Text>
         {cart.map((item, index) => (
           <View style={styles.cartContainer} key={index}>
-            <Text>{capitalizeFirstLetter(item.name)}</Text>
+            <Text>{item.title}</Text>
             <Text>${item.price}</Text>
-            <Image style={styles.imageItem} source={{ uri: item.sprite }} />
+            <Image style={styles.imageItem} source={{ uri: item.images[0] }} />
             <Pressable onPress={() => deleteItem(index)}>
               <Ionicons
                 name="close-sharp"
