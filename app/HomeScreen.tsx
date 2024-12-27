@@ -8,12 +8,12 @@ import {
   FlatList,
   ActivityIndicator,
 } from "react-native";
-import { Image } from "react-native";
+import { Image } from "expo-image";
+// import { Image } from "react-native";
 import SearchBar from "@/components/SearchBar";
 import { Product } from "./type/types";
 import { HomeScreenNavigationProp } from "./type/types";
 import { useCart } from "./store";
-import FastImage from 'react-native-fast-image';
 
 export const HomeScreen = memo(function HomeScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -32,8 +32,11 @@ export const HomeScreen = memo(function HomeScreen() {
     const getProducts = async () => {
       try {
         const data = await fetchProductData();
+        const imagesToPreload = data.map((product) => product.images[0]);
+        await Image.prefetch(imagesToPreload);
         setProducts(data);
         setFilteredProducts(data);
+
         console.log("Filtered Products: " + JSON.stringify(filteredProducts));
       } catch (error) {
         console.error("Error fetching Products:", error);
@@ -75,11 +78,7 @@ export const HomeScreen = memo(function HomeScreen() {
         </Text>
       );
     } else {
-      nameDisplay = (
-        <Text style={styles.textItemName}>
-          {item.title}
-        </Text>
-      );
+      nameDisplay = <Text style={styles.textItemName}>{item.title}</Text>;
     }
 
     return (
@@ -88,7 +87,7 @@ export const HomeScreen = memo(function HomeScreen() {
         onPress={() => navigation.navigate("ItemScreen", { item })}
       >
         <View style={styles.cardContent}>
-          <Image style={styles.imageItem} source={{ uri: item.images[0] }} />
+          <Image style={styles.imageItem} source={{ uri: item.images[0] }} transition={200} />
           {nameDisplay}
           <Text>${item.price}</Text>
         </View>
