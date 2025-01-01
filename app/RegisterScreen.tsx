@@ -13,10 +13,6 @@ import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import "firebase/compat/database";
 import { firebaseConfig } from "../firecloud/firebaseConfig";
 
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
-
 function RegisterScreen() {
   const route = useRoute<RouteProp<RootStackParamList, "RegisterScreen">>();
   const [email, setEmail] = useState<string>("");
@@ -24,12 +20,8 @@ function RegisterScreen() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [dataMessage, setDataMessage] = useState<string>("");
 
-  // const auth = initializeAuth(app, {
-  //   persistence: getReactNativePersistence(ReactNativeAsyncStorage)
-  // });
-
   const handleRegister = async () => {
-    // const registerUsersURL = "https://registerusers-g42pohnrxa-uc.a.run.app";
+    const registerUsersURL = "https://registerusers-700548026300.us-central1.run.app";
     try {
       if (password !== confirmPassword) {
         console.log("Passwords do not match");
@@ -44,36 +36,25 @@ function RegisterScreen() {
         console.log(
           "Registering with payload: " + JSON.stringify({ email, password })
         );
-        const auth = getAuth();
-        createUserWithEmailAndPassword(auth, email, password)
-          .then((userCredential) => {
-            // Signed up
-            const user = userCredential.user;
-            // ...
-          })
-          .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            // ..
-          });
 
-        // const response = await fetch(registerUsersURL, {
-        //   method: "POST",
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //   },
-        //   body: JSON.stringify({
-        //     email,
-        //     password,
-        //   }),
-        // });
+        const response = await fetch(registerUsersURL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            password,
+          }),
+        });
 
-        // const dataMessage = await response.json();
-        // setDataMessage(dataMessage.message);
+        const dataMessage = await response.json();
+        console.log(response);
+        setDataMessage(dataMessage.message);
 
-        // if (dataMessage.email) {
-        //   console.log("Email from backend" + dataMessage.email);
-        // }
+        if (dataMessage.email) {
+          console.log("Email from backend" + dataMessage.email);
+        }
       }
     } catch (error) {
       console.log(error);

@@ -19,8 +19,9 @@ export const HomeScreen = memo(function HomeScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [category, setCategory] = useState<string>("");
 
   const fetchProductData = async (): Promise<Product[]> => {
     const response = await fetch("https://dummyjson.com/products");
@@ -87,7 +88,11 @@ export const HomeScreen = memo(function HomeScreen() {
         onPress={() => navigation.navigate("ItemScreen", { item })}
       >
         <View style={styles.cardContent}>
-          <Image style={styles.imageItem} source={{ uri: item.images[0] }} transition={200} />
+          <Image
+            style={styles.imageItem}
+            source={{ uri: item.images[0] }}
+            transition={200}
+          />
           {nameDisplay}
           <Text>${item.price}</Text>
         </View>
@@ -121,6 +126,15 @@ export const HomeScreen = memo(function HomeScreen() {
           placeholder="Search Items..."
         />
       </View>
+      {/* <FlatList
+        data={filteredProducts}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={styles.container}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+      /> */}
+
       <FlatList
         data={filteredProducts}
         renderItem={renderItem}
