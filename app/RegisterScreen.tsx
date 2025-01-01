@@ -19,6 +19,7 @@ function RegisterScreen() {
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [dataMessage, setDataMessage] = useState<string>("");
+  const [error, setError] = useState("");
 
   const handleRegister = async () => {
     const registerUsersURL = "https://registerusers-700548026300.us-central1.run.app";
@@ -36,7 +37,7 @@ function RegisterScreen() {
         console.log(
           "Registering with payload: " + JSON.stringify({ email, password })
         );
-
+        
         const response = await fetch(registerUsersURL, {
           method: "POST",
           headers: {
@@ -56,7 +57,8 @@ function RegisterScreen() {
           console.log("Email from backend" + dataMessage.email);
         }
       }
-    } catch (error) {
+    } catch (error: any) {
+      setError(error);
       console.log(error);
     }
   };
