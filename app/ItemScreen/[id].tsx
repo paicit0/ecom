@@ -40,7 +40,8 @@ const ItemScreen = memo(function ItemScreen() {
       <ScrollView>
         <View style={styles.header}>
           <Image style={styles.image} source={{ uri: product.images[0] }} />
-          <Text style={styles.name}>{product.title.toUpperCase()}</Text>
+          <Text style={styles.name}>{product.title}</Text>
+          <Text style={styles.name}>{"$" + product.price}</Text>
           <View style={styles.idContainer}>
             <Text style={styles.idText}>
               #{product.id.toString().padStart(3, "0")}

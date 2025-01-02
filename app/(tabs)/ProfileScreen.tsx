@@ -22,10 +22,12 @@ const profileStyles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "red",
+    // backgroundColor: "red",
   },
   title: {
     justifyContent: "center",
+    padding: 16,
+    backgroundColor: "yellow",
   }
 });
 

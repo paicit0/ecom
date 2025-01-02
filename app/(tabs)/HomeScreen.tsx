@@ -38,7 +38,7 @@ export const HomeScreen = memo(function HomeScreen() {
         setProducts(data);
         setFilteredProducts(data);
 
-        console.log("Filtered Products: " + JSON.stringify(filteredProducts));
+        // console.log("Filtered Products: " + JSON.stringify(filteredProducts));
       } catch (error) {
         console.error("Error fetching Products:", error);
       } finally {
@@ -70,16 +70,16 @@ export const HomeScreen = memo(function HomeScreen() {
       const after = item.title.slice(index + searchQuery.length);
 
       nameDisplay = (
-        <Text style={styles.textItemName}>
+        <Text style={styles.textItemName} numberOfLines={1} ellipsizeMode="tail">
           {before}
-          <Text style={[styles.textItemName, { fontWeight: "bold" }]}>
+          <Text numberOfLines={1} ellipsizeMode="tail">
             {match}
           </Text>
           {after}
         </Text>
       );
     } else {
-      nameDisplay = <Text style={styles.textItemName}>{item.title}</Text>;
+      nameDisplay = <Text style={styles.textItemName} numberOfLines={2} ellipsizeMode="tail">{item.title}</Text>;
     }
 
     return (
@@ -97,6 +97,7 @@ export const HomeScreen = memo(function HomeScreen() {
               transition={200}
             />
             {nameDisplay}
+            <Text></Text>
             <Text>${item.price}</Text>
           </View>
         </Link>
@@ -115,14 +116,8 @@ export const HomeScreen = memo(function HomeScreen() {
   return (
     <View style={styles.mainContainer}>
       <View style={styles.header}>
-        <View style={styles.title}>
+        <View>
           <Text></Text>
-          <Link href="/LoginScreen" style={styles.title}>
-            <Text >Login</Text>
-          </Link>
-          <Link href="/RegisterScreen" style={styles.title}>
-            <Text>Register</Text>
-          </Link>
         </View>
         <SearchBar
           value={searchQuery}
@@ -162,17 +157,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   header: {
-    // flex: 1,
     padding: 16,
     backgroundColor: "#fff",
     borderBottomWidth: 1,
     borderBottomColor: "#e0e0e0",
   },
   title: {
-    // flex: 1,
     fontSize: 18,
-    // fontWeight: "bold",
-    // marginBottom: 12,
     color: "#333",
     alignItems: "flex-end",
   },
@@ -192,14 +183,18 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
+    alignItems: "center",
+    maxWidth: "48%",
   },
   cardContent: {
     padding: 8,
-    alignItems: "center",
+    alignItems: "flex-start",
+    width: 150,
   },
   imageItem: {
     width: 120,
     height: 120,
+    alignItems: "center",
     resizeMode: "contain",
   },
   textItemName: {
@@ -207,6 +202,8 @@ const styles = StyleSheet.create({
     fontWeight: "normal",
     color: "#333",
     marginTop: 8,
+    textAlign: "left",
+    width: "100%",
   },
 });
 
