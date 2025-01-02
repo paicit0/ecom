@@ -9,14 +9,12 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Image } from "expo-image";
-// import { Image } from "react-native";
 import SearchBar from "@/components/SearchBar";
 import { Product } from "./type/types";
-import { HomeScreenNavigationProp } from "./type/types";
-import { useCart } from "./store";
+import { Link } from "expo-router";
+import { useProductStore } from "./store";
 
 export const HomeScreen = memo(function HomeScreen() {
-  const navigation = useNavigation<HomeScreenNavigationProp>();
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -26,6 +24,7 @@ export const HomeScreen = memo(function HomeScreen() {
   const fetchProductData = async (): Promise<Product[]> => {
     const response = await fetch("https://dummyjson.com/products");
     const data = await response.json();
+    useProductStore.getState().setProducts(data.products);
     return data.products;
   };
 
@@ -83,20 +82,24 @@ export const HomeScreen = memo(function HomeScreen() {
     }
 
     return (
-      <Pressable
-        style={styles.itemContainer}
-        onPress={() => navigation.navigate("ItemScreen", { item })}
-      >
-        <View style={styles.cardContent}>
-          <Image
-            style={styles.imageItem}
-            source={{ uri: item.images[0] }}
-            transition={200}
-          />
-          {nameDisplay}
-          <Text>${item.price}</Text>
-        </View>
-      </Pressable>
+      <View style={styles.itemContainer}>
+        <Link
+          href={{
+            pathname: "/ItemScreen/[id]" as "/ItemScreen[id]",
+            params: { id: item.id },
+          }}
+        >
+          <View style={styles.cardContent}>
+            <Image
+              style={styles.imageItem}
+              source={{ uri: item.images[0] }}
+              transition={200}
+            />
+            {nameDisplay}
+            <Text>${item.price}</Text>
+          </View>
+        </Link>
+      </View>
     );
   };
 
@@ -113,12 +116,12 @@ export const HomeScreen = memo(function HomeScreen() {
       <View style={styles.header}>
         <View>
           <Text style={styles.title}>Shop</Text>
-          <Pressable onPress={() => navigation.navigate("LoginScreen")}>
+          <Link href="/LoginScreen">
             <Text>Login</Text>
-          </Pressable>
-          <Pressable onPress={() => navigation.navigate("RegisterScreen")}>
+          </Link>
+          <Link href="/RegisterScreen">
             <Text>Register</Text>
-          </Pressable>
+          </Link>
         </View>
         <SearchBar
           value={searchQuery}

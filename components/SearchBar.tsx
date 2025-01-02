@@ -2,8 +2,7 @@ import React from "react";
 import { Pressable, StyleSheet, TextInput, View, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { memo } from "react";
-import { useNavigation } from "expo-router";
-import { CartScreenNavigationProp } from "@/app/type/types";
+import { Link, useNavigation } from "expo-router";
 import { useCart } from "@/app/store";
 
 interface SearchBarProps {
@@ -17,7 +16,6 @@ const SearchBar = memo(function SearchBar({
   onChangeText,
   placeholder = "Search...",
 }: SearchBarProps) {
-  const navigation = useNavigation<CartScreenNavigationProp>();
   const cart = useCart((state) => state.cartItems);
   return (
     <View style={styles.container}>
@@ -42,7 +40,7 @@ const SearchBar = memo(function SearchBar({
           />
         </Pressable>
       )}
-      <Pressable onPress={() => navigation.navigate("CartScreen")}>
+      <Link href="/CartScreen">
         {cart.length > 0 && (
           <Text style={styles.badge}>
             {cart.length > 99 ? '99+' : cart.length}
@@ -54,7 +52,7 @@ const SearchBar = memo(function SearchBar({
           color="#666"
           style={styles.icon}
         />
-      </Pressable>
+      </Link>
     </View>
   );
 });

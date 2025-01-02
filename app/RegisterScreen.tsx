@@ -6,15 +6,9 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
-import { RootStackParamList } from "./type/types";
-import { useRoute, RouteProp } from "@react-navigation/native";
-import firebase from "firebase/compat/app";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import "firebase/compat/database";
-import { firebaseConfig } from "../firecloud/firebaseConfig";
 
 function RegisterScreen() {
-  const route = useRoute<RouteProp<RootStackParamList, "RegisterScreen">>();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -22,7 +16,8 @@ function RegisterScreen() {
   const [error, setError] = useState("");
 
   const handleRegister = async () => {
-    const registerUsersURL = "https://registerusers-700548026300.us-central1.run.app";
+    const registerUsersURL =
+      "https://registerusers-700548026300.us-central1.run.app";
     try {
       if (password !== confirmPassword) {
         console.log("Passwords do not match");
@@ -37,7 +32,7 @@ function RegisterScreen() {
         console.log(
           "Registering with payload: " + JSON.stringify({ email, password })
         );
-        
+
         const response = await fetch(registerUsersURL, {
           method: "POST",
           headers: {
@@ -51,7 +46,7 @@ function RegisterScreen() {
 
         const dataMessage = await response.json();
         console.log(response);
-        setDataMessage(dataMessage.message);
+        setDataMessage(dataMessage.message + dataMessage.id);
 
         if (dataMessage.email) {
           console.log("Email from backend" + dataMessage.email);

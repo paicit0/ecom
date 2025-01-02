@@ -6,20 +6,20 @@ import { Timestamp } from "firebase-admin/firestore";
 const registerUsers = functions.https.onRequest(async (req, res) => {
   try {
     console.log("Connected! Proceeding...");
-
-    const docRef = db.collection("users").doc(req.body.email);
+    const { email, password } = req.body;
+    const docRef = db.collection("users").doc(email);
     const docGet = await docRef.get();
 
     const salt = bcryptjs.genSaltSync(10);
-    const hashedPassword = await bcryptjs.hash(req.body.password, salt);
+    const hashedPassword = await bcryptjs.hash(password, salt);
 
     const user = {
-      email: req.body.email,
+      email: email,
       password: hashedPassword,
       timestamp: Timestamp.now(),
     };
 
-    if (!req.body.email || !req.body.password) {
+    if (!email || !password) {
       res.status(400).json({ message: "No email or password provided" });
     }
 

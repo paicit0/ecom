@@ -1,14 +1,11 @@
-import React from "react";
 import { Stack } from "expo-router";
-import { View, Text, StyleSheet } from "react-native";
-
+import { View, StyleSheet } from "react-native";
 
 function RootLayout() {
   return (
     <>
-      <View style={layoutStyles.topNavBar}>
-      </View>
-      <Stack screenOptions={{ headerShown : false }}>
+      <View style={layoutStyles.topNavBar}></View>
+      <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
       </Stack>
     </>
@@ -27,9 +24,8 @@ const layoutStyles = StyleSheet.create({
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
-    paddingBottom: 10
+    paddingBottom: 10,
   },
 });
 
-
-export default RootLayout
+export default RootLayout;

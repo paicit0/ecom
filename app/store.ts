@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { CartItem } from './type/types';
+import { CartItem, Product } from './type/types';
 
 interface useCartArray {
     cartItems: CartItem[];
@@ -8,6 +8,11 @@ interface useCartArray {
     deleteAll: () => void;
 }
 
+interface ProductStore {
+    products: Product[];
+    setProducts: (newProducts: CartItem[]) => void;
+  }
+
 export const useCart = create<useCartArray>((set) => ({
     cartItems: [],
     addItem: (item) => set((state) => ({ cartItems: [...state.cartItems, item] })),
@@ -15,3 +20,8 @@ export const useCart = create<useCartArray>((set) => ({
     deleteAll: () => set({ cartItems: [] })
     
 }))
+
+export const useProductStore = create<ProductStore>((set) => ({
+    products: [],
+    setProducts: (newProducts: any) => set({ products: newProducts }),
+  })); 

@@ -33,3 +33,6 @@ export { registerUsers };
 
 import { securedToken } from "./securedToken";
 export { securedToken };
+
+import { loginUsers } from "./loginUsers";
+export { loginUsers };

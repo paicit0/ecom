@@ -1,14 +1,11 @@
 import React, { useState, memo } from "react";
 import { View, StyleSheet, Pressable, ScrollView } from "react-native";
-import { RootStackParamList } from "./type/types";
-import { useRoute, RouteProp } from "@react-navigation/native";
 import { Text, Image } from "react-native";
 import { useCart } from "./store";
 import { Ionicons } from "@expo/vector-icons";
 import { CartItem } from "./type/types";
 
 export const CartScreen = memo(() => {
-  const route = useRoute<RouteProp<RootStackParamList, "CartScreen">>();
   const cart = useCart((state) => state.cartItems);
   const deleteItem = useCart((state) => state.deleteItem);
   const deleteAll = useCart((state) => state.deleteAll);

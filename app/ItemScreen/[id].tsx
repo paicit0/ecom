@@ -7,31 +7,43 @@ import {
   ScrollView,
   Pressable,
 } from "react-native";
-import { useRoute, RouteProp } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { RootStackParamList } from "./type/types";
-import { useCart } from "./store";
+import { useCart, useProductStore } from "../store";
+import { useLocalSearchParams } from "expo-router";
 
 const ItemScreen = memo(function ItemScreen() {
-  const route = useRoute<RouteProp<RootStackParamList, "ItemScreen">>();
-  const { item } = route.params;
+  const { id } = useLocalSearchParams();
   const addItem = useCart((state) => state.addItem);
-  const deleteItem = useCart((state) => state.deleteItem);
   const cart = useCart((state) => state.cartItems);
 
-  console.log("ItemScreen: " + item.title);
-  console.log("Current Cart: " + JSON.stringify(cart.map(({ title }) => ({ title }))));
+  const products = useProductStore((state) => state.products);
+  const product = products.find((item) => item.id.toString() === id);
+
+  if (!product) {
+    return (
+      <SafeAreaView
+        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+      >
+        <Text>Product not found!</Text>
+      </SafeAreaView>
+    );
+  }
+
+  console.log("ItemScreen: " + product.title);
+  console.log(
+    "Current Cart: " + JSON.stringify(cart.map(({ title }) => ({ title })))
+  );
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={styles.header}>
-          <Image style={styles.image} source={{ uri: item.images[0] }} />
-          <Text style={styles.name}>{item.title.toUpperCase()}</Text>
+          <Image style={styles.image} source={{ uri: product.images[0] }} />
+          <Text style={styles.name}>{product.title.toUpperCase()}</Text>
           <View style={styles.idContainer}>
             <Text style={styles.idText}>
-              #{item.id.toString().padStart(3, "0")}
+              #{product.id.toString().padStart(3, "0")}
             </Text>
           </View>
         </View>
@@ -40,12 +52,12 @@ const ItemScreen = memo(function ItemScreen() {
       <View style={[styles.ItemFooter, {}]}>
         <Pressable
           onPress={() => {
-            console.log("Adding to cart: " + item.title);
+            console.log("Adding to cart: " + product.title);
             addItem({
-              title: item.title,
-              id: item.id,
-              images: item.images,
-              price: item.price,
+              title: product.title,
+              id: product.id,
+              images: product.images,
+              price: product.price,
             });
           }}
           style={styles.FooterCart}

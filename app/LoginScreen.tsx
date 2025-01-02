@@ -9,30 +9,24 @@ import {
 } from "react-native";
 
 function LoginScreen() {
-  const [hello, setHello] = useState<string>("");
-  const handleLogin = () => {
-    console.log("Login");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+
+  const handleLogin = async () => {
+    try {
+      const loginUsersURL = "https://loginusers-g42pohnrxa-uc.a.run.app";
+      const loginUser = await fetch(loginUsersURL);
+      const response = await loginUser.json();
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
   };
-
-  // const handleTest = async () => {
-  //   try {
-  //     const helloResponse = await fetch("https://helloworld-g42pohnrxa-uc.a.run.app");
-  //     const helloResponseData = await helloResponse.text();
-  //     setHello(helloResponseData);
-  //     console.log(helloResponse);
-  //     console.log(helloResponseData);
-
-  //   } catch(error) {
-  //     console.log(error);
-  //   }
-  // }
 
   return (
     <View>
       <Text>LoginScreen</Text>
-      {/* <Text>{hello}</Text>
-      <Pressable onPress={handleTest}><Text>TEST API HERE</Text></Pressable> */}
-      <TextInput style={styles.input} placeholder="Username"></TextInput>
+      <TextInput style={styles.input} placeholder="Email"></TextInput>
       <TextInput style={styles.input} placeholder="Password"></TextInput>
       <Pressable onPress={() => handleLogin()}>
         <Text>Login!</Text>
