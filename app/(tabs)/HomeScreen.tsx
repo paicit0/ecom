@@ -70,16 +70,26 @@ export const HomeScreen = memo(function HomeScreen() {
       const after = item.title.slice(index + searchQuery.length);
 
       nameDisplay = (
-        <Text style={styles.textItemName} numberOfLines={1} ellipsizeMode="tail">
+        <Text
+          style={styles.textItemName}
+          numberOfLines={2}
+          ellipsizeMode="tail"
+        >
           {before}
-          <Text numberOfLines={1} ellipsizeMode="tail">
-            {match}
-          </Text>
+          <Text>{match}</Text>
           {after}
         </Text>
       );
     } else {
-      nameDisplay = <Text style={styles.textItemName} numberOfLines={2} ellipsizeMode="tail">{item.title}</Text>;
+      nameDisplay = (
+        <Text
+          style={styles.textItemName}
+          numberOfLines={2}
+          ellipsizeMode="tail"
+        >
+          {item.title}
+        </Text>
+      );
     }
 
     return (
@@ -98,7 +108,10 @@ export const HomeScreen = memo(function HomeScreen() {
             />
             {nameDisplay}
             <Text></Text>
-            <Text>${item.price}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Text style={styles.itemPrice}>${item.price}</Text>
+              <Text style={styles.itemStock}>Stock: {item.stock}</Text>
+            </View>
           </View>
         </Link>
       </View>
@@ -146,6 +159,8 @@ export const HomeScreen = memo(function HomeScreen() {
   );
 });
 
+const testColor = "green";
+
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
@@ -174,21 +189,11 @@ const styles = StyleSheet.create({
     flex: 1,
     margin: 4,
     backgroundColor: "#fff",
-    borderRadius: 12,
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
     alignItems: "center",
     maxWidth: "48%",
   },
   cardContent: {
     padding: 8,
-    alignItems: "flex-start",
     width: 150,
   },
   imageItem: {
@@ -204,6 +209,14 @@ const styles = StyleSheet.create({
     marginTop: 8,
     textAlign: "left",
     width: "100%",
+  },
+  itemPrice: {
+    textAlign: "left",
+    // backgroundColor: testColor,
+  },
+  itemStock: {
+    textAlign: "right",
+    // backgroundColor: testColor,
   },
 });
 
