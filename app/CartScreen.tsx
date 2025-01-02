@@ -1,3 +1,4 @@
+// CartScreen.tsx
 import React, { useState, memo } from "react";
 import { View, StyleSheet, Pressable, ScrollView } from "react-native";
 import { Text, Image } from "react-native";

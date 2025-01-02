@@ -1,3 +1,4 @@
+//HomeScreen.tsx
 import React, { memo, useEffect, useState } from "react";
 import { useNavigation } from "expo-router";
 import {
@@ -10,9 +11,9 @@ import {
 } from "react-native";
 import { Image } from "expo-image";
 import SearchBar from "@/components/SearchBar";
-import { Product } from "./type/types";
+import { Product } from "../type/types";
 import { Link } from "expo-router";
-import { useProductStore } from "./store";
+import { useProductStore } from "../store";
 
 export const HomeScreen = memo(function HomeScreen() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -114,12 +115,12 @@ export const HomeScreen = memo(function HomeScreen() {
   return (
     <View style={styles.mainContainer}>
       <View style={styles.header}>
-        <View>
-          <Text style={styles.title}>Shop</Text>
-          <Link href="/LoginScreen">
-            <Text>Login</Text>
+        <View style={styles.title}>
+          <Text></Text>
+          <Link href="/LoginScreen" style={styles.title}>
+            <Text >Login</Text>
           </Link>
-          <Link href="/RegisterScreen">
+          <Link href="/RegisterScreen" style={styles.title}>
             <Text>Register</Text>
           </Link>
         </View>
@@ -169,10 +170,11 @@ const styles = StyleSheet.create({
   },
   title: {
     // flex: 1,
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 12,
+    fontSize: 18,
+    // fontWeight: "bold",
+    // marginBottom: 12,
     color: "#333",
+    alignItems: "flex-end",
   },
   container: {
     padding: 8,

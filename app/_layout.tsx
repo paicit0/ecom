@@ -1,24 +1,21 @@
+// app/_layout.tsx
 import { Stack } from "expo-router";
 import { View, StyleSheet } from "react-native";
+import { Text } from "react-native";
 
-function RootLayout() {
+export default function RootLayout() {
   return (
-    <>
-      <View style={layoutStyles.topNavBar}></View>
+    <View style={styles.container}>
       <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="index" />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack>
-    </>
+    </View>
   );
 }
 
-const layoutStyles = StyleSheet.create({
-  topNavBar: {
-    height: 50,
-    backgroundColor: "green",
-    justifyContent: "flex-end",
-    alignItems: "center",
-    width: "100%",
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
   },
   title: {
     color: "#fff",
@@ -27,5 +24,3 @@ const layoutStyles = StyleSheet.create({
     paddingBottom: 10,
   },
 });
-
-export default RootLayout;
