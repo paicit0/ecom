@@ -96,7 +96,7 @@ export const HomeScreen = memo(function HomeScreen() {
       <View style={styles.itemContainer}>
         <Link
           href={{
-            pathname: "/ItemScreen/[id]" as "/ItemScreen[id]",
+            pathname: "/ItemScreen/[id]",
             params: { id: item.id },
           }}
         >

@@ -15,7 +15,16 @@ function LoginScreen() {
   const handleLogin = async () => {
     try {
       const loginUsersURL = "https://loginusers-g42pohnrxa-uc.a.run.app";
-      const loginUser = await fetch(loginUsersURL);
+      const loginUser = await fetch(loginUsersURL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
       const response = await loginUser.json();
       console.log(response);
     } catch (error) {
@@ -26,8 +35,18 @@ function LoginScreen() {
   return (
     <View>
       <Text>LoginScreen</Text>
-      <TextInput style={styles.input} placeholder="Email"></TextInput>
-      <TextInput style={styles.input} placeholder="Password"></TextInput>
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email}
+        onChangeText={(text) => setEmail(text)}
+      ></TextInput>
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        value={password}
+        onChangeText={(text) => setPassword(text)}
+      ></TextInput>
       <Pressable onPress={() => handleLogin()}>
         <Text>Login!</Text>
       </Pressable>
