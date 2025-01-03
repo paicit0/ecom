@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Pressable,
 } from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function LoginScreen() {
   const [email, setEmail] = useState<string>("");
@@ -25,8 +26,10 @@ function LoginScreen() {
           password,
         }),
       });
+      console.log("Logging in with payload: " + JSON.stringify({ email, password }))
       const response = await loginUser.json();
       console.log(response);
+      console.log(loginUser.status);
     } catch (error) {
       console.log(error);
     }

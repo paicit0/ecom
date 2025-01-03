@@ -104,11 +104,18 @@ export const HomeScreen = memo(function HomeScreen() {
             <Image
               style={styles.imageItem}
               source={{ uri: item.images[0] }}
+              contentFit="cover"
               transition={200}
             />
             {nameDisplay}
             <Text></Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
               <Text style={styles.itemPrice}>${item.price}</Text>
               <Text style={styles.itemStock}>Stock: {item.stock}</Text>
             </View>

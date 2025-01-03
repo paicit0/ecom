@@ -1,16 +1,10 @@
 import React, { memo, useState } from "react";
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-} from "react-native";
+import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useCart, useProductStore } from "../store";
 import { useLocalSearchParams } from "expo-router";
+import { Image } from "expo-image";
 
 const ItemScreen = memo(function ItemScreen() {
   const { id } = useLocalSearchParams();
@@ -39,7 +33,12 @@ const ItemScreen = memo(function ItemScreen() {
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={styles.header}>
-          <Image style={styles.image} source={{ uri: product.images[0] }} />
+          <Image
+            style={styles.image}
+            source={{ uri: product.images[0] }}
+            contentFit="cover"
+            transition={200}
+          />
           <Text style={styles.name}>{product.title}</Text>
           <Text style={styles.name}>{"$" + product.price}</Text>
           <View style={styles.idContainer}>

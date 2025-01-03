@@ -28,7 +28,7 @@ const profileStyles = StyleSheet.create({
     justifyContent: "center",
     padding: 16,
     backgroundColor: "yellow",
-  }
+  },
 });
 
 export default ProfileScreen;
