@@ -15,14 +15,13 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "@babel/preset-env": "^7.1.6",
+    "@babel/runtime": "^7.26.0",
     "@expo/vector-icons": "^14.0.2",
     "@react-native-firebase/app": "^21.6.1",
     "@react-native-firebase/auth": "^21.6.1",
-    "@react-navigation/bottom-tabs": "^6.6.1",
-    "@react-navigation/native": "^6.0.2",
-    "@react-navigation/stack": "^7.0.5",
     "@reduxjs/toolkit": "^2.3.0",
-    "@shopify/flash-list": "^1.7.2",
+    "@shopify/flash-list": "1.6.4",
     "@types/bcryptjs": "^2.4.6",
     "bcryptjs": "^2.4.3",
     "detox": "^20.27.6",
@@ -45,7 +44,6 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.74.5",
-    "react-native-fast-image": "^8.6.3",
     "react-native-gesture-handler": "~2.16.1",
     "react-native-reanimated": "~3.10.1",
     "react-native-safe-area-context": "4.10.5",
@@ -53,6 +51,8 @@
     "react-native-screens": "3.31.1",
     "react-native-web": "~0.19.10",
     "react-redux": "^9.1.2",
+    "recyclerlistview": "^4.2.1",
+    "tslib": "^2.8.1",
     "zustand": "^5.0.1"
   },
   "devDependencies": {

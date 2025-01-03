@@ -14,7 +14,7 @@ import SearchBar from "@/components/SearchBar";
 import { Product } from "../type/types";
 import { Link } from "expo-router";
 import { useProductStore } from "../store";
-import { FlashList } from "@shopify/flash-list";
+// import { FlashList } from "@shopify/flash-list";
 
 export const HomeScreen = memo(function HomeScreen() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -137,26 +137,31 @@ export const HomeScreen = memo(function HomeScreen() {
   return (
     <View style={styles.mainContainer}>
       <View style={styles.header}>
-        <View>
-          <Text></Text>
-          <Text></Text>
-        </View>
+        <View style={{ height: 10 }}></View>
         <SearchBar
           value={searchQuery}
           onChangeText={handleSearch}
           placeholder="Search Items..."
         />
       </View>
-      {/* <FlatList
+      <FlatList
         data={filteredProducts}
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.container}
+        contentContainerStyle={styles.horizontalItemContainer}
         horizontal
         showsHorizontalScrollIndicator={false}
-      /> */}
+      />
 
-      <FlashList
+      <FlatList
+        data={filteredProducts}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={styles.verticalItemConTainer}
+        numColumns={2}
+        showsVerticalScrollIndicator={false}
+      />
+      {/* <FlatList
         data={filteredProducts}
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
@@ -164,7 +169,7 @@ export const HomeScreen = memo(function HomeScreen() {
         numColumns={2}
         showsVerticalScrollIndicator={false}
         estimatedItemSize={200}
-      />
+      /> */}
     </View>
   );
 });
@@ -192,7 +197,10 @@ const styles = StyleSheet.create({
     color: "#333",
     alignItems: "flex-end",
   },
-  container: {
+  verticalItemConTainer: {
+    padding: 8,
+  },
+  horizontalItemContainer: {
     padding: 8,
   },
   itemContainer: {
