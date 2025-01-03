@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   Pressable,
 } from "react-native";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function LoginScreen() {
   const [email, setEmail] = useState<string>("");
