@@ -32,20 +32,21 @@ const ItemScreen = memo(function ItemScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        <View style={styles.header}>
+        <View style={styles.headerImage}>
           <Image
             style={styles.image}
             source={{ uri: product.images[0] }}
             contentFit="cover"
             transition={200}
           />
-          <Text style={styles.name}>{product.title}</Text>
-          <Text style={styles.name}>{"$" + product.price}</Text>
-          <View style={styles.idContainer}>
-            <Text style={styles.idText}>
-              #{product.id.toString().padStart(3, "0")}
-            </Text>
+        </View>
+        <View style={styles.mainDescription}>
+          <View style={{ flex: 1, flexDirection: "row", justifyContent: "space-between" }}>
+            <Text style={styles.name}>{"$" + product.price}</Text>
+            <Text>Stock: {product.stock}</Text>
           </View>
+          <Text style={styles.name}>{product.title}</Text>
+          <Text>{product.description}</Text>
         </View>
       </ScrollView>
 
@@ -83,20 +84,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f5f5f5",
   },
-  header: {
+  headerImage: {
     alignItems: "center",
     padding: 20,
     backgroundColor: "#fff",
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+  },
+  mainDescription: {
+    padding: 20,
   },
   image: {
     width: 200,

@@ -14,7 +14,7 @@ import SearchBar from "@/components/SearchBar";
 import { Product } from "../type/types";
 import { Link } from "expo-router";
 import { useProductStore } from "../store";
-// import { FlashList } from "@shopify/flash-list";
+import { FlashList } from "@shopify/flash-list";
 
 export const HomeScreen = memo(function HomeScreen() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -161,15 +161,15 @@ export const HomeScreen = memo(function HomeScreen() {
         numColumns={2}
         showsVerticalScrollIndicator={false}
       />
-      {/* <FlatList
+      <FlashList
         data={filteredProducts}
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.container}
+        contentContainerStyle={styles.verticalItemConTainer}
         numColumns={2}
         showsVerticalScrollIndicator={false}
         estimatedItemSize={200}
-      /> */}
+      />
     </View>
   );
 });

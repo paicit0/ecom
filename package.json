@@ -21,7 +21,7 @@
     "@react-native-firebase/app": "^21.6.1",
     "@react-native-firebase/auth": "^21.6.1",
     "@reduxjs/toolkit": "^2.3.0",
-    "@shopify/flash-list": "1.6.4",
+    "@shopify/flash-list": "^1.7.2",
     "@types/bcryptjs": "^2.4.6",
     "bcryptjs": "^2.4.3",
     "detox": "^20.27.6",
