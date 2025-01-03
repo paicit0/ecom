@@ -28,7 +28,7 @@ const loginUsers = functions.https.onRequest(async (req, res) => {
 
     if (validPassword) {
       console.log("Password Matched!");
-      res.status(200).json({ message: "Authentication successful!" });
+      res.status(200).json({ message: "Authentication successful!", jwt: "jwt Token here" });
     } else {
       console.log("Password Doesn't Match!");
       res.status(401).json({ message: "Invalid password." });

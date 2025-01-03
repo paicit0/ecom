@@ -25,10 +25,17 @@ function LoginScreen() {
           password,
         }),
       });
-      console.log("Logging in with payload: " + JSON.stringify({ email, password }))
+      console.log(
+        "Logging in with payload: " + JSON.stringify({ email, password })
+      );
       const response = await loginUser.json();
       console.log(response);
       console.log(loginUser.status);
+      if(loginUser.status === 200){
+        console.log("Login successful!");
+      } else {
+        console.log("Login failed!");
+      }
     } catch (error) {
       console.log(error);
     }
