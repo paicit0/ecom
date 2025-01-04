@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useCart, useProductStore } from "../store";
-import { useLocalSearchParams } from "expo-router";
+import { Link, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
 
 const ItemScreen = memo(function ItemScreen() {
@@ -24,7 +24,7 @@ const ItemScreen = memo(function ItemScreen() {
     );
   }
 
-  console.log("ItemScreen: " + product.title);
+  console.log("ItemScreen: " + product.title + ", ID: " + product.id);
   console.log(
     "Current Cart: " + JSON.stringify(cart.map(({ title }) => ({ title })))
   );
@@ -32,6 +32,9 @@ const ItemScreen = memo(function ItemScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
+        <Link href="../(tabs)/HomeScreen">
+          <Ionicons name="arrow-back-outline"></Ionicons>
+        </Link>
         <View style={styles.headerImage}>
           <Image
             style={styles.image}
@@ -41,7 +44,13 @@ const ItemScreen = memo(function ItemScreen() {
           />
         </View>
         <View style={styles.mainDescription}>
-          <View style={{ flex: 1, flexDirection: "row", justifyContent: "space-between" }}>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
+          >
             <Text style={styles.name}>{"$" + product.price}</Text>
             <Text>Stock: {product.stock}</Text>
           </View>

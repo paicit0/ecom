@@ -5,6 +5,7 @@ import { Text, Image } from "react-native";
 import { useCart } from "./store";
 import { Ionicons } from "@expo/vector-icons";
 import { CartItem } from "./type/types";
+import { Link } from "expo-router";
 
 export const CartScreen = memo(() => {
   const cart = useCart((state) => state.cartItems);
@@ -21,7 +22,14 @@ export const CartScreen = memo(() => {
   return (
     <ScrollView>
       <View>
-        <Text style={{ textAlign: "center" }}>Your Cart</Text>
+        <View style={{ height: 60 }}></View>
+        <View>
+          <Link href="../(tabs)/HomeScreen">
+            <Ionicons name="arrow-back-outline"></Ionicons>
+          </Link>
+          <Text style={{ textAlign: "center" }}>Your Cart</Text>
+        </View>
+
         {cart.map((item, index) => (
           <View style={styles.cartContainer} key={index}>
             <Text>{item.title}</Text>

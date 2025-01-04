@@ -1,3 +1,5 @@
+import { Ionicons } from "@expo/vector-icons";
+import { Link } from "expo-router";
 import React, { useState } from "react";
 import {
   View,
@@ -30,8 +32,8 @@ function LoginScreen() {
       );
       const response = await loginUser.json();
       console.log(response);
-      console.log(loginUser.status);
-      if(loginUser.status === 200){
+      console.log("loginUsers Status: " + loginUser.status);
+      if (loginUser.status === 200) {
         console.log("Login successful!");
       } else {
         console.log("Login failed!");
@@ -42,7 +44,10 @@ function LoginScreen() {
   };
 
   return (
-    <View>
+    <View style={styles.container}>
+      <Link href="../(tabs)/HomeScreen">
+        <Ionicons name="arrow-back-outline"></Ionicons>
+      </Link>
       <Text>LoginScreen</Text>
       <TextInput
         style={styles.input}
@@ -64,6 +69,12 @@ function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
   input: {
     height: 40,
     borderColor: "gray",

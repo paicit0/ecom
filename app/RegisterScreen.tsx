@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
 } from "react-native";
 import "firebase/compat/database";
+import { Link } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 
 function RegisterScreen() {
   const [email, setEmail] = useState<string>("");
@@ -33,7 +35,7 @@ function RegisterScreen() {
           "Registering with payload: " + JSON.stringify({ email, password })
         );
 
-        const response = await fetch(registerUsersURL, {
+        const registerUsers = await fetch(registerUsersURL, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -44,12 +46,13 @@ function RegisterScreen() {
           }),
         });
 
-        const dataMessage = await response.json();
+        const response = await registerUsers.json();
         console.log(response);
-        setDataMessage(dataMessage.message + dataMessage.id);
+        setDataMessage(response.message + response.id);
+        console.log("registerUsers Status: " + registerUsers.status);
 
-        if (dataMessage.email) {
-          console.log("Email from backend" + dataMessage.email);
+        if (response.email) {
+          console.log("Email from backend" + response.email);
         }
       }
     } catch (error: any) {
@@ -60,6 +63,9 @@ function RegisterScreen() {
 
   return (
     <View style={styles.container}>
+      <Link href="../(tabs)/HomeScreen">
+        <Ionicons name="arrow-back-outline"></Ionicons>
+      </Link>
       <Text style={styles.title}>Register</Text>
       <Text>{dataMessage}</Text>
       <TextInput

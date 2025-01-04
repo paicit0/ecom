@@ -1,13 +1,12 @@
 //HomeScreen.tsx
 import React, { memo, useEffect, useState } from "react";
-import { useNavigation } from "expo-router";
 import {
   StyleSheet,
   View,
   Text,
   Pressable,
-  FlatList,
   ActivityIndicator,
+  Dimensions,
 } from "react-native";
 import { Image } from "expo-image";
 import SearchBar from "@/components/SearchBar";
@@ -62,7 +61,6 @@ export const HomeScreen = memo(function HomeScreen() {
     const lowerName = item.title.toLowerCase();
     const lowerQuery = searchQuery.toLowerCase();
     const index = lowerName.indexOf(lowerQuery);
-
     let nameDisplay;
 
     if (index >= 0 && searchQuery) {
@@ -70,26 +68,24 @@ export const HomeScreen = memo(function HomeScreen() {
       const match = item.title.slice(index, index + searchQuery.length);
       const after = item.title.slice(index + searchQuery.length);
 
-      nameDisplay = (
-        <Text
-          style={styles.textItemName}
-          numberOfLines={2}
-          ellipsizeMode="tail"
-        >
-          {before}
-          <Text>{match}</Text>
-          {after}
-        </Text>
-      );
+      nameDisplay = // when searched
+        (
+          <View style={styles.textItemName}>
+            <Text numberOfLines={2} ellipsizeMode="tail">
+              {before}
+              <Text>{match}</Text>
+              {after}
+            </Text>
+          </View>
+        );
     } else {
+      // default
       nameDisplay = (
-        <Text
-          style={styles.textItemName}
-          numberOfLines={2}
-          ellipsizeMode="tail"
-        >
-          {item.title}
-        </Text>
+        <View style={styles.textItemName}>
+          <Text numberOfLines={2} ellipsizeMode="tail">
+            {item.title}
+          </Text>
+        </View>
       );
     }
 
@@ -100,6 +96,7 @@ export const HomeScreen = memo(function HomeScreen() {
             pathname: "/ItemScreen/[id]",
             params: { id: item.id },
           }}
+          // style={{ flex: 1 }}
         >
           <View style={styles.cardContent}>
             <Image
@@ -108,8 +105,7 @@ export const HomeScreen = memo(function HomeScreen() {
               contentFit="cover"
               transition={200}
             />
-            {nameDisplay}
-            <Text></Text>
+            <View>{nameDisplay}</View>
             <View
               style={{
                 flexDirection: "row",
@@ -137,49 +133,44 @@ export const HomeScreen = memo(function HomeScreen() {
   return (
     <View style={styles.mainContainer}>
       <View style={styles.header}>
-        <View style={{ height: 10 }}></View>
+        <View style={{ height: 45 }}></View>
         <SearchBar
           value={searchQuery}
           onChangeText={handleSearch}
           placeholder="Search Items..."
         />
       </View>
-      <FlatList
+      {/* <FlashList
         data={filteredProducts}
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.horizontalItemContainer}
-        horizontal
+        contentContainerStyle={styles.horizontalListContainer}
         showsHorizontalScrollIndicator={false}
-      />
-
-      <FlatList
-        data={filteredProducts}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.verticalItemConTainer}
-        numColumns={2}
-        showsVerticalScrollIndicator={false}
-      />
+        estimatedItemSize={160}
+        horizontal={true}
+      /> */}
       <FlashList
         data={filteredProducts}
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.verticalItemConTainer}
+        contentContainerStyle={styles.verticalListContainer}
         numColumns={2}
         showsVerticalScrollIndicator={false}
-        estimatedItemSize={200}
+        estimatedItemSize={210}
+        horizontal={false}
       />
     </View>
   );
 });
 
 const testColor = "green";
+// const { width } = Dimensions.get("window");
+// console.log(width);
 
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    // backgroundColor: "yellow",
   },
   loadingContainer: {
     flex: 1,
@@ -187,7 +178,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   header: {
-    padding: 16,
+    padding: 8,
     backgroundColor: "#fff",
     borderBottomWidth: 1,
     borderBottomColor: "#e0e0e0",
@@ -197,27 +188,29 @@ const styles = StyleSheet.create({
     color: "#333",
     alignItems: "flex-end",
   },
-  verticalItemConTainer: {
-    padding: 8,
+  verticalListContainer: {
+    padding: 0,
+    backgroundColor: "black",
   },
-  horizontalItemContainer: {
-    padding: 8,
+  horizontalListContainer: {
+    padding: 0,
+    backgroundColor: "cyan",
   },
   itemContainer: {
     flex: 1,
-    margin: 4,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    maxWidth: "48%",
+    margin: 2,
+    backgroundColor: "white",
+
   },
   cardContent: {
-    padding: 8,
-    width: 150,
+    padding: 10,
+    backgroundColor: "blue",
   },
   imageItem: {
-    width: 120,
-    height: 120,
-    alignItems: "center",
+    aspectRatio: 1,
+    height: 150,
+    width: 150,
+    backgroundColor: "green",
     resizeMode: "contain",
   },
   textItemName: {
@@ -225,16 +218,17 @@ const styles = StyleSheet.create({
     fontWeight: "normal",
     color: "#333",
     marginTop: 8,
+    marginBottom: 8,
     textAlign: "left",
-    width: "100%",
+    backgroundColor: "red",
   },
   itemPrice: {
     textAlign: "left",
-    // backgroundColor: testColor,
+    backgroundColor: testColor,
   },
   itemStock: {
     textAlign: "right",
-    // backgroundColor: testColor,
+    backgroundColor: "green",
   },
 });
 

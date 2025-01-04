@@ -1,6 +1,6 @@
 // app/(tabs)/_layout.tsx
 import { Tabs } from "expo-router";
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from "@expo/vector-icons";
 
 export default function TabsLayout() {
   return (
@@ -8,7 +8,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="HomeScreen"
         options={{
-          tabBarLabel: 'Home',
+          tabBarLabel: "Home",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" size={size} color={color} />
           ),
@@ -17,7 +17,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="ProfileScreen"
         options={{
-          tabBarLabel: 'Profile',
+          tabBarLabel: "Profile",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person" size={size} color={color} />
           ),
