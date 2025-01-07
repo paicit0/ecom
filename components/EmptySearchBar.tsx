@@ -2,44 +2,17 @@ import React from "react";
 import { Pressable, StyleSheet, TextInput, View, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { memo } from "react";
-import { Link, useNavigation } from "expo-router";
+import { Link } from "expo-router";
 import { useCart } from "@/app/store";
 
-interface SearchBarProps {
-  value: string;
-  onChangeText: (text: string) => void;
-  placeholder?: string;
-}
-
-const SearchBar = memo(function SearchBar({
-  value,
-  onChangeText,
-  placeholder = "Search...",
-}: SearchBarProps) {
+const EmptySearchBar = memo(function SearchBar() {
   const cart = useCart((state) => state.cartItems);
   return (
     <View style={styles.container}>
-      <Ionicons name="search" size={20} color="#666" style={styles.icon} />
-      <TextInput
-        value={value}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor="#999"
-        clearButtonMode="while-editing"
-        autoCapitalize="none"
-        autoCorrect={false}
-        autoFocus={true}
-      />
-      {value.length > 0 && (
-        <Pressable onPress={() => onChangeText("")}>
-          <Ionicons
-            name="close-sharp"
-            size={20}
-            color="#666"
-            style={styles.icon}
-          />
-        </Pressable>
-      )}
+      <Link href={"/SearchScreen"} style={styles.input}>
+        <Ionicons name="search" size={20} color="#666" style={styles.icon} />
+        <Text>Search items...</Text>
+      </Link>
       <Link href="/CartScreen">
         {cart.length > 0 && (
           <Text style={styles.badge}>
@@ -92,4 +65,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SearchBar;
+export default EmptySearchBar;

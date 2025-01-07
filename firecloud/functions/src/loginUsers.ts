@@ -1,6 +1,7 @@
 import * as functions from "firebase-functions";
 import { db } from "./index";
 import { compare } from "bcryptjs";
+import * as jwt from "jsonwebtoken";
 
 const loginUsers = functions.https.onRequest(async (req, res) => {
   try {
@@ -26,9 +27,23 @@ const loginUsers = functions.https.onRequest(async (req, res) => {
 
     const validPassword = await compare(password, hashedPassword);
 
+    const generateJWT = jwt.sign(
+      { foo: "bar" },
+      "privatekey",
+      { algorithm: "RS256" },
+      (err: unknown, token: unknown) => {
+        console.log(generateJWT, token);
+        if (err) {
+          console.log(err);
+        }
+      }
+    );
+
     if (validPassword) {
       console.log("Password Matched!");
-      res.status(200).json({ message: "Authentication successful!", jwt: "jwt Token here" });
+      res
+        .status(200)
+        .json({ message: "Authentication successful!", jwt: generateJWT });
     } else {
       console.log("Password Doesn't Match!");
       res.status(401).json({ message: "Invalid password." });

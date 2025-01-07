@@ -7,8 +7,8 @@ const registerUsers = functions.https.onRequest(async (req, res) => {
   try {
     console.log("Connected! Proceeding...");
     const { email, password } = req.body;
-    const docRef = db.collection("users").doc(email);
-    const docGet = await docRef.get();
+    const usersCollectionEmail = db.collection("users").doc(email);
+    const docGet = await usersCollectionEmail.get();
 
     const salt = bcryptjs.genSaltSync(10);
     const hashedPassword = await bcryptjs.hash(password, salt);

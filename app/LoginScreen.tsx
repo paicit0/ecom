@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Pressable,
 } from "react-native";
+import * as SecureStore from "expo-secure-store";
 
 function LoginScreen() {
   const [email, setEmail] = useState<string>("");

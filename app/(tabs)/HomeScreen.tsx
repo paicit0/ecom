@@ -12,8 +12,10 @@ import { Image } from "expo-image";
 import SearchBar from "@/components/SearchBar";
 import { Product } from "../type/types";
 import { Link } from "expo-router";
-import { useProductStore } from "../store";
+import { useCart, useProductStore } from "../store";
 import { FlashList } from "@shopify/flash-list";
+import { Ionicons } from "@expo/vector-icons";
+import EmptySearchBar from "../../components/EmptySearchBar";
 
 export const HomeScreen = memo(function HomeScreen() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -21,6 +23,7 @@ export const HomeScreen = memo(function HomeScreen() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [category, setCategory] = useState<string>("");
+  const cart = useCart((state) => state.cartItems);
 
   const fetchProductData = async (): Promise<Product[]> => {
     const response = await fetch("https://dummyjson.com/products");
@@ -57,68 +60,26 @@ export const HomeScreen = memo(function HomeScreen() {
     setFilteredProducts(filtered);
   };
 
-  const renderItem = ({ item }: { item: Product }) => {
-    const lowerName = item.title.toLowerCase();
-    const lowerQuery = searchQuery.toLowerCase();
-    const index = lowerName.indexOf(lowerQuery);
-    let nameDisplay;
-
-    if (index >= 0 && searchQuery) {
-      const before = item.title.slice(0, index);
-      const match = item.title.slice(index, index + searchQuery.length);
-      const after = item.title.slice(index + searchQuery.length);
-
-      nameDisplay = // when searched
-        (
-          <View style={styles.textItemName}>
-            <Text numberOfLines={2} ellipsizeMode="tail">
-              {before}
-              <Text>{match}</Text>
-              {after}
-            </Text>
-          </View>
-        );
-    } else {
-      // default
-      nameDisplay = (
-        <View style={styles.textItemName}>
-          <Text numberOfLines={2} ellipsizeMode="tail">
-            {item.title}
-          </Text>
-        </View>
-      );
-    }
-
+  const render = ({ item }: { item: Product }) => {
     return (
-      <View style={styles.itemContainer}>
-        <Link
-          href={{
-            pathname: "/ItemScreen/[id]",
-            params: { id: item.id },
-          }}
-          // style={{ flex: 1 }}
-        >
-          <View style={styles.cardContent}>
-            <Image
-              style={styles.imageItem}
-              source={{ uri: item.images[0] }}
-              contentFit="cover"
-              transition={200}
-            />
-            <View>{nameDisplay}</View>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <Text style={styles.itemPrice}>${item.price}</Text>
-              <Text style={styles.itemStock}>Stock: {item.stock}</Text>
-            </View>
-          </View>
-        </Link>
-      </View>
+      <Link
+        href={{
+          pathname: "/ItemScreen/[id]",
+          params: { id: item.id },
+        }}
+      >
+        <View style={styles.itemContainer}>
+          <Image
+            style={styles.imageItem}
+            source={{ uri: item.images[0] }}
+            contentFit="cover"
+            transition={200}
+          />
+          <Text style={styles.textItemName}>{item.title}</Text>
+          <Text style={styles.itemPrice}>${item.price}</Text>
+          <Text style={styles.itemStock}>Stock: {item.stock}</Text>
+        </View>
+      </Link>
     );
   };
 
@@ -133,15 +94,11 @@ export const HomeScreen = memo(function HomeScreen() {
   return (
     <View style={styles.mainContainer}>
       <View style={styles.header}>
-        <View style={{ height: 45 }}></View>
-        <SearchBar
-          value={searchQuery}
-          onChangeText={handleSearch}
-          placeholder="Search Items..."
-        />
+        <View style={{ height: 100 }}></View>
+        <EmptySearchBar />
       </View>
       {/* <FlashList
-        data={filteredProducts}
+        data={products}
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.horizontalListContainer}
@@ -150,8 +107,8 @@ export const HomeScreen = memo(function HomeScreen() {
         horizontal={true}
       /> */}
       <FlashList
-        data={filteredProducts}
-        renderItem={renderItem}
+        data={products}
+        renderItem={render}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.verticalListContainer}
         numColumns={2}
@@ -164,8 +121,6 @@ export const HomeScreen = memo(function HomeScreen() {
 });
 
 const testColor = "green";
-// const { width } = Dimensions.get("window");
-// console.log(width);
 
 const styles = StyleSheet.create({
   mainContainer: {
@@ -178,10 +133,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   header: {
-    padding: 8,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f0f0f0",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    marginVertical: 8,
   },
   title: {
     fontSize: 18,
@@ -200,7 +157,6 @@ const styles = StyleSheet.create({
     flex: 1,
     margin: 2,
     backgroundColor: "white",
-
   },
   cardContent: {
     padding: 10,
@@ -229,6 +185,30 @@ const styles = StyleSheet.create({
   itemStock: {
     textAlign: "right",
     backgroundColor: "green",
+  },
+  icon: {
+    marginRight: 8,
+  },
+  input: {
+    flex: 1,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: "#333",
+  },
+  badge: {
+    position: "absolute",
+    top: -12,
+    right: -6,
+    backgroundColor: "red",
+    color: "white",
+    borderRadius: 10,
+    width: 18,
+    height: 18,
+    textAlign: "center",
+    fontSize: 12,
+    fontWeight: "bold",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
