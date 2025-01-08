@@ -7,6 +7,7 @@ import { Link } from "expo-router";
 import { StyleSheet } from "react-native";
 import { Product } from "./type/types";
 import { Image } from "expo-image";
+import { Ionicons } from "@expo/vector-icons";
 
 function SearchScreen() {
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -99,6 +100,9 @@ function SearchScreen() {
   return (
     <View style={styles.mainContainer}>
       <View style={{ height: 45 }}></View>
+      <Link href="../(tabs)/HomeScreen">
+        <Ionicons name="arrow-back-outline"></Ionicons>
+      </Link>
       <SearchBar
         value={searchQuery}
         onChangeText={handleSearch}

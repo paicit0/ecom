@@ -75,9 +75,11 @@ export const HomeScreen = memo(function HomeScreen() {
             contentFit="cover"
             transition={200}
           />
-          <Text style={styles.textItemName}>{item.title}</Text>
-          <Text style={styles.itemPrice}>${item.price}</Text>
-          <Text style={styles.itemStock}>Stock: {item.stock}</Text>
+          <Text style={styles.itemTitle}>{item.title}</Text>
+          <View style={styles.priceStockContainer}>
+            <Text style={styles.itemPrice}>${item.price}</Text>
+            <Text style={styles.itemStock}>Stock: {item.stock}</Text>
+          </View>
         </View>
       </Link>
     );
@@ -127,72 +129,45 @@ const styles = StyleSheet.create({
     flex: 1,
     // backgroundColor: "yellow",
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#f0f0f0",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    marginVertical: 8,
-  },
+  loadingContainer: {},
+  header: {},
   title: {
     fontSize: 18,
     color: "#333",
     alignItems: "flex-end",
   },
   verticalListContainer: {
-    padding: 0,
     backgroundColor: "black",
   },
   horizontalListContainer: {
-    padding: 0,
     backgroundColor: "cyan",
   },
   itemContainer: {
-    flex: 1,
-    margin: 2,
     backgroundColor: "white",
   },
   cardContent: {
-    padding: 10,
     backgroundColor: "blue",
   },
   imageItem: {
-    aspectRatio: 1,
     height: 150,
     width: 150,
     backgroundColor: "green",
     resizeMode: "contain",
   },
-  textItemName: {
-    fontSize: 16,
-    fontWeight: "normal",
-    color: "#333",
-    marginTop: 8,
-    marginBottom: 8,
-    textAlign: "left",
-    backgroundColor: "red",
+  priceStockContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignContent: 'space-between',
   },
   itemPrice: {
-    textAlign: "left",
     backgroundColor: testColor,
   },
   itemStock: {
-    textAlign: "right",
     backgroundColor: "green",
   },
-  icon: {
-    marginRight: 8,
-  },
+  itemTitle: {},
+  icon: {},
   input: {
-    flex: 1,
-    paddingVertical: 12,
-    fontSize: 16,
     color: "#333",
   },
   badge: {
