@@ -56,7 +56,7 @@ function RegisterScreen() {
           });
 
         if (registerFirebaseAuth) {
-          const registerUser = await fetch(registerUsersURLLocal, {
+          const registerUser = await fetch(registerUsersURL, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

@@ -17,6 +17,7 @@ const registerUsers = functions.https.onRequest(async (req, res) => {
       email: email,
       // password: hashedPassword,
       timestamp: Timestamp.now(),
+      role: "normalUser",
     };
 
     if (!email) {
@@ -29,10 +30,11 @@ const registerUsers = functions.https.onRequest(async (req, res) => {
       return;
     } else {
       const addUser = await db.collection("users").add(user);
-      console.log("User registered successfully! ID: ", addUser.id);
+      const addUserGet = await addUser.get();
+      console.log("User registered successfully! ID: ", addUserGet.id);
       res.status(201).json({
         message: "User registered successfully! ID: ",
-        id: addUser.id,
+        id: addUserGet.id,
       });
     }
   } catch (error) {
