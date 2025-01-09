@@ -10,19 +10,22 @@ import {
   Pressable,
 } from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth } from "./auth/firebaseAuth";
 import { useUserSession } from "./storeSession";
-import { loginSaveSecureStorage } from "../firebase";
+import { loginSaveSecureStore } from "./auth/firebaseAuth";
 
 function LoginScreen() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const { userIsSignedIn, login, logout } = useUserSession();
+  const { userIsSignedIn, login, logout, storeEmail } = useUserSession();
 
   const handleLogin = async () => {
     try {
-      loginSaveSecureStorage(email, password);
+      loginSaveSecureStore(email, password);
+      login();
+      storeEmail(email);
+      console.log("Trying to login... ", email);
     } catch (error) {
       console.log(error);
     }

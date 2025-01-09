@@ -10,12 +10,8 @@ const registerUsers = functions.https.onRequest(async (req, res) => {
     const usersCollectionEmail = db.collection("users").doc(email);
     const docGet = await usersCollectionEmail.get();
 
-    // const salt = bcryptjs.genSaltSync(10);
-    // const hashedPassword = await bcryptjs.hash(password, salt);
-    
     const user = {
       email: email,
-      // password: hashedPassword,
       timestamp: Timestamp.now(),
       role: "normalUser",
     };

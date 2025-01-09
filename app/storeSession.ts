@@ -6,6 +6,8 @@ interface userSessionType {
   userIsSignedIn: boolean;
   login: () => void;
   logout: () => void;
+  storeEmail: (string: string) => void;
+  email: string;
 }
 
 const SecureStorage: StateStorage = {
@@ -24,8 +26,10 @@ export const useUserSession = create<userSessionType>()(
   persist(
     (set) => ({
       userIsSignedIn: false,
+      email: "",
       login: () => set({ userIsSignedIn: true }),
       logout: () => set({ userIsSignedIn: false }),
+      storeEmail: (email: string) => set({ email }),
     }),
     {
       name: "storage",

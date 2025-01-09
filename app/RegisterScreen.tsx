@@ -10,7 +10,7 @@ import "firebase/compat/database";
 import { Link } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth } from "./auth/firebaseAuth";
 
 function RegisterScreen() {
   const [email, setEmail] = useState<string>("");

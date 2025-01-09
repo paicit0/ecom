@@ -6,10 +6,16 @@ import { useUserSession } from "../storeSession";
 
 function ProfileScreen() {
   const { userIsSignedIn, logout } = useUserSession();
+  const sessionEmail = useUserSession((state) => state.email);
   return (
     <View style={profileStyles.profilesContainer}>
       {userIsSignedIn ? (
-        <Pressable onPress={()=> logout()}><Text>Logout!</Text></Pressable>
+        <>
+          <Text>User: {sessionEmail}</Text>
+          <Pressable onPress={() => logout()}>
+            <Text>Logout!</Text>
+          </Pressable>
+        </>
       ) : (
         <>
           <Link href="/LoginScreen" style={profileStyles.title}>
@@ -20,12 +26,6 @@ function ProfileScreen() {
           </Link>
         </>
       )}
-
-      <Text>Profiles!</Text>
-
-      <Pressable onPress={() => console.log(userIsSignedIn)}>
-        <Text>check user signed in</Text>
-      </Pressable>
     </View>
   );
 }
