@@ -1,26 +1,26 @@
 import * as functions from "firebase-functions";
 import { db } from "./index";
-import bcryptjs from "bcryptjs";
+// import bcryptjs from "bcryptjs";
 import { Timestamp } from "firebase-admin/firestore";
 
 const registerUsers = functions.https.onRequest(async (req, res) => {
   try {
     console.log("Connected! Proceeding...");
-    const { email, password } = req.body;
+    const { email } = req.body;
     const usersCollectionEmail = db.collection("users").doc(email);
     const docGet = await usersCollectionEmail.get();
 
-    const salt = bcryptjs.genSaltSync(10);
-    const hashedPassword = await bcryptjs.hash(password, salt);
-
+    // const salt = bcryptjs.genSaltSync(10);
+    // const hashedPassword = await bcryptjs.hash(password, salt);
+    
     const user = {
       email: email,
-      password: hashedPassword,
+      // password: hashedPassword,
       timestamp: Timestamp.now(),
     };
 
-    if (!email || !password) {
-      res.status(400).json({ message: "No email or password provided" });
+    if (!email) {
+      res.status(400).json({ message: "No email provided" });
     }
 
     if (docGet.exists) {
@@ -37,7 +37,7 @@ const registerUsers = functions.https.onRequest(async (req, res) => {
     }
   } catch (error) {
     console.log("Registering failed: " + error);
-    res.status(500).json({ message: "Registering failed" }); // don't include "error" due to security risk.
+    res.status(500).json({ message: "Registering failed on Cloud Function.", error: error }); // don't include "error" due to security risk.
   }
 });
 

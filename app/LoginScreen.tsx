@@ -9,36 +9,20 @@ import {
   TouchableOpacity,
   Pressable,
 } from "react-native";
-import * as SecureStore from "expo-secure-store";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
+import { useUserSession } from "./storeSession";
+import { loginSaveSecureStorage } from "../firebase";
 
 function LoginScreen() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [error, setError] = useState<string>("");
+  const { userIsSignedIn, login, logout } = useUserSession();
 
   const handleLogin = async () => {
     try {
-      const loginUsersURL = "https://loginusers-g42pohnrxa-uc.a.run.app";
-      const loginUser = await fetch(loginUsersURL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
-      console.log(
-        "Logging in with payload: " + JSON.stringify({ email, password })
-      );
-      const response = await loginUser.json();
-      console.log(response);
-      console.log("loginUsers Status: " + loginUser.status);
-      if (loginUser.status === 200) {
-        console.log("Login successful!");
-      } else {
-        console.log("Login failed!");
-      }
+      loginSaveSecureStorage(email, password);
     } catch (error) {
       console.log(error);
     }

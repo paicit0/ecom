@@ -9,7 +9,6 @@ import {
   Dimensions,
 } from "react-native";
 import { Image } from "expo-image";
-import SearchBar from "@/components/SearchBar";
 import { Product } from "../type/types";
 import { Link } from "expo-router";
 import { useCart, useProductStore } from "../store";
@@ -75,7 +74,9 @@ export const HomeScreen = memo(function HomeScreen() {
             contentFit="cover"
             transition={200}
           />
-          <Text style={styles.itemTitle}>{item.title}</Text>
+          <Text numberOfLines={2} ellipsizeMode="tail" style={styles.itemTitle}>
+            {item.title}
+          </Text>
           <View style={styles.priceStockContainer}>
             <Text style={styles.itemPrice}>${item.price}</Text>
             <Text style={styles.itemStock}>Stock: {item.stock}</Text>
@@ -96,7 +97,7 @@ export const HomeScreen = memo(function HomeScreen() {
   return (
     <View style={styles.mainContainer}>
       <View style={styles.header}>
-        <View style={{ height: 100 }}></View>
+        <View style={{ height: 45 }}></View>
         <EmptySearchBar />
       </View>
       {/* <FlashList
@@ -112,7 +113,7 @@ export const HomeScreen = memo(function HomeScreen() {
         data={products}
         renderItem={render}
         keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.verticalListContainer}
+        // contentContainerStyle={styles.verticalListContainer}
         numColumns={2}
         showsVerticalScrollIndicator={false}
         estimatedItemSize={210}
@@ -156,15 +157,11 @@ const styles = StyleSheet.create({
   },
   priceStockContainer: {
     flex: 1,
-    flexDirection: 'row',
-    alignContent: 'space-between',
+    flexDirection: "row",
+    alignContent: "space-between",
   },
-  itemPrice: {
-    backgroundColor: testColor,
-  },
-  itemStock: {
-    backgroundColor: "green",
-  },
+  itemPrice: {},
+  itemStock: {},
   itemTitle: {},
   icon: {},
   input: {

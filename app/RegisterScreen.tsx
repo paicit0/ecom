@@ -9,6 +9,8 @@ import {
 import "firebase/compat/database";
 import { Link } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
 
 function RegisterScreen() {
   const [email, setEmail] = useState<string>("");
@@ -16,10 +18,11 @@ function RegisterScreen() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [dataMessage, setDataMessage] = useState<string>("");
   const [error, setError] = useState("");
-
   const handleRegister = async () => {
     const registerUsersURL =
       "https://registerusers-700548026300.us-central1.run.app";
+    const registerUsersURLLocal =
+      "http://127.0.0.1:5001/ecom-firestore-11867/us-central1/registerUsers";
     try {
       if (password !== confirmPassword) {
         console.log("Passwords do not match");
@@ -35,24 +38,39 @@ function RegisterScreen() {
           "Registering with payload: " + JSON.stringify({ email, password })
         );
 
-        const registerUsers = await fetch(registerUsersURL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email,
-            password,
-          }),
-        });
+        const registerFirebaseAuth = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        )
+          .then((userCredential) => {
+            const user = userCredential.user;
+            console.log("Registered on Firebase Authentication!");
+            return true;
+          })
+          .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.log(errorMessage);
+            return false;
+          });
 
-        const response = await registerUsers.json();
-        console.log(response);
-        setDataMessage(response.message + response.id);
-        console.log("registerUsers Status: " + registerUsers.status);
-
-        if (response.email) {
-          console.log("Email from backend" + response.email);
+        if (registerFirebaseAuth) {
+          const registerUser = await fetch(registerUsersURLLocal, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: email,
+            }),
+          });
+          const data = await registerUser.json();
+          setDataMessage(data.message);
+          console.log(data.message);
+          if (data.error) {
+            console.log(data.error);
+          }
         }
       }
     } catch (error: any) {

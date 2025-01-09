@@ -1,18 +1,31 @@
 import { Link } from "expo-router";
-import { View, Text } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import { StyleSheet } from "react-native";
 // @ts-ignore
+import { useUserSession } from "../storeSession";
 
 function ProfileScreen() {
+  const { userIsSignedIn, logout } = useUserSession();
   return (
     <View style={profileStyles.profilesContainer}>
+      {userIsSignedIn ? (
+        <Pressable onPress={()=> logout()}><Text>Logout!</Text></Pressable>
+      ) : (
+        <>
+          <Link href="/LoginScreen" style={profileStyles.title}>
+            <Text>Login</Text>
+          </Link>
+          <Link href="/RegisterScreen" style={profileStyles.title}>
+            <Text>Register</Text>
+          </Link>
+        </>
+      )}
+
       <Text>Profiles!</Text>
-      <Link href="/LoginScreen" style={profileStyles.title}>
-        <Text>Login</Text>
-      </Link>
-      <Link href="/RegisterScreen" style={profileStyles.title}>
-        <Text>Register</Text>
-      </Link>
+
+      <Pressable onPress={() => console.log(userIsSignedIn)}>
+        <Text>check user signed in</Text>
+      </Pressable>
     </View>
   );
 }
