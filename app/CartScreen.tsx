@@ -2,7 +2,7 @@
 import React, { useState, memo } from "react";
 import { View, StyleSheet, Pressable, ScrollView } from "react-native";
 import { Text, Image } from "react-native";
-import { useCart } from "./store";
+import { useCart } from "./store/store";
 import { Ionicons } from "@expo/vector-icons";
 import { CartItem } from "./type/types";
 import { Link } from "expo-router";

@@ -7,20 +7,20 @@ import {
   Pressable,
   ActivityIndicator,
   Dimensions,
+  FlatList,
 } from "react-native";
 import { Image } from "expo-image";
 import { Product } from "../type/types";
 import { Link } from "expo-router";
-import { useCart, useProductStore } from "../store";
+import { useCart, useProductStore } from "../store/store";
 import { FlashList } from "@shopify/flash-list";
 import { Ionicons } from "@expo/vector-icons";
 import EmptySearchBar from "../../components/EmptySearchBar";
+import { ErrorBoundary } from "expo-router";
 
 export const HomeScreen = memo(function HomeScreen() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [searchQuery, setSearchQuery] = useState<string>("");
   const [category, setCategory] = useState<string>("");
   const cart = useCart((state) => state.cartItems);
 
@@ -38,7 +38,6 @@ export const HomeScreen = memo(function HomeScreen() {
         const imagesToPreload = data.map((product) => product.images[0]);
         await Image.prefetch(imagesToPreload);
         setProducts(data);
-        setFilteredProducts(data);
 
         // console.log("Filtered Products: " + JSON.stringify(filteredProducts));
       } catch (error) {
@@ -51,21 +50,22 @@ export const HomeScreen = memo(function HomeScreen() {
     getProducts();
   }, []);
 
-  const handleSearch = (text: string) => {
-    setSearchQuery(text);
-    const filtered = products.filter((product) =>
-      product.title.toLowerCase().includes(text.toLowerCase())
-    );
-    setFilteredProducts(filtered);
-  };
-
   const render = ({ item }: { item: Product }) => {
+    if (isLoading) {
+      return (
+        <>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </>
+      );
+    }
+
     return (
       <Link
         href={{
           pathname: "/ItemScreen/[id]",
           params: { id: item.id },
         }}
+        style={styles.linkStyle}
       >
         <View style={styles.itemContainer}>
           <Image
@@ -86,40 +86,23 @@ export const HomeScreen = memo(function HomeScreen() {
     );
   };
 
-  if (isLoading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    );
-  }
-
   return (
-    <View style={styles.mainContainer}>
+    <>
       <View style={styles.header}>
         <View style={{ height: 45 }}></View>
         <EmptySearchBar />
       </View>
-      {/* <FlashList
-        data={products}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.horizontalListContainer}
-        showsHorizontalScrollIndicator={false}
-        estimatedItemSize={160}
-        horizontal={true}
-      /> */}
       <FlashList
         data={products}
         renderItem={render}
         keyExtractor={(item) => item.id.toString()}
-        // contentContainerStyle={styles.verticalListContainer}
+        contentContainerStyle={styles.verticalListContainer}
         numColumns={2}
         showsVerticalScrollIndicator={false}
-        estimatedItemSize={210}
+        estimatedItemSize={150}
         horizontal={false}
       />
-    </View>
+    </>
   );
 });
 
@@ -128,14 +111,12 @@ const testColor = "green";
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    // backgroundColor: "yellow",
   },
   loadingContainer: {},
   header: {},
   title: {
     fontSize: 18,
     color: "#333",
-    alignItems: "flex-end",
   },
   verticalListContainer: {
     backgroundColor: "black",
@@ -144,16 +125,17 @@ const styles = StyleSheet.create({
     backgroundColor: "cyan",
   },
   itemContainer: {
+    flex: 1,
+    // flexDirection: "column",
     backgroundColor: "white",
   },
   cardContent: {
     backgroundColor: "blue",
   },
   imageItem: {
-    height: 150,
-    width: 150,
+    minHeight: 150,
+    minWidth: 150,
     backgroundColor: "green",
-    resizeMode: "contain",
   },
   priceStockContainer: {
     flex: 1,
@@ -167,20 +149,10 @@ const styles = StyleSheet.create({
   input: {
     color: "#333",
   },
-  badge: {
-    position: "absolute",
-    top: -12,
-    right: -6,
-    backgroundColor: "red",
-    color: "white",
-    borderRadius: 10,
-    width: 18,
-    height: 18,
-    textAlign: "center",
-    fontSize: 12,
-    fontWeight: "bold",
-    justifyContent: "center",
-    alignItems: "center",
+  badge: {},
+  linkStyle: {
+    flex: 1,
+    flexDirection: "row",
   },
 });
 

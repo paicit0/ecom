@@ -1,88 +1,28 @@
-import React, { useEffect, useState } from "react";
+//SearchScreen.tsx
+import { useEffect, useState } from "react";
 import { View, Text, TextInput } from "react-native";
-import SearchBar from "../components/SearchBar";
-import { useCart, useProductStore } from "./store";
+import { useProductStore } from "./store/store";
 import { FlashList } from "@shopify/flash-list";
 import { Link } from "expo-router";
 import { StyleSheet } from "react-native";
 import { Product } from "./type/types";
-import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 
 function SearchScreen() {
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const cart = useCart((state) => state.cartItems);
+  const [filteredItems, setFilteredItems] = useState<Product[]>([]);
+  const product = useProductStore((state) => state.products);
 
-  useEffect(() => {});
-  const handleSearch = (text: string) => {
-    setSearchQuery(text);
-  };
-
-  // const renderItem = ({ item }: { item: Product }) => {
-  //   const lowerName = item.title.toLowerCase();
-  //   const lowerQuery = searchQuery.toLowerCase();
-  //   const index = lowerName.indexOf(lowerQuery);
-  //   let nameDisplay;
-
-  //   if (index >= 0 && searchQuery) {
-  //     const before = item.title.slice(0, index);
-  //     const match = item.title.slice(index, index + searchQuery.length);
-  //     const after = item.title.slice(index + searchQuery.length);
-
-  //     nameDisplay = // when searched
-  //       (
-  //         <View style={styles.textItemName}>
-  //           <Text numberOfLines={2} ellipsizeMode="tail">
-  //             {before}
-  //             <Text>{match}</Text>
-  //             {after}
-  //           </Text>
-  //         </View>
-  //       );
-  //   } else {
-  //     // default
-  //     nameDisplay = (
-  //       <View style={styles.textItemName}>
-  //         <Text numberOfLines={2} ellipsizeMode="tail">
-  //           {item.title}
-  //         </Text>
-  //       </View>
-  //     );
-  //   }
-
-  //   return (
-  //     <View style={styles.itemContainer}>
-  //       <Link
-  //         href={{
-  //           pathname: "/ItemScreen/[id]",
-  //           params: { id: item.id },
-  //         }}
-  //         // style={{ flex: 1 }}
-  //       >
-  //         <View style={styles.cardContent}>
-  //           <Image
-  //             style={styles.imageItem}
-  //             source={{ uri: item.images[0] }}
-  //             contentFit="cover"
-  //             transition={200}
-  //           />
-  //           <View>{nameDisplay}</View>
-  //           <View
-  //             style={{
-  //               flexDirection: "row",
-  //               alignItems: "center",
-  //               justifyContent: "space-between",
-  //             }}
-  //           >
-  //             <Text style={styles.itemPrice}>${item.price}</Text>
-  //             <Text style={styles.itemStock}>Stock: {item.stock}</Text>
-  //           </View>
-  //         </View>
-  //       </Link>
-  //     </View>
-  //   );
-  // };
-
+  useEffect(() => {
+    const filterItem = product.filter((item) =>
+      item.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    if (!searchQuery) {
+      setFilteredItems([]);
+    } else {
+      setFilteredItems(filterItem);
+    }
+  }, [searchQuery]);
   const render = ({ item }: { item: Product }) => {
     return (
       <Link
@@ -97,20 +37,20 @@ function SearchScreen() {
       </Link>
     );
   };
+
   return (
     <View style={styles.mainContainer}>
       <View style={{ height: 45 }}></View>
       <Link href="../(tabs)/HomeScreen">
         <Ionicons name="arrow-back-outline"></Ionicons>
       </Link>
-      <SearchBar
+      <TextInput
         value={searchQuery}
-        onChangeText={handleSearch}
+        onChangeText={(text) => setSearchQuery(text)}
         placeholder="Search Items..."
-      />
-      <TextInput></TextInput>
+      ></TextInput>
       <FlashList
-        data={useProductStore.getState().products}
+        data={filteredItems}
         renderItem={render}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.verticalListContainer}

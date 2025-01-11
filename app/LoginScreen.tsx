@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./auth/firebaseAuth";
-import { useUserSession } from "./storeSession";
+import { useUserSession } from "./store/storeSession";
 import { loginSaveSecureStore } from "./auth/firebaseAuth";
 
 function LoginScreen() {

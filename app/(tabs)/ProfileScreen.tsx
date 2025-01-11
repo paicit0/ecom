@@ -2,8 +2,7 @@ import { Link } from "expo-router";
 import { View, Text, Pressable } from "react-native";
 import { StyleSheet } from "react-native";
 // @ts-ignore
-import { useUserSession } from "../storeSession";
-
+import { useUserSession } from "../store/storeSession";
 function ProfileScreen() {
   const { userIsSignedIn, logout } = useUserSession();
   const sessionEmail = useUserSession((state) => state.email);

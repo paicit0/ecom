@@ -2,7 +2,7 @@ import React, { memo, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useCart, useProductStore } from "../store";
+import { useCart, useProductStore } from "../store/store";
 import { Link, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
 

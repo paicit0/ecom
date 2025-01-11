@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, TextInput, View, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { memo } from "react";
 import { Link, useNavigation } from "expo-router";
-import { useCart } from "@/app/store";
+import { useCart } from "@/app/store/store";
 
 interface SearchBarProps {
   value: string;

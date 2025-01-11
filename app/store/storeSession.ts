@@ -20,15 +20,26 @@ const SecureStorage: StateStorage = {
   removeItem: async (name: string) => {
     return SecureStore.deleteItemAsync(name);
   },
-}
+};
 
 export const useUserSession = create<userSessionType>()(
   persist(
     (set) => ({
       userIsSignedIn: false,
       email: "",
-      login: () => set({ userIsSignedIn: true }),
-      logout: () => set({ userIsSignedIn: false }),
+      login: async () => {
+        console.log("Saving userIsSignedIn to SecureStorage");
+        SecureStorage.setItem("userIsSignedIn", "true");
+        console.log("Setting userIsSignedIn to true");
+        set({ userIsSignedIn: true });
+      },
+
+      logout: async () => {
+        console.log("Removing userIsSignedIn from SecureStorage");
+        SecureStorage.removeItem("userIsSignedIn");
+        console.log("Setting userIsSignedIn to false");
+        set({ userIsSignedIn: false });
+      },
       storeEmail: (email: string) => set({ email }),
     }),
     {
