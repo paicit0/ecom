@@ -8,6 +8,7 @@ interface userSessionType {
   logout: () => void;
   storeEmail: (string: string) => void;
   email: string;
+  userInfo: [];
 }
 
 const SecureStorage: StateStorage = {
@@ -25,6 +26,7 @@ const SecureStorage: StateStorage = {
 export const useUserSession = create<userSessionType>()(
   persist(
     (set) => ({
+      userInfo: [],
       userIsSignedIn: false,
       email: "",
       login: async () => {

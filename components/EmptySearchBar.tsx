@@ -11,7 +11,7 @@ const EmptySearchBar = memo(function SearchBar() {
     <View style={styles.container}>
       <Link href={"/SearchScreen"} style={styles.input}>
         <Ionicons name="search" size={20} color="#666" style={styles.icon} />
-        <Text>Search items...</Text>
+        <Text style={{fontWeight:"200"}}>Search items...</Text>
       </Link>
       <Link href="/CartScreen">
         {cart.length > 0 && (

@@ -1,6 +1,6 @@
 //SearchScreen.tsx
 import { useEffect, useState } from "react";
-import { View, Text, TextInput } from "react-native";
+import { View, Text, TextInput, Pressable } from "react-native";
 import { useProductStore } from "./store/store";
 import { FlashList } from "@shopify/flash-list";
 import { Link } from "expo-router";
@@ -12,10 +12,11 @@ function SearchScreen() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [filteredItems, setFilteredItems] = useState<Product[]>([]);
   const product = useProductStore((state) => state.products);
+  // console.log("product: ", product);
 
   useEffect(() => {
     const filterItem = product.filter((item) =>
-      item.title.toLowerCase().includes(searchQuery.toLowerCase())
+      item.title.toLowerCase().startsWith(searchQuery.toLowerCase())
     );
     if (!searchQuery) {
       setFilteredItems([]);
@@ -23,7 +24,23 @@ function SearchScreen() {
       setFilteredItems(filterItem);
     }
   }, [searchQuery]);
+
+  useEffect(() => {}, []);
+
   const render = ({ item }: { item: Product }) => {
+    console.log("search query: ", searchQuery);
+    const searchForIndex = item.title
+      .toLowerCase()
+      .indexOf(searchQuery.toLowerCase());
+    const beforeMatch = item.title.slice(0, searchForIndex);
+    const match = item.title.slice(searchForIndex, searchQuery.length);
+    const afterMatch = item.title.slice(beforeMatch.length + match.length);
+    // console.log(
+    //   "index" + searchForIndex,
+    //   " be:" + beforeMatch,
+    //   " match:" + match,
+    //   " after:" + afterMatch
+    // );
     return (
       <Link
         href={{
@@ -31,9 +48,11 @@ function SearchScreen() {
           params: { id: item.id },
         }}
       >
-        <View style={styles.itemContainer}>
-          <Text style={styles.textItemName}>{item.title}</Text>
-        </View>
+        <Text>
+          {beforeMatch}
+          <Text style={{ fontWeight: "bold", color: "black" }}>{match}</Text>
+          {afterMatch}
+        </Text>
       </Link>
     );
   };
@@ -44,19 +63,30 @@ function SearchScreen() {
       <Link href="../(tabs)/HomeScreen">
         <Ionicons name="arrow-back-outline"></Ionicons>
       </Link>
-      <TextInput
-        value={searchQuery}
-        onChangeText={(text) => setSearchQuery(text)}
-        placeholder="Search Items..."
-      ></TextInput>
+      <View style={styles.searchBarContainer}>
+        <TextInput
+          value={searchQuery}
+          onChangeText={(text) => setSearchQuery(text)}
+          placeholder="Search Items..."
+          autoFocus
+          autoCapitalize="none"
+        ></TextInput>
+        <Pressable
+          onPress={() => setSearchQuery("")}
+          style={{ backgroundColor: "red" }}
+        >
+          <Ionicons name="close-circle-outline" size={20}></Ionicons>
+        </Pressable>
+        <Ionicons name="search" size={20} color="#666" style={{}} />
+      </View>
       <FlashList
         data={filteredItems}
         renderItem={render}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.verticalListContainer}
-        numColumns={2}
+        numColumns={1}
         showsVerticalScrollIndicator={false}
-        estimatedItemSize={210}
+        estimatedItemSize={100}
         horizontal={false}
       />
     </View>
@@ -68,22 +98,24 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   itemContainer: {
-    flex: 1,
-    margin: 2,
-    backgroundColor: "white",
+    // flex: 1,
+    // backgroundColor: "white",
   },
   verticalListContainer: {
-    padding: 0,
-    backgroundColor: "black",
+    // backgroundColor: "black",
   },
   textItemName: {
     fontSize: 16,
     fontWeight: "normal",
     color: "#333",
-    marginTop: 8,
-    marginBottom: 8,
     textAlign: "left",
-    backgroundColor: "red",
+    // backgroundColor: "d",
+  },
+  searchBarContainer: {
+    flex: 1,
+    flexDirection: "row",
+    backgroundColor: "yellow",
+    height: 150,
   },
 });
 
