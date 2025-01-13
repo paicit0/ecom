@@ -2,15 +2,16 @@ import { Link } from "expo-router";
 import { View, Text, Pressable } from "react-native";
 import { StyleSheet } from "react-native";
 // @ts-ignore
-import { useUserSession } from "../store/storeSession";
+import { useUserSession } from "../auth/firebaseAuth";
 function ProfileScreen() {
   const { userIsSignedIn, logout } = useUserSession();
-  const sessionEmail = useUserSession((state) => state.email);
+  const userInfoFromStore = useUserSession((state) => state.userInfo);
   return (
     <View style={profileStyles.profilesContainer}>
       {userIsSignedIn ? (
         <>
-          <Text>User: {sessionEmail}</Text>
+          <Text>User: {userInfoFromStore.email}</Text>
+          <Text>Current Role: {userInfoFromStore.role}</Text>
           <Pressable onPress={() => logout()}>
             <Text>Logout!</Text>
           </Pressable>

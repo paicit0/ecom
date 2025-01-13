@@ -1,30 +1,17 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  Pressable,
-} from "react-native";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "./auth/firebaseAuth";
-import { useUserSession } from "./store/storeSession";
-import { loginSaveSecureStore } from "./auth/firebaseAuth";
-
+import { useState } from "react";
+import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
+import { useUserSession } from "./auth/firebaseAuth";
 function LoginScreen() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const { userIsSignedIn, login, logout, storeEmail } = useUserSession();
+  const { userIsSignedIn, login, logout } = useUserSession();
 
   const handleLogin = async () => {
     try {
-      loginSaveSecureStore(email, password);
-      login();
-      storeEmail(email);
+      login(email, password);
       console.log("Trying to login... ", email);
     } catch (error) {
       console.log(error);

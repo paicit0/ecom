@@ -47,6 +47,7 @@ function SearchScreen() {
           pathname: "/ItemScreen/[id]",
           params: { id: item.id },
         }}
+        style={{padding: 10}}
       >
         <Text>
           {beforeMatch}
@@ -79,16 +80,18 @@ function SearchScreen() {
         </Pressable>
         <Ionicons name="search" size={20} color="#666" style={{}} />
       </View>
-      <FlashList
-        data={filteredItems}
-        renderItem={render}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.verticalListContainer}
-        numColumns={1}
-        showsVerticalScrollIndicator={false}
-        estimatedItemSize={100}
-        horizontal={false}
-      />
+      <View style={styles.flashListStyle}>
+        <FlashList
+          data={filteredItems}
+          renderItem={render}
+          keyExtractor={(item) => item.id.toString()}
+          // contentContainerStyle={styles.verticalListContainer}
+          numColumns={1}
+          showsVerticalScrollIndicator={false}
+          estimatedItemSize={200}
+          horizontal={false}
+        />
+      </View>
     </View>
   );
 }
@@ -97,21 +100,20 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
   },
-  verticalListContainer: {
-    // backgroundColor: "black",
-  },
-  textItemName: {
-    fontSize: 16,
-    fontWeight: "normal",
-    color: "#333",
-    textAlign: "left",
-    // backgroundColor: "d",
-  },
   searchBarContainer: {
     flex: 1,
     flexDirection: "row",
     backgroundColor: "yellow",
-    justifyContent: "flex-start"
+  },
+  flashListStyle: {
+    // backgroundColor: "black",
+    flex: 24,
+  },
+  textItemName: {
+    fontSize: 16,
+    fontWeight: "normal",
+    textAlign: "left",
+    // backgroundColor: "grey",
   },
 });
 

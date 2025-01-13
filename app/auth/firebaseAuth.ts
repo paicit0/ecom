@@ -1,35 +1,108 @@
-import { initializeApp,  } from "firebase/app";
-import { initializeAuth, onAuthStateChanged, signInWithEmailAndPassword, User } from "firebase/auth";
+//firebaseAuth.ts
+import { initializeApp } from "firebase/app";
+import {
+  initializeAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  User,
+} from "firebase/auth";
 import { firebaseConfig } from "../../firecloud/firebaseConfig";
 import * as SecureStore from "expo-secure-store";
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getReactNativePersistence } from "firebase/auth";
+import { create } from "zustand";
+import { StateStorage, createJSONStorage, persist } from "zustand/middleware";
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 
 const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 export const auth = initializeAuth(app, {
-    persistence: getReactNativePersistence(AsyncStorage),
-  });
+  persistence: getReactNativePersistence(AsyncStorage),
+});
+
+interface userSessionType {
+  userIsSignedIn: boolean;
+  login: (email: string, password: string) => void;
+  logout: () => void;
+  userInfo: {
+    email: string;
+    role: string;
+  };
+}
+
+const SecureStorage: StateStorage = {
+  getItem: async (name: string) => {
+    return SecureStore.getItemAsync(name);
+  },
+  setItem: async (name: string, value: string) => {
+    return SecureStore.setItemAsync(name, value);
+  },
+  removeItem: async (name: string) => {
+    return SecureStore.deleteItemAsync(name);
+  },
+};
 
 async function saveToken(user: User | null) {
-    if (user) {
-      const token = await user.getIdToken();
-      await SecureStore.setItemAsync("authToken", token);
-    } else {
-      await SecureStore.deleteItemAsync("authToken");
-    }
-  }
-
-  onAuthStateChanged(auth, (user) => {
-    saveToken(user);
-  });
-
-  export async function loginSaveSecureStore(email: string, password: string) {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    await saveToken(userCredential.user);
-    return userCredential.user;
-  }
-  
-  export async function logoutDeleteSecureStore() {
-    await auth.signOut();
+  if (user) {
+    const token = await user.getIdToken();
+    await SecureStore.setItemAsync("authToken", token);
+  } else {
     await SecureStore.deleteItemAsync("authToken");
   }
+}
+
+export const useUserSession = create<userSessionType>()(
+  persist(
+    (set) => ({
+      userInfo: { email: "", role: "" },
+      userIsSignedIn: false,
+      login: async (email, password) => {
+        console.log("Saving userIsSignedIn to SecureStorage");
+        SecureStorage.setItem("userIsSignedIn", "true");
+        console.log("Setting userIsSignedIn to true");
+
+        try {
+          const userCredential = await signInWithEmailAndPassword(auth, email, password);
+          const userRef = collection(db, "users");
+          const emailQuery = query(userRef, where("email", "==", email));
+          const querySnapshot = await getDocs(emailQuery);
+          
+          if (querySnapshot.empty) {
+            throw new Error("No user found with this email.");
+          }
+          
+          const userData = querySnapshot.docs[0].data();
+          set({ userIsSignedIn: true });
+          set({ userInfo: { email: email, role: userData.role } });
+          await saveToken(userCredential.user);
+        } catch (error: any) {
+          console.error("Login failed:", error.message);
+          // Handle the error, e.g., show a user-friendly message
+        }
+      },
+
+      logout: async () => {
+        console.log("Removing userIsSignedIn from SecureStorage");
+        SecureStorage.removeItem("userIsSignedIn");
+        console.log("Setting userIsSignedIn to false");
+        set({ userIsSignedIn: false });
+        await auth.signOut();
+        await SecureStore.deleteItemAsync("authToken");
+      },
+    }),
+    {
+      name: "storage",
+      storage: createJSONStorage(() => SecureStorage),
+    }
+  )
+);
+
+onAuthStateChanged(auth, (user) => {
+  saveToken(user);
+});

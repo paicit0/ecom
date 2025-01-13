@@ -6542,7 +6542,7 @@ find-yarn-workspace-root@~2.0.0:
   dependencies:
     micromatch "^4.0.2"
 
-firebase-admin@^13.0.1:
+firebase-admin@^13.0.2:
   version "13.0.2"
   resolved "https://registry.yarnpkg.com/firebase-admin/-/firebase-admin-13.0.2.tgz#ea4d9a739dde467d584820d8c38086bc4884a6a2"
   integrity sha512-YWVpoN+tZVSRXF0qC0gojoF5bSqvBRbnBk8+xUtFiguM2L4vB7f0moAwV1VVWDDHvTnvQ68OyTMpdp6wKo/clw==
