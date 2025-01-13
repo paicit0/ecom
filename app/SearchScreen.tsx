@@ -97,10 +97,6 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
   },
-  itemContainer: {
-    // flex: 1,
-    // backgroundColor: "white",
-  },
   verticalListContainer: {
     // backgroundColor: "black",
   },
@@ -115,7 +111,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     backgroundColor: "yellow",
-    height: 150,
+    justifyContent: "flex-start"
   },
 });
 
