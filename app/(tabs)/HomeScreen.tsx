@@ -16,7 +16,6 @@ import { useCart, useProductStore } from "../store/store";
 import { FlashList } from "@shopify/flash-list";
 import { Ionicons } from "@expo/vector-icons";
 import EmptySearchBar from "../../components/EmptySearchBar";
-import { ErrorBoundary } from "expo-router";
 
 export const HomeScreen = memo(function HomeScreen() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -89,19 +88,20 @@ export const HomeScreen = memo(function HomeScreen() {
   return (
     <>
       <View style={styles.header}>
-        <View style={{ height: 45 }}></View>
         <EmptySearchBar />
       </View>
-      <FlashList
-        data={products}
-        renderItem={render}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.verticalListContainer}
-        numColumns={2}
-        showsVerticalScrollIndicator={false}
-        estimatedItemSize={150}
-        horizontal={false}
-      />
+      <View style={styles.flashListStyle}>
+        <FlashList
+          data={products}
+          renderItem={render}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={styles.verticalListContainer}
+          numColumns={2}
+          showsVerticalScrollIndicator={false}
+          estimatedItemSize={200}
+          horizontal={false}
+        />
+      </View>
     </>
   );
 });
@@ -114,6 +114,12 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {},
   header: {},
+  flashListStyle: {
+    // height: 200,
+    height: Dimensions.get("window").height,
+    width: Dimensions.get("window").width,
+    padding: 10,
+  },
   title: {
     fontSize: 18,
     color: "#333",

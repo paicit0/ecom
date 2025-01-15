@@ -61,10 +61,11 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "white",
     borderRadius: 10,
     paddingHorizontal: 12,
     marginVertical: 8,
+    borderColor: 'black'
   },
   icon: {
     marginRight: 8,

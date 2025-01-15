@@ -83,7 +83,6 @@ export const useUserSession = create<userSessionType>()(
           await saveToken(userCredential.user);
         } catch (error: any) {
           console.error("Login failed:", error.message);
-          // Handle the error, e.g., show a user-friendly message
         }
       },
 
