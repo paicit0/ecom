@@ -9,7 +9,8 @@ import {
 import { firebaseConfig } from "../../firecloud/firebaseConfig";
 import * as SecureStore from "expo-secure-store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getReactNativePersistence } from "firebase/auth";
+//@ts-ignore
+import { getReactNativePersistence } from '@firebase/auth/dist/rn/index.js';
 import { create } from "zustand";
 import { StateStorage, createJSONStorage, persist } from "zustand/middleware";
 import {
@@ -68,15 +69,19 @@ export const useUserSession = create<userSessionType>()(
         console.log("Setting userIsSignedIn to true");
 
         try {
-          const userCredential = await signInWithEmailAndPassword(auth, email, password);
+          const userCredential = await signInWithEmailAndPassword(
+            auth,
+            email,
+            password
+          );
           const userRef = collection(db, "users");
           const emailQuery = query(userRef, where("email", "==", email));
           const querySnapshot = await getDocs(emailQuery);
-          
+
           if (querySnapshot.empty) {
             throw new Error("No user found with this email.");
           }
-          
+
           const userData = querySnapshot.docs[0].data();
           set({ userIsSignedIn: true });
           set({ userInfo: { email: email, role: userData.role } });

@@ -1,6 +1,5 @@
 import * as functions from "firebase-functions";
 import { db } from "./index";
-// import bcryptjs from "bcryptjs";
 import { Timestamp } from "firebase-admin/firestore";
 
 const registerUsers = functions.https.onRequest(async (req, res) => {

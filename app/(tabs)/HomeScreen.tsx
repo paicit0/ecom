@@ -37,6 +37,7 @@ export const HomeScreen = memo(function HomeScreen() {
         const imagesToPreload = data.map((product) => product.images[0]);
         await Image.prefetch(imagesToPreload);
         setProducts(data);
+        console.log("Getting Products: " + data);
 
         // console.log("Filtered Products: " + JSON.stringify(filteredProducts));
       } catch (error) {
@@ -45,7 +46,7 @@ export const HomeScreen = memo(function HomeScreen() {
         setIsLoading(false);
       }
     };
-    console.log("Getting Products: " + getProducts);
+    
     getProducts();
   }, []);
 

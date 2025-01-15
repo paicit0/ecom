@@ -10,8 +10,8 @@ const EmptySearchBar = memo(function SearchBar() {
   return (
     <View style={styles.mainContainer}>
       <View style={{ height: 53 }}></View>
-      <View style={styles.searchBarContainer}>
-        <Link href={"/SearchScreen"} style={{  }}>
+      <Link href={"/SearchScreen"} style={styles.searchLink}>
+        <View style={styles.searchBarContainer}>
           <Ionicons name="search" size={25} color="#666" />
           <View style={styles.input}>
             <TextInput
@@ -19,7 +19,7 @@ const EmptySearchBar = memo(function SearchBar() {
               editable={false}
             ></TextInput>
           </View>
-          <Link href="/CartScreen" style={{}}>
+          <Link href="/CartScreen">
             {cart.length > 0 && (
               <Text style={styles.badge}>
                 {cart.length > 99 ? "99+" : cart.length}
@@ -27,8 +27,8 @@ const EmptySearchBar = memo(function SearchBar() {
             )}
             <Ionicons name="cart-outline" size={25} color="#666" />
           </Link>
-        </Link>
-      </View>
+        </View>
+      </Link>
     </View>
   );
 });
@@ -36,22 +36,21 @@ const EmptySearchBar = memo(function SearchBar() {
 const styles = StyleSheet.create({
   mainContainer: { padding: 10 },
   searchBarContainer: {
+    flex: 1,
     flexDirection: "row",
-    alignItems: "center",
     backgroundColor: "white",
     borderRadius: 10,
-    paddingHorizontal: 12,
     borderColor: "black",
     height: 53,
     borderWidth: 0.5,
-    width: "100%",
-    justifyContent: "space-between",
+  },
+  searchLink: {
+    
   },
   input: {
     flex: 1,
     fontSize: 16,
     color: "black",
-    // width: "100%",
     backgroundColor: "white",
   },
   badge: {

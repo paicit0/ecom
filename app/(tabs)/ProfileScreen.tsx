@@ -6,6 +6,23 @@ import { useUserSession } from "../auth/firebaseAuth";
 function ProfileScreen() {
   const { userIsSignedIn, logout } = useUserSession();
   const userInfoFromStore = useUserSession((state) => state.userInfo);
+
+  const handleSellerRegister = async () => {
+    const emulatorRegisterSellersURL =
+      "http://127.0.0.1:5001/ecom-firestore-11867/us-central1/registerSellers";
+    try {
+      console.log("Trying to fetch!");
+      const req = await fetch(emulatorRegisterSellersURL, {
+        method: "POST",
+        body: JSON.stringify({ email: userInfoFromStore.email }),
+      });
+      const res = await req.json();
+      console.log(res.status);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <View style={profileStyles.profilesContainer}>
       {userIsSignedIn ? (
@@ -25,6 +42,11 @@ function ProfileScreen() {
             <Text>Register</Text>
           </Link>
         </>
+      )}
+      {userInfoFromStore.role !== "seller" && (
+        <Pressable onPress={handleSellerRegister}>
+          <Text>Become a seller!</Text>
+        </Pressable>
       )}
     </View>
   );
