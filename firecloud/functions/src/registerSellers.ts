@@ -5,19 +5,22 @@ const registerSellers = functions.https.onRequest(async (req, res) => {
   try {
     const { email } = req.body;
     if (!email) {
-      res.status(404).json({ message: "Error 404: No user found" });
+      console.log("No email received!");
+      res.status(404).json({ message: "Error 404: Didn't receive an email" });
+      return;
     }
 
-    const userRef = db.collection("users").doc(email);
+    const userRef = db.collection("users").where("email", "==", email);
     const getUser = await userRef.get();
 
-    if (!getUser.exists) {
+    if (getUser.empty) {
+      console.log("No such user exists!");
       res.status(404).json({ message: "Error 404: No user found" });
+      return;
     } else {
-      const updateRole = await userRef.update({ role: "seller" });
-      res
-        .status(400)
-        .json({ message: "Success 400: Role changed to seller" + updateRole });
+      const userDocRef = getUser.docs[0].ref;
+      await userDocRef.update({ role: "seller" });
+      res.status(200).json({ message: "Success 200: Role changed to seller" });
     }
   } catch (error) {
     res.status(500).json({

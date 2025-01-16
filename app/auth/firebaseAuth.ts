@@ -10,7 +10,7 @@ import { firebaseConfig } from "../../firecloud/firebaseConfig";
 import * as SecureStore from "expo-secure-store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 //@ts-ignore
-import { getReactNativePersistence } from '@firebase/auth/dist/rn/index.js';
+import { getReactNativePersistence } from "@firebase/auth/dist/rn/index.js";
 import { create } from "zustand";
 import { StateStorage, createJSONStorage, persist } from "zustand/middleware";
 import {
@@ -31,9 +31,10 @@ interface userSessionType {
   userIsSignedIn: boolean;
   login: (email: string, password: string) => void;
   logout: () => void;
+  syncUserInfo: (email: string) => void;
   userInfo: {
     email: string;
-    role: string;
+    role: string | null;
   };
 }
 
@@ -66,7 +67,6 @@ export const useUserSession = create<userSessionType>()(
       login: async (email, password) => {
         console.log("Saving userIsSignedIn to SecureStorage");
         SecureStorage.setItem("userIsSignedIn", "true");
-        console.log("Setting userIsSignedIn to true");
 
         try {
           const userCredential = await signInWithEmailAndPassword(
@@ -83,21 +83,46 @@ export const useUserSession = create<userSessionType>()(
           }
 
           const userData = querySnapshot.docs[0].data();
+          console.log("Setting userIsSignedIn to true");
           set({ userIsSignedIn: true });
           set({ userInfo: { email: email, role: userData.role } });
           await saveToken(userCredential.user);
-        } catch (error: any) {
-          console.error("Login failed:", error.message);
+        } catch (error) {
+          console.error("Login failed:", error);
         }
       },
 
       logout: async () => {
-        console.log("Removing userIsSignedIn from SecureStorage");
-        SecureStorage.removeItem("userIsSignedIn");
-        console.log("Setting userIsSignedIn to false");
-        set({ userIsSignedIn: false });
-        await auth.signOut();
-        await SecureStore.deleteItemAsync("authToken");
+        try {
+          console.log("Removing userIsSignedIn from SecureStorage");
+          SecureStorage.removeItem("userIsSignedIn");
+          console.log("Setting userIsSignedIn to false");
+          set({ userIsSignedIn: false });
+          console.log("Setting userInfo to default");
+          set({ userInfo: { email: "", role: null } });
+          await auth.signOut();
+          await SecureStore.deleteItemAsync("authToken");
+        } catch (error) {
+          console.error("Logout failed:", error);
+        }
+      },
+
+      syncUserInfo: async (email) => {
+        try {
+          const userRef = collection(db, "users");
+          const emailQuery = query(userRef, where("email", "==", email));
+          const querySnapshot = await getDocs(emailQuery);
+          if (querySnapshot.empty) {
+            throw new Error("No user found with this email.");
+          }
+
+          const userData = querySnapshot.docs[0].data();
+          set((state) => ({
+            userInfo: { ...state.userInfo, role: userData.role },
+          }));
+        } catch (error) {
+          console.log(error);
+        }
       },
     }),
     {
