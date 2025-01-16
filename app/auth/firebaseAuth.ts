@@ -31,9 +31,9 @@ interface userSessionType {
   userIsSignedIn: boolean;
   login: (email: string, password: string) => void;
   logout: () => void;
-  syncUserInfo: (email: string) => void;
+  syncUserInfo: (email: string | null) => void;
   userInfo: {
-    email: string;
+    email: string | null;
     role: string | null;
   };
 }
@@ -65,6 +65,10 @@ export const useUserSession = create<userSessionType>()(
       userInfo: { email: "", role: "" },
       userIsSignedIn: false,
       login: async (email, password) => {
+        if (!email || !password) {
+          console.log("No email or password received.");
+          return;
+        }
         console.log("Saving userIsSignedIn to SecureStorage");
         SecureStorage.setItem("userIsSignedIn", "true");
 
