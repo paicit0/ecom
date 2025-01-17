@@ -11,8 +11,11 @@ const registerUsers = functions.https.onRequest(async (req, res) => {
 
     const user = {
       email: email,
+      pictureURL: "",
       timestamp: Timestamp.now(),
       role: "normalUser",
+      balance: 0,
+      cart: [],
     };
 
     if (!email) {
@@ -34,7 +37,9 @@ const registerUsers = functions.https.onRequest(async (req, res) => {
     }
   } catch (error) {
     console.log("Registering failed: " + error);
-    res.status(500).json({ message: "Registering failed on Cloud Function.", error: error }); // don't include "error" due to security risk.
+    res
+      .status(500)
+      .json({ message: "Registering failed on Cloud Function.", error: error }); // don't include "error" due to security risk.
   }
 });
 
