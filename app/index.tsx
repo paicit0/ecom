@@ -1,3 +1,4 @@
+//eas build --profile development --platform android
 //Index.tsx
 import { Redirect } from "expo-router";
 import { StripeProvider } from "@stripe/stripe-react-native";

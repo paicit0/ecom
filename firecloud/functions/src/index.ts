@@ -22,3 +22,6 @@ export { loginUsers };
 
 import { registerSellers } from "./registerSellers";
 export { registerSellers };
+
+import { uploadawsS3 } from "./uploadawsS3";
+export { uploadawsS3 };
