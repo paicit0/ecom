@@ -28,12 +28,12 @@ function SubmitProductScreen() {
     }
   };
 
-  const handleSubmit = (req: any) => {
+  const handleSubmit = () => {
     try {
-      const {productName, productPrice, imageUrl} = req.body
       // fetch awsS3 api to create a url for image
       // setImageURL
       // fetch createProduct api
+      // working on this next
       console.log("handleSubmitt");
     } catch (error) {
       console.log("Submitting error: ", error);
