@@ -25,7 +25,7 @@ function SearchScreen() {
     }
   }, [searchQuery]);
 
-  useEffect(() => {}, []);
+  // useEffect(() => {}, []);
 
   const render = ({ item }: { item: Product }) => {
     console.log("search query: ", searchQuery);

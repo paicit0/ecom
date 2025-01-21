@@ -3,7 +3,7 @@ import { render, fireEvent, waitFor, screen } from '@testing-library/react-nativ
 import HomeScreen from '../app/HomeScreen';
 import CartScreen from '../app/CartScreen';
 
-const mockPokemons = [
+const mockProduct = [
   { id: 1, name: 'bulbasaur' },
   { id: 2, name: 'ivysaur' },
 ];
@@ -19,3 +19,4 @@ describe('<CartScreen />', () => {
 
   })
 })
+

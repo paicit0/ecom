@@ -32,3 +32,5 @@ deletedCode
 firecloud/S3Config.ts
 learn.txt
 firecloud/awsS3Config.ts
+.env.dev
+.env

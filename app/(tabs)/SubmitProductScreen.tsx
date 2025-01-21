@@ -2,7 +2,11 @@ import { useState } from "react";
 import { View, Text } from "react-native";
 
 function SubmitProductScreen() {
-  const [product, setProduct] = useState({});
+  const [product, setProduct] = useState({
+    productName: "",
+    productPrice: "",
+    imageUrl: "",
+  });
   return (
     <View>
       <Text>SubmitProductScreen</Text>

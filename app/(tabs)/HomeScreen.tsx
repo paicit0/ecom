@@ -27,6 +27,7 @@ export const HomeScreen = memo(function HomeScreen() {
     const response = await fetch("https://dummyjson.com/products");
     const data = await response.json();
     useProductStore.getState().setProducts(data.products);
+    // console.log(data)
     return data.products;
   };
 
@@ -34,19 +35,19 @@ export const HomeScreen = memo(function HomeScreen() {
     const getProducts = async () => {
       try {
         const data = await fetchProductData();
-        const imagesToPreload = data.map((product) => product.images[0]);
-        await Image.prefetch(imagesToPreload);
+        // const imagesToPreload = data.map((product) => product.images[0]);
+        // await Promise.all(
+        //   imagesToPreload.map((image) => Image.prefetch(image))
+        // );
         setProducts(data);
-        console.log("Getting Products: " + data);
-
-        // console.log("Filtered Products: " + JSON.stringify(filteredProducts));
+        // console.log("Getting Products: " + data);
       } catch (error) {
         console.error("Error fetching Products:", error);
       } finally {
         setIsLoading(false);
       }
     };
-    
+
     getProducts();
   }, []);
 
@@ -60,29 +61,35 @@ export const HomeScreen = memo(function HomeScreen() {
     }
 
     return (
-      <Link
-        href={{
-          pathname: "/ItemScreen/[id]",
-          params: { id: item.id },
-        }}
-        style={styles.linkStyle}
-      >
-        <View style={styles.itemContainer}>
-          <Image
-            style={styles.imageItem}
-            source={{ uri: item.images[0] }}
-            contentFit="cover"
-            transition={200}
-          />
-          <Text numberOfLines={2} ellipsizeMode="tail" style={styles.itemTitle}>
-            {item.title}
-          </Text>
-          <View style={styles.priceStockContainer}>
-            <Text style={styles.itemPrice}>${item.price}</Text>
-            <Text style={styles.itemStock}>Stock: {item.stock}</Text>
+      <View style={styles.renderStyle}>
+        <Link
+          href={{
+            pathname: "/ItemScreen/[id]",
+            params: { id: item.id },
+          }}
+          // asChild
+        >
+          <View style={styles.itemContainer}>
+            <Image
+              style={styles.imageItem}
+              source={{ uri: item.images[0] }}
+              contentFit="cover"
+              transition={200}
+            />
+            <Text
+              numberOfLines={2}
+              ellipsizeMode="tail"
+              style={styles.itemTitle}
+            >
+              {item.title}
+            </Text>
+            <View style={styles.priceStockContainer}>
+              <Text style={styles.itemPrice}>${item.price}</Text>
+              <Text style={styles.itemStock}>Stock: {item.stock}</Text>
+            </View>
           </View>
-        </View>
-      </Link>
+        </Link>
+      </View>
     );
   };
 
@@ -101,6 +108,9 @@ export const HomeScreen = memo(function HomeScreen() {
           showsVerticalScrollIndicator={false}
           estimatedItemSize={200}
           horizontal={false}
+          ListEmptyComponent={() => (
+            <Text style={{ color: "red" }}>No Products to Display</Text>
+          )}
         />
       </View>
     </>
@@ -116,7 +126,6 @@ const styles = StyleSheet.create({
   loadingContainer: {},
   header: {},
   flashListStyle: {
-    // height: 200,
     height: Dimensions.get("window").height,
     width: Dimensions.get("window").width,
     padding: 10,
@@ -132,8 +141,6 @@ const styles = StyleSheet.create({
     backgroundColor: "cyan",
   },
   itemContainer: {
-    flex: 1,
-    // flexDirection: "column",
     backgroundColor: "white",
   },
   cardContent: {
@@ -145,9 +152,9 @@ const styles = StyleSheet.create({
     backgroundColor: "green",
   },
   priceStockContainer: {
-    flex: 1,
     flexDirection: "row",
     alignContent: "space-between",
+    width: Dimensions.get("window").width / 2,
   },
   itemPrice: {},
   itemStock: {},
@@ -157,10 +164,7 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   badge: {},
-  linkStyle: {
-    flex: 1,
-    flexDirection: "row",
-  },
+  renderStyle: {},
 });
 
 export default HomeScreen;

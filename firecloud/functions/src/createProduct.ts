@@ -9,8 +9,8 @@ const createProduct = functions.https.onRequest(async (req, res) => {
       productName: productName,
       productPrice: productPrice,
       soldNumber: 0,
-      Timestamp: Timestamp.now(),
       imageUrl: imageUrl,
+      Timestamp: Timestamp.now(),
     };
     const productsCollection = db.collection("products");
     const createOneProduct = await productsCollection.add(product);
