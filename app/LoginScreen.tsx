@@ -33,6 +33,7 @@ function LoginScreen() {
       <TextInput
         style={styles.input}
         placeholder="Password"
+        secureTextEntry
         value={password}
         onChangeText={(text) => setPassword(text)}
       ></TextInput>

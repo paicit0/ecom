@@ -5,7 +5,7 @@ import { Timestamp } from "firebase-admin/firestore";
 const registerUsers = functions.https.onRequest(async (req, res) => {
   try {
     console.log("Connected! Proceeding...");
-    const { email } = req.body;
+    const { email } = await req.body;
     const usersCollectionEmail = db.collection("users").doc(email);
     const docGet = await usersCollectionEmail.get();
 
