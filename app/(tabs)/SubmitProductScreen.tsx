@@ -4,6 +4,7 @@ import { View, Text, TextInput, Pressable } from "react-native";
 import { StyleSheet } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
+global.Buffer = require("buffer").Buffer;
 
 function SubmitProductScreen() {
   const [productName, setProductName] = useState<string>("");
@@ -53,6 +54,10 @@ function SubmitProductScreen() {
           contentType: contentType,
         }),
       });
+
+      const { imageUrl, thumbnailUrl } = await getS3URL.json();
+      console.log("Got URLs:", { imageUrl, thumbnailUrl });
+
       console.log("status:", getS3URL.status);
     } catch (error) {
       console.log("Submitting error: ", error);
