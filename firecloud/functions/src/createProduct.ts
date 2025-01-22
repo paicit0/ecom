@@ -17,6 +17,11 @@ const createProduct = functions.https.onRequest(async (req, res) => {
     console.log(
       "Product added successfully! " + "Product ID: " + createOneProduct.id
     );
+    res
+      .status(200)
+      .json({
+        message: "Product submitted sucessfully! " + createOneProduct.id,
+      });
   } catch (error) {
     res.status(400).json({ message: "failed the create product!" });
     console.log(error);

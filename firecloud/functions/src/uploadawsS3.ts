@@ -2,19 +2,22 @@ import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import sharp from "sharp";
 import * as functions from "firebase-functions";
+import { v4 as uuidv4 } from "uuid";
 
 const REGION = process.env.AWS_REGION;
 const BUCKET_NAME = process.env.AWS_BUCKET_NAME;
+const ACCESS_KEY = process.env.AWS_ACCESS_KEY_ID;
+const SECRET_KEY = process.env.AWS_SECRET_ACCESS_KEY;
 
 const s3Client = new S3Client({
-  region: process.env.AWS_REGION!,
+  region: REGION,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+    accessKeyId: ACCESS_KEY || "",
+    secretAccessKey: SECRET_KEY || "",
   },
 });
 
-const getUploadUrl = async (key: string, contentType: any) => {
+const getUploadUrl = async (key: string, contentType: string) => {
   const command = new PutObjectCommand({
     Bucket: BUCKET_NAME,
     Key: key,
@@ -24,7 +27,7 @@ const getUploadUrl = async (key: string, contentType: any) => {
   return signedUrl;
 };
 
-const uploadToS3 = async (buffer: any, key: string, contentType: any) => {
+const uploadToS3 = async (buffer: Buffer, key: string, contentType: string) => {
   const command = new PutObjectCommand({
     Bucket: BUCKET_NAME,
     Key: key,
@@ -34,21 +37,25 @@ const uploadToS3 = async (buffer: any, key: string, contentType: any) => {
   await s3Client.send(command);
 };
 
-const createThumbnail = async (imageBuffer: Buffer<ArrayBuffer>) => {
+const createThumbnail = async (imageBuffer: Buffer) => {
   return sharp(imageBuffer).resize({ width: 250 }).toBuffer();
 };
 
 const uploadawsS3 = functions.https.onRequest(async (req, res) => {
   try {
-    const { fileName, contentType, imageBase64 } = await req.body;
+    const uniqueName = uuidv4();
+    // console.log("Request body:", req.body);
+    console.log(process.env.AWS_ACCESS_KEY_ID);
+    console.log(process.env.AWS_BUCKET_NAME);
+    const { imageBase64, contentType } = await req.body;
     const imageBuffer = Buffer.from(imageBase64, "base64");
 
     // Create a thumbnail from the image buffer
     const thumbnailBuffer = await createThumbnail(imageBuffer);
 
     // Define S3 keys for the original image and the thumbnail
-    const originalKey = `uploads/${fileName}`;
-    const thumbnailKey = `thumbnails/${fileName}`;
+    const originalKey = `uploads/${uniqueName}`;
+    const thumbnailKey = `thumbnails/${uniqueName}`;
 
     // Upload the thumbnail to S3
     await uploadToS3(thumbnailBuffer, thumbnailKey, contentType);
