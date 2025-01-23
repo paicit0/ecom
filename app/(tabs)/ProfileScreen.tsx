@@ -8,7 +8,7 @@ function ProfileScreen() {
   const [error, setError] = useState("");
   const { userIsSignedIn, logout } = useUserSession();
   const userInfoFromStore = useUserSession((state) => state.userInfo);
-  const { syncUserInfo } = useUserSession();
+  const { getUserInfo } = useUserSession();
 
   useEffect(() => {
     console.log(userInfoFromStore.role);
@@ -28,7 +28,7 @@ function ProfileScreen() {
     const emulatorRegisterSellersURL =
       "http://10.0.2.2:5001/ecom-firestore-11867/us-central1/registerSellers";
     try {
-      console.log("Trying to fetch!", userInfoFromStore.email);
+      console.log("Trying to register with: ", userInfoFromStore.email);
       const req = await fetch(emulatorRegisterSellersURL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -36,7 +36,7 @@ function ProfileScreen() {
       });
       console.log(req.status);
       if (req.status === 200) {
-        syncUserInfo(userInfoFromStore.email);
+        getUserInfo(userInfoFromStore.email);
       }
     } catch (error) {
       console.error(error);

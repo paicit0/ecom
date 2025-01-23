@@ -25,7 +25,7 @@ const uploadToS3 = async (buffer: Buffer, key: string, contentType: string) => {
     ContentType: contentType,
   });
   await s3Client.send(command);
-  const url = `https://${BUCKET_NAME}.s3.amazonaws.com/${key}`;
+  const url = `https://${BUCKET_NAME}.s3.${REGION}.amazonaws.com/${key}`;
   return url;
 };
 

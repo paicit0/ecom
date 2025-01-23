@@ -1,15 +1,17 @@
-import React, { memo, useState } from "react";
+import { memo, useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useCart, useProductStore } from "../store/store";
 import { Link, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
+import { useUserSession } from "../auth/firebaseAuth";
 
 const ItemScreen = memo(function ItemScreen() {
   const { id } = useLocalSearchParams();
-  const addItem = useCart((state) => state.addItem);
+  const addItem = useCart((state) => state.addCart);
   const cart = useCart((state) => state.cartItems);
+  const user = useUserSession();
 
   const products = useProductStore((state) => state.products);
   const product = products.find((item) => item.id.toString() === id);
@@ -28,6 +30,23 @@ const ItemScreen = memo(function ItemScreen() {
   console.log(
     "Current Cart: " + JSON.stringify(cart.map(({ title }) => ({ title })))
   );
+
+  useEffect(() => {
+    const updateCart = async () => {
+      try {
+        const updateUserUrl = "";
+        const update = await fetch(updateUserUrl, {
+          body: JSON.stringify({
+            email: user.userInfo.email,
+            cart: cart,
+          }),
+        });
+        console.log(update.status);
+      } catch (error) {
+        console.log("update failed: ", error);
+      }
+    };
+  }, [cart]);
 
   return (
     <SafeAreaView style={styles.container}>

@@ -18,4 +18,4 @@ const buyProduct = functions.https.onRequest(async (req, res) => {
   }
 });
 
-export default { buyProduct };
+export { buyProduct };

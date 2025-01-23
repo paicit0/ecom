@@ -1,16 +1,35 @@
 // CartScreen.tsx
-import React, { useState, memo } from "react";
+import { memo, useEffect } from "react";
 import { View, StyleSheet, Pressable, ScrollView } from "react-native";
 import { Text, Image } from "react-native";
 import { useCart } from "./store/store";
 import { Ionicons } from "@expo/vector-icons";
-import { CartItem } from "./type/types";
+import { CartItem } from "./store/store";
 import { Link } from "expo-router";
+import { useUserSession } from "./auth/firebaseAuth";
 
 export const CartScreen = memo(() => {
   const cart = useCart((state) => state.cartItems);
-  const deleteItem = useCart((state) => state.deleteItem);
-  const deleteAll = useCart((state) => state.deleteAll);
+  const deleteItem = useCart((state) => state.deleteCart);
+  const deleteAll = useCart((state) => state.deleteAllCart);
+  const userEmail = useUserSession((state) => state.userInfo.email);
+
+  useEffect(() => {
+    const updateCart = async () => {
+      try {
+        const updateUserUrlLocal = "http://10.0.2.2:5001/ecom-firestore-11867/us-central1/updateUser";
+        const update = await fetch(updateUserUrlLocal, {
+          body: JSON.stringify({
+            email: userEmail,
+            favorite: cart,
+          }),
+        });
+        console.log(update.status);
+      } catch (error) {
+        console.log("update failed: ", error);
+      }
+    };
+  }, [cart]);
 
   const handleCartSubmit = (cart: CartItem[]) => {
     try {
@@ -21,11 +40,11 @@ export const CartScreen = memo(() => {
 
   const calculateTotal = () => {
     let total = 0;
-    for (let i=0; i<cart.length; i++) {
+    for (let i = 0; i < cart.length; i++) {
       total = total + cart[i].price;
-    } 
+    }
     return total;
-  }
+  };
 
   return (
     <ScrollView>

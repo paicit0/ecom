@@ -1,44 +1,43 @@
 //HomeScreen.tsx
-import React, { memo, useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import {
   StyleSheet,
   View,
   Text,
-  Pressable,
   ActivityIndicator,
   Dimensions,
-  FlatList,
 } from "react-native";
 import { Image } from "expo-image";
-import { Product } from "../type/types";
+import { Product } from "../store/store";
 import { Link } from "expo-router";
-import { useCart, useProductStore } from "../store/store";
 import { FlashList } from "@shopify/flash-list";
-import { Ionicons } from "@expo/vector-icons";
 import EmptySearchBar from "../../components/EmptySearchBar";
+import { useProductStore } from "../store/store";
 
 export const HomeScreen = memo(function HomeScreen() {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [category, setCategory] = useState<string>("");
-  const cart = useCart((state) => state.cartItems);
+  const getProductsUrl =
+    "http://10.0.2.2:5001/ecom-firestore-11867/us-central1/getProducts";
 
   const fetchProductData = async (): Promise<Product[]> => {
-    const response = await fetch("https://dummyjson.com/products");
+    const response = await fetch(getProductsUrl, {
+      body: JSON.stringify({ numberOfItems: 50 }),
+    });
     const data = await response.json();
-    useProductStore.getState().setProducts(data.products);
-    // console.log(data)
     return data.products;
+    // fix this up
   };
 
   useEffect(() => {
     const getProducts = async () => {
       try {
         const data = await fetchProductData();
-        // const imagesToPreload = data.map((product) => product.images[0]);
-        // await Promise.all(
-        //   imagesToPreload.map((image) => Image.prefetch(image))
-        // );
+        const imagesToPreload = data.map((product) => product.images[0]);
+        await Promise.all(
+          imagesToPreload.map((image) => Image.prefetch(image))
+        );
         setProducts(data);
         // console.log("Getting Products: " + data);
       } catch (error) {
@@ -50,6 +49,13 @@ export const HomeScreen = memo(function HomeScreen() {
 
     getProducts();
   }, []);
+
+  const loadMore = async () => {
+    const response = await fetch(getProductsUrl, {
+      body: JSON.stringify({ numberOfItems: 20 }),
+    });
+    // fix this up
+  };
 
   const render = ({ item }: { item: Product }) => {
     if (isLoading) {
@@ -111,6 +117,7 @@ export const HomeScreen = memo(function HomeScreen() {
           ListEmptyComponent={() => (
             <Text style={{ color: "red" }}>No Products to Display</Text>
           )}
+          onEndReached={loadMore}
         />
       </View>
     </>

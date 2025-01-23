@@ -1,15 +1,16 @@
-//SubmitProductScreen.tsx
+// SubmitProductScreen.tsx
 import { useEffect, useState } from "react";
 import { View, Text, TextInput, Pressable } from "react-native";
 import { StyleSheet } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
+import { useUserSession } from "../auth/firebaseAuth";
 global.Buffer = require("buffer").Buffer;
 
 function SubmitProductScreen() {
+  const user = useUserSession((state) => state.userInfo.email);
   const [productName, setProductName] = useState<string>("");
   const [productPrice, setProductPrice] = useState<string>("");
-  const [imageUrl, setImageUrl] = useState<string>("");
   const [imageIsSelected, setImageIsSelected] = useState<boolean>(false);
   const [imageName, setImageName] = useState<string>("");
   const [imageBase64, setImageBase64] = useState<string>("");
@@ -39,12 +40,23 @@ function SubmitProductScreen() {
     }
   };
 
+  /**
+   * Handles the submission of product data and image upload.
+   *
+   * This function first uploads the selected image to AWS S3 via a Cloud Function,
+   * obtaining URLs for the original image and its thumbnail. It then sets these URLs
+   * in the state and sends a request to create a new product in a Firestore collection.
+   *
+   * @throws Will log an error message if the submission process fails at any point.
+   */
+
   const handleSubmit = async () => {
     try {
       const uploadawsS3URL =
         "http://10.0.2.2:5001/ecom-firestore-11867/us-central1/uploadawsS3";
-      const createProductURL = "";
-      const getS3URL = await fetch(uploadawsS3URL, {
+      const createProductURL =
+        "http://10.0.2.2:5001/ecom-firestore-11867/us-central1/createProduct";
+      const getImagesURL = await fetch(uploadawsS3URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -54,11 +66,34 @@ function SubmitProductScreen() {
           contentType: contentType,
         }),
       });
+      const response = await getImagesURL.json();
+      console.log(response);
+      const { imageUrl, thumbnailUrl } = response;
+      console.log("getImagesURL Status:", getImagesURL.status);
 
-      const { imageUrl, thumbnailUrl } = await getS3URL.json();
-      console.log("Got URLs:", { imageUrl, thumbnailUrl });
-
-      console.log("status:", getS3URL.status);
+      if (getImagesURL.ok) {
+        console.log("Got image URLs:", {
+          imageUrl,
+          thumbnailUrl,
+        });
+        const createProductOnFirestore = await fetch(createProductURL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            productName: productName,
+            productPrice: productPrice,
+            imageUrl: imageUrl,
+            thumbnailUrl: thumbnailUrl,
+            owner: user,
+          }),
+        });
+        console.log(
+          "createProductOnFirestore Status: ",
+          createProductOnFirestore.status
+        );
+      }
     } catch (error) {
       console.log("Submitting error: ", error);
     }

@@ -27,3 +27,12 @@ export { registerSellers };
 
 import { uploadawsS3 } from "./uploadawsS3";
 export { uploadawsS3 };
+
+import { createProduct } from "./createProduct";
+export { createProduct };
+
+import { getProducts } from "./getProducts";
+export { getProducts };
+
+import { updateUser } from "./updateUser";
+export { updateUser };

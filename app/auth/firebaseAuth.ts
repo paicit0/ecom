@@ -31,10 +31,12 @@ interface userSessionType {
   userIsSignedIn: boolean;
   login: (email: string, password: string) => void;
   logout: () => void;
-  syncUserInfo: (email: string | null) => void;
+  getUserInfo: (email: string | null) => void;
   userInfo: {
     email: string | null;
     role: string | null;
+    favorite: [] | null;
+    cart: [] | null;
   };
 }
 
@@ -62,7 +64,7 @@ async function saveToken(user: User | null) {
 export const useUserSession = create<userSessionType>()(
   persist(
     (set) => ({
-      userInfo: { email: "", role: "" },
+      userInfo: { email: "", role: "", favorite: [], cart: [] },
       userIsSignedIn: false,
       login: async (email, password) => {
         if (!email || !password) {
@@ -89,7 +91,14 @@ export const useUserSession = create<userSessionType>()(
           const userData = querySnapshot.docs[0].data();
           console.log("Setting userIsSignedIn to true");
           set({ userIsSignedIn: true });
-          set({ userInfo: { email: email, role: userData.role } });
+          set({
+            userInfo: {
+              email: email,
+              role: userData.role,
+              favorite: userData.favorite,
+              cart: userData.cart,
+            },
+          });
           await saveToken(userCredential.user);
         } catch (error) {
           console.error("Login failed:", error);
@@ -103,7 +112,7 @@ export const useUserSession = create<userSessionType>()(
           console.log("Setting userIsSignedIn to false");
           set({ userIsSignedIn: false });
           console.log("Setting userInfo to default");
-          set({ userInfo: { email: "", role: null } });
+          set({ userInfo: { email: "", role: null, favorite: [], cart: [] } });
           await auth.signOut();
           await SecureStore.deleteItemAsync("authToken");
         } catch (error) {
@@ -111,7 +120,13 @@ export const useUserSession = create<userSessionType>()(
         }
       },
 
-      syncUserInfo: async (email) => {
+      /**
+       * Retrieves user information (role, favorite, cart) from the database based on the given email.
+       * Updates the userInfo state with the retrieved data.
+       * @param email The user's email.
+       */
+
+      getUserInfo: async (email) => {
         try {
           const userRef = collection(db, "users");
           const emailQuery = query(userRef, where("email", "==", email));
@@ -122,7 +137,12 @@ export const useUserSession = create<userSessionType>()(
 
           const userData = querySnapshot.docs[0].data();
           set((state) => ({
-            userInfo: { ...state.userInfo, role: userData.role },
+            userInfo: {
+              ...state.userInfo,
+              role: userData.role,
+              favorite: userData.favorite,
+              cart: userData.cart,
+            },
           }));
         } catch (error) {
           console.log(error);

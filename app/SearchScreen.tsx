@@ -5,7 +5,7 @@ import { useProductStore } from "./store/store";
 import { FlashList } from "@shopify/flash-list";
 import { Link } from "expo-router";
 import { StyleSheet } from "react-native";
-import { Product } from "./type/types";
+import { Product } from "./store/store";
 import { Ionicons } from "@expo/vector-icons";
 
 function SearchScreen() {
