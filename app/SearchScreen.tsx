@@ -16,7 +16,7 @@ function SearchScreen() {
 
   useEffect(() => {
     const filterItem = product.filter((item) =>
-      item.title.toLowerCase().startsWith(searchQuery.toLowerCase())
+      item.productName.toLowerCase().startsWith(searchQuery.toLowerCase())
     );
     if (!searchQuery) {
       setFilteredItems([]);
@@ -29,12 +29,12 @@ function SearchScreen() {
 
   const render = ({ item }: { item: Product }) => {
     console.log("search query: ", searchQuery);
-    const searchForIndex = item.title
+    const searchForIndex = item.productName
       .toLowerCase()
       .indexOf(searchQuery.toLowerCase());
-    const beforeMatch = item.title.slice(0, searchForIndex);
-    const match = item.title.slice(searchForIndex, searchQuery.length);
-    const afterMatch = item.title.slice(beforeMatch.length + match.length);
+    const beforeMatch = item.productName.slice(0, searchForIndex);
+    const match = item.productName.slice(searchForIndex, searchQuery.length);
+    const afterMatch = item.productName.slice(beforeMatch.length + match.length);
     return (
       <Link
         href={{
@@ -88,7 +88,7 @@ function SearchScreen() {
 }
 
 const styles = StyleSheet.create({
-  mainContainer: { padding: 10 },
+  mainContainer: { padding: 10, flex:1 },
   searchBarContainer: {
     flexDirection: "row",
     alignItems: "center",

@@ -57,7 +57,7 @@ const ItemScreen = memo(function ItemScreen() {
         <View style={styles.headerImage}>
           <Image
             style={styles.image}
-            source={{ uri: product.productImageUrl[0] }}
+            source={{ uri: product.productImageUrl }}
             contentFit="cover"
             transition={200}
           />
