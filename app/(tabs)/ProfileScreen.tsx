@@ -4,7 +4,6 @@ import { StyleSheet } from "react-native";
 // @ts-ignore
 import { useUserSession } from "../auth/firebaseAuth";
 import { useState, useEffect } from "react";
-import { useShallow } from 'zustand/react/shallow'
 function ProfileScreen() {
   const [error, setError] = useState("");
   const userIsSignedIn = useUserSession(state=>state.userIsSignedIn);
