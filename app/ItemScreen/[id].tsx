@@ -26,9 +26,9 @@ const ItemScreen = memo(function ItemScreen() {
     );
   }
 
-  console.log("ItemScreen: " + product.title + ", ID: " + product.id);
+  console.log("ItemScreen: " + product.productName + ", ID: " + product.id);
   console.log(
-    "Current Cart: " + JSON.stringify(cart.map(({ title }) => ({ title })))
+    "Current Cart: " + JSON.stringify(cart.map(({ productName }) => ({ productName })))
   );
 
   useEffect(() => {
@@ -57,7 +57,7 @@ const ItemScreen = memo(function ItemScreen() {
         <View style={styles.headerImage}>
           <Image
             style={styles.image}
-            source={{ uri: product.images[0] }}
+            source={{ uri: product.productImageUrl[0] }}
             contentFit="cover"
             transition={200}
           />
@@ -70,23 +70,23 @@ const ItemScreen = memo(function ItemScreen() {
               justifyContent: "space-between",
             }}
           >
-            <Text style={styles.name}>{"$" + product.price}</Text>
-            <Text>Stock: {product.stock}</Text>
+            <Text style={styles.name}>{"$" + product.productPrice}</Text>
+            <Text>Stock: {product.productStock}</Text>
           </View>
-          <Text style={styles.name}>{product.title}</Text>
-          <Text>{product.description}</Text>
+          <Text style={styles.name}>{product.productName}</Text>
+          <Text>{product.productDescription}</Text>
         </View>
       </ScrollView>
 
       <View style={[styles.ItemFooter, {}]}>
         <Pressable
           onPress={() => {
-            console.log("Adding to cart: " + product.title);
+            console.log("Adding to cart: " + product.productName);
             addItem({
-              title: product.title,
+              productName: product.productName,
               id: product.id,
-              images: product.images,
-              price: product.price,
+              productThumbnailUrl: product.productThumbnailUrl,
+              productPrice: product.productPrice,
             });
           }}
           style={styles.FooterCart}

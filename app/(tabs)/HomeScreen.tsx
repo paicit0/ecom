@@ -6,6 +6,8 @@ import {
   Text,
   ActivityIndicator,
   Dimensions,
+  RefreshControl,
+  ScrollView,
 } from "react-native";
 import { Image } from "expo-image";
 import { Product } from "../store/store";
@@ -15,59 +17,92 @@ import EmptySearchBar from "../../components/EmptySearchBar";
 import { useProductStore } from "../store/store";
 
 export const HomeScreen = memo(function HomeScreen() {
-  const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [category, setCategory] = useState<string>("");
+  const [currentProductNumber, setCurrentProductNumber] = useState<number>(0);
   const getProductsUrl =
     "http://10.0.2.2:5001/ecom-firestore-11867/us-central1/getProducts";
+  const initialProductLoadNumber = 50;
+  const LoadMoreProductNumber = 20;
+  const storeProducts = useProductStore((state) => state.setProducts);
+  const products = useProductStore((state) => state.products);
 
-  const fetchProductData = async (): Promise<Product[]> => {
+  const fetchProductData = async (): Promise<void> => {
     try {
+      console.log(
+        "fetchProductData with: Load:",
+        initialProductLoadNumber, "Skip:",
+        currentProductNumber
+      );
       const response = await fetch(getProductsUrl, {
         method: "POST",
-        body: JSON.stringify({ numberOfItems: 50 }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          numberOfItems: initialProductLoadNumber,
+          currentProductNumber: currentProductNumber,
+        }),
       });
-      const data = await response.json();
-      return data.products;
+      console.log("fetchProductdata status: ", response.status);
+      if (response.ok) {
+        const data = await response.json();
+        storeProducts(data.productsData);
+        const imagesToPreload = data.productsData.map(
+          (product: Product) => product.productThumbnailUrl
+        );
+        await Promise.all(
+          imagesToPreload.map((image: string) => Image.prefetch(image))
+        );
+        console.log("response is ok!");
+        setIsRefreshing(false);
+      }
     } catch (error) {
-      console.log("fetchProductData error: ", error);
-      return [];
+      console.log("fetchProductData Error: ", error);
+      return;
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
     }
-
-    // fix this up
   };
 
   useEffect(() => {
-    const getProducts = async () => {
-      try {
-        const data = await fetchProductData();
-        const imagesToPreload = data.map((product) => product.images[0]);
-        await Promise.all(
-          imagesToPreload.map((image) => Image.prefetch(image))
-        );
-        setProducts(data);
-        // console.log("Getting Products: " + data);
-      } catch (error) {
-        console.error("Error fetching Products:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    getProducts();
+    fetchProductData();
   }, []);
 
   const loadMore = async () => {
     try {
       const response = await fetch(getProductsUrl, {
         method: "POST",
-        body: JSON.stringify({ numberOfItems: 20 }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          numberOfItems: initialProductLoadNumber,
+          currentProductNumber: currentProductNumber,
+        }),
       });
+      if (response.ok) {
+        const data = await response.json();
+        setCurrentProductNumber((prev) => prev + LoadMoreProductNumber);
+        storeProducts([...products, ...data.productsData]);
+      }
     } catch (error) {
       console.log("loadMore Error: ", error);
       return;
     }
   };
+
+  // useEffect(() => {
+  //   products.forEach(product => {
+  //     console.log(product.id);
+  //   });
+  // }, [products]);
+
+  useEffect(() => {
+    console.log("isLoading: ", isLoading);
+  }, [isLoading]);
 
   const render = ({ item }: { item: Product }) => {
     if (isLoading) {
@@ -85,12 +120,11 @@ export const HomeScreen = memo(function HomeScreen() {
             pathname: "/ItemScreen/[id]",
             params: { id: item.id },
           }}
-          // asChild
         >
           <View style={styles.itemContainer}>
             <Image
               style={styles.imageItem}
-              source={{ uri: item.images[0] }}
+              source={{ uri: item.productThumbnailUrl }}
               contentFit="cover"
               transition={200}
             />
@@ -99,11 +133,11 @@ export const HomeScreen = memo(function HomeScreen() {
               ellipsizeMode="tail"
               style={styles.itemTitle}
             >
-              {item.title}
+              {item.productName}
             </Text>
             <View style={styles.priceStockContainer}>
-              <Text style={styles.itemPrice}>${item.price}</Text>
-              <Text style={styles.itemStock}>Stock: {item.stock}</Text>
+              <Text style={styles.itemPrice}>${item.productPrice}</Text>
+              <Text style={styles.itemStock}>Stock: {item.productStock}</Text>
             </View>
           </View>
         </Link>
@@ -112,7 +146,15 @@ export const HomeScreen = memo(function HomeScreen() {
   };
 
   return (
-    <>
+    <ScrollView
+      style={styles.mainContainer}
+      refreshControl={
+        <RefreshControl
+          refreshing={isRefreshing}
+          onRefresh={fetchProductData}
+        />
+      }
+    >
       <View style={styles.header}>
         <EmptySearchBar />
       </View>
@@ -120,7 +162,7 @@ export const HomeScreen = memo(function HomeScreen() {
         <FlashList
           data={products}
           renderItem={render}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.id}
           contentContainerStyle={styles.verticalListContainer}
           numColumns={2}
           showsVerticalScrollIndicator={false}
@@ -129,10 +171,11 @@ export const HomeScreen = memo(function HomeScreen() {
           ListEmptyComponent={() => (
             <Text style={{ color: "red" }}>No Products to Display</Text>
           )}
+          onEndReachedThreshold={1}
           onEndReached={loadMore}
         />
       </View>
-    </>
+    </ScrollView>
   );
 });
 

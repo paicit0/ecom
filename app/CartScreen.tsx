@@ -41,7 +41,7 @@ export const CartScreen = memo(() => {
   const calculateTotal = () => {
     let total = 0;
     for (let i = 0; i < cart.length; i++) {
-      total = total + cart[i].price;
+      total = total + cart[i].productPrice;
     }
     return total;
   };
@@ -59,9 +59,9 @@ export const CartScreen = memo(() => {
 
         {cart.map((item, index) => (
           <View style={styles.cartContainer} key={index}>
-            <Text>{item.title}</Text>
-            <Text>${item.price}</Text>
-            <Image style={styles.imageItem} source={{ uri: item.images[0] }} />
+            <Text>{item.productName}</Text>
+            <Text>${item.productPrice}</Text>
+            <Image style={styles.imageItem} source={{ uri: item.productThumbnailUrl }} />
             <Pressable onPress={() => deleteItem(index)}>
               <Ionicons
                 name="close-sharp"

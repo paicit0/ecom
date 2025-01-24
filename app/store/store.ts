@@ -2,20 +2,22 @@
 import { create } from "zustand";
 
 export type Product = {
-  stock: number;
-  id: number;
-  title: string;
-  description: string;
-  category: string;
-  price: number;
-  images: string[];
+  id: string;
+  productName: string;
+  productDescription: string;
+  productCategory: string;
+  productPrice: number;
+  productImageUrl: string;
+  productThumbnailUrl: string;
+  productStock: number;
+  productOwner: string;
 };
 
 export interface CartItem {
-  price: number;
-  title: string;
-  id: number;
-  images: string[];
+  id: string;
+  productName: string;
+  productPrice: number;
+  productThumbnailUrl: string;
 }
 
 interface useCartArray {
@@ -25,10 +27,6 @@ interface useCartArray {
   deleteAllCart: () => void;
 }
 
-interface ProductStore {
-  products: Product[];
-  setProducts: (newProducts: CartItem[]) => void;
-}
 
 export const useCart = create<useCartArray>((set) => ({
   cartItems: [],
@@ -41,9 +39,14 @@ export const useCart = create<useCartArray>((set) => ({
   deleteAllCart: () => set({ cartItems: [] }),
 }));
 
+interface ProductStore {
+  products: Product[];
+  setProducts: (newProducts: Product[]) => void;
+}
+
 export const useProductStore = create<ProductStore>((set) => ({
   products: [],
-  setProducts: (newProducts: any) => set({ products: newProducts }),
+  setProducts: (newProducts: Product[]) => set({ products: newProducts }),
 }));
 
 interface useFavoriteArray {

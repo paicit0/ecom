@@ -11,10 +11,10 @@ global.Buffer = require("buffer").Buffer;
 function SubmitProductScreen() {
   const user = useUserSession((state) => state.userInfo);
   const [productName, setProductName] = useState<string>("");
-  const [productPrice, setProductPrice] = useState<number>(0);
+  const [productPrice, setProductPrice] = useState<number>(NaN);
   const [productDescription, setProductDescription] = useState<string>("");
   const [productCategory, setProductCategory] = useState<string | null>(null);
-  const [productStock, setProductStock] = useState<number>(0);
+  const [productStock, setProductStock] = useState<number>(NaN);
   const [imageIsSelected, setImageIsSelected] = useState<boolean>(false);
   const [imageName, setImageName] = useState<string>("");
   const [imageBase64, setImageBase64] = useState<string>("");
@@ -107,12 +107,6 @@ function SubmitProductScreen() {
     }
   };
 
-  const handleOnPriceInputChange = (text: any) => {
-    if (!isNaN(text)) {
-      setProductPrice(text);
-    }
-  };
-
   const DropdownCategories = [
     { label: "Food", value: "food" },
     { label: "Electronic", value: "electronic" },
@@ -141,8 +135,19 @@ function SubmitProductScreen() {
         style={styles.input}
         keyboardType="numeric"
         placeholder="Price..."
-        value={productPrice.toString()}
-        onChangeText={handleOnPriceInputChange}
+        value={isNaN(productPrice) ? "" : productPrice.toString()}
+        onChangeText={(num) => {
+          setProductPrice(parseInt(num));
+        }}
+      />
+      <TextInput
+        style={styles.input}
+        keyboardType="numeric"
+        placeholder="Stock..."
+        value={isNaN(productStock) ? "" : productStock.toString()}
+        onChangeText={(num) => {
+          setProductStock(parseInt(num));
+        }}
       />
       <Dropdown
         style={styles.dropdown}

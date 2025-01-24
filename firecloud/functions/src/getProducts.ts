@@ -5,18 +5,20 @@ const getProducts = functions.https.onRequest(async (req, res) => {
   try {
     // fix this up
     console.log("getProducts req.body: ", req.body);
-    const { numberOfItems } = req.body;
-    const docRef = await db
+    const { numberOfItems, currentProductNumber } = req.body;
+    const productsSnapshot = await db
       .collection("products")
       .orderBy("productName")
-      .startAt(0)
-      .endAt(numberOfItems)
+      .limit(numberOfItems)
+      .offset(currentProductNumber)
       .get();
-    console.log(docRef);
-    console.log(numberOfItems);
-    const productsCollection = db.collection("products");
-    console.log(productsCollection);
-    res.status(200);
+
+    const productsData = productsSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    res.status(200).json({ productsData });
   } catch (error) {
     console.log("getProducts error: ", error);
     res.status(400);
