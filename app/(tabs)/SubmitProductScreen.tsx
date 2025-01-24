@@ -113,10 +113,6 @@ function SubmitProductScreen() {
     { label: "Tool", value: "tool" },
   ];
 
-  // useEffect(() => {
-  //   console.log(productCategory);
-  // }, [productCategory]);
-
   return (
     <View style={styles.mainContainer}>
       <TextInput
