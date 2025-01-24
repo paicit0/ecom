@@ -105,9 +105,9 @@ export const HomeScreen = memo(function HomeScreen() {
     );
   }, [products]);
 
-  useEffect(() => {
-    console.log("isLoading: ", isLoading);
-  }, [isLoading]);
+  // useEffect(() => {
+  //   console.log("isLoading: ", isLoading);
+  // }, [isLoading]);
 
   const render = ({ item }: { item: Product }) => {
     if (isLoading) {
@@ -176,7 +176,6 @@ export const HomeScreen = memo(function HomeScreen() {
       <View style={styles.header}>
         <EmptySearchBar />
       </View>
-      {/* <View style={styles.flashListStyle}> */}
       <FlashList
         data={products}
         renderItem={render}
@@ -184,19 +183,22 @@ export const HomeScreen = memo(function HomeScreen() {
         contentContainerStyle={styles.verticalListContainer}
         numColumns={2}
         showsVerticalScrollIndicator={false}
-        estimatedItemSize={200}
+        estimatedItemSize={190}
         horizontal={false}
         ListEmptyComponent={() => (
           <Text style={{ color: "red" }}>No Products to Display</Text>
         )}
         extraData={[isLoading, products]} // re renders if isLoading/ products change
-        // onEndReachedThreshold={0.1}
+        onEndReachedThreshold={0.1}
         // onEndReached={loadMore}
+        onEndReached={()=>console.log("End of FlashList reached!")}
+        bounces={false}
       />
-      {/* </View> */}
+      <View style={{height: 50}}></View>
     </ScrollView>
   );
 });
+// console.log(Dimensions.get("window").width)
 
 const styles = StyleSheet.create({
   mainContainer: {
