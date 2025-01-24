@@ -44,9 +44,7 @@ const styles = StyleSheet.create({
     height: 53,
     borderWidth: 0.5,
   },
-  searchLink: {
-    
-  },
+  searchLink: {},
   input: {
     flex: 1,
     fontSize: 16,

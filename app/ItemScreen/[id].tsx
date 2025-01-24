@@ -11,7 +11,7 @@ const ItemScreen = memo(function ItemScreen() {
   const { id } = useLocalSearchParams();
   const addItem = useCart((state) => state.addCart);
   const cart = useCart((state) => state.cartItems);
-  const user = useUserSession();
+  const userEmail = useUserSession(state=>state.userInfo.email);
 
   const products = useProductStore((state) => state.products);
   const product = products.find((item) => item.id.toString() === id);
@@ -37,7 +37,7 @@ const ItemScreen = memo(function ItemScreen() {
         const updateUserUrl = "";
         const update = await fetch(updateUserUrl, {
           body: JSON.stringify({
-            email: user.userInfo.email,
+            email: userEmail,
             cart: cart,
           }),
         });

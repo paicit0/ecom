@@ -22,11 +22,18 @@ export const HomeScreen = memo(function HomeScreen() {
     "http://10.0.2.2:5001/ecom-firestore-11867/us-central1/getProducts";
 
   const fetchProductData = async (): Promise<Product[]> => {
-    const response = await fetch(getProductsUrl, {
-      body: JSON.stringify({ numberOfItems: 50 }),
-    });
-    const data = await response.json();
-    return data.products;
+    try {
+      const response = await fetch(getProductsUrl, {
+        method: "POST",
+        body: JSON.stringify({ numberOfItems: 50 }),
+      });
+      const data = await response.json();
+      return data.products;
+    } catch (error) {
+      console.log("fetchProductData error: ", error);
+      return [];
+    }
+
     // fix this up
   };
 
@@ -51,10 +58,15 @@ export const HomeScreen = memo(function HomeScreen() {
   }, []);
 
   const loadMore = async () => {
-    const response = await fetch(getProductsUrl, {
-      body: JSON.stringify({ numberOfItems: 20 }),
-    });
-    // fix this up
+    try {
+      const response = await fetch(getProductsUrl, {
+        method: "POST",
+        body: JSON.stringify({ numberOfItems: 20 }),
+      });
+    } catch (error) {
+      console.log("loadMore Error: ", error);
+      return;
+    }
   };
 
   const render = ({ item }: { item: Product }) => {

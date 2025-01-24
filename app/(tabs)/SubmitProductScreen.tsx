@@ -5,12 +5,16 @@ import { StyleSheet } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
 import { useUserSession } from "../auth/firebaseAuth";
+import { Dropdown } from "react-native-element-dropdown";
 global.Buffer = require("buffer").Buffer;
 
 function SubmitProductScreen() {
-  const user = useUserSession((state) => state.userInfo.email);
+  const user = useUserSession((state) => state.userInfo);
   const [productName, setProductName] = useState<string>("");
-  const [productPrice, setProductPrice] = useState<string>("");
+  const [productPrice, setProductPrice] = useState<number>(0);
+  const [productDescription, setProductDescription] = useState<string>("");
+  const [productCategory, setProductCategory] = useState<string | null>(null);
+  const [productStock, setProductStock] = useState<number>(0);
   const [imageIsSelected, setImageIsSelected] = useState<boolean>(false);
   const [imageName, setImageName] = useState<string>("");
   const [imageBase64, setImageBase64] = useState<string>("");
@@ -68,13 +72,14 @@ function SubmitProductScreen() {
       });
       const response = await getImagesURL.json();
       console.log(response);
-      const { imageUrl, thumbnailUrl } = response;
+      const { imageUrl: productImageUrl, thumbnailUrl: productThumbnailUrl } =
+        response;
       console.log("getImagesURL Status:", getImagesURL.status);
 
       if (getImagesURL.ok) {
         console.log("Got image URLs:", {
-          imageUrl,
-          thumbnailUrl,
+          imageUrl: productImageUrl,
+          thumbnailUrl: productThumbnailUrl,
         });
         const createProductOnFirestore = await fetch(createProductURL, {
           method: "POST",
@@ -84,9 +89,12 @@ function SubmitProductScreen() {
           body: JSON.stringify({
             productName: productName,
             productPrice: productPrice,
-            imageUrl: imageUrl,
-            thumbnailUrl: thumbnailUrl,
-            owner: user,
+            productDescription: productDescription,
+            productCategory: productCategory,
+            productImageUrl: productImageUrl,
+            productThumbnailUrl: productThumbnailUrl,
+            productStock: productStock,
+            productOwner: user.email,
           }),
         });
         console.log(
@@ -104,23 +112,50 @@ function SubmitProductScreen() {
       setProductPrice(text);
     }
   };
-  useEffect(() => {}, []);
+
+  const DropdownCategories = [
+    { label: "Food", value: "food" },
+    { label: "Electronic", value: "electronic" },
+    { label: "Tool", value: "tool" },
+  ];
+
+  // useEffect(() => {
+  //   console.log(productCategory);
+  // }, [productCategory]);
 
   return (
-    <View style={style.mainContainer}>
+    <View style={styles.mainContainer}>
       <TextInput
-        style={style.input}
+        style={styles.input}
         placeholder="Name..."
         value={productName}
         onChangeText={setProductName}
       />
       <TextInput
-        style={style.input}
+        style={styles.input}
+        placeholder="Description..."
+        value={productDescription}
+        onChangeText={setProductDescription}
+      />
+      <TextInput
+        style={styles.input}
         keyboardType="numeric"
         placeholder="Price..."
-        value={productPrice}
+        value={productPrice.toString()}
         onChangeText={handleOnPriceInputChange}
       />
+      <Dropdown
+        style={styles.dropdown}
+        data={DropdownCategories}
+        onChange={(item) => {
+          setProductCategory(item.value);
+        }}
+        placeholder="Select Category"
+        value={productCategory}
+        labelField="label"
+        valueField="value"
+      />
+
       {imageIsSelected ? (
         <>
           <Text>{imageName}</Text>
@@ -148,7 +183,7 @@ function SubmitProductScreen() {
   );
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     justifyContent: "center",
@@ -160,6 +195,13 @@ const style = StyleSheet.create({
     borderWidth: 1,
     marginVertical: 10,
     paddingHorizontal: 10,
+    width: 300,
+  },
+  dropdown: {
+    margin: 16,
+    height: 50,
+    borderBottomColor: "gray",
+    borderBottomWidth: 0.5,
     width: 300,
   },
 });

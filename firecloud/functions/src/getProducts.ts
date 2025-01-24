@@ -9,8 +9,10 @@ const getProducts = functions.https.onRequest(async (req, res) => {
     const docRef = await db
       .collection("products")
       .orderBy("productName")
-      .startAt()
+      .startAt(0)
+      .endAt(numberOfItems)
       .get();
+    console.log(docRef);
     console.log(numberOfItems);
     const productsCollection = db.collection("products");
     console.log(productsCollection);
