@@ -5,6 +5,8 @@ import { StyleSheet } from "react-native";
 import { useUserSession } from "../auth/firebaseAuth";
 import { useState, useEffect } from "react";
 import { getAuth } from "firebase/auth";
+import * as SecureStore from "expo-secure-store";
+
 function ProfileScreen() {
   const [error, setError] = useState("");
   const userIsSignedIn = useUserSession((state) => state.userIsSignedIn);
@@ -30,7 +32,8 @@ function ProfileScreen() {
       console.log("not logged in");
       return;
     }
-    const idToken = await userAuth.getIdToken();
+    const idToken = await SecureStore.getItemAsync("authToken");
+    console.log("idToken:", idToken);
     if (!userIsSignedIn) {
       setError("Please sign in first!");
       return;
@@ -57,48 +60,99 @@ function ProfileScreen() {
   };
 
   return (
-    <View style={profileStyles.profilesContainer}>
-      {<Text>{error}</Text>}
+    <View style={styles.profilesContainer}>
+      {error && <Text style={styles.errorText}>{error}</Text>}
       {userIsSignedIn ? (
         <>
-          <Text>User: {userInfoFromStore.email}</Text>
-          <Text>Current Role: {userInfoFromStore.role}</Text>
-          <Pressable onPress={() => logout()}>
-            <Text>Logout!</Text>
+          <Text style={styles.text}>Welcome, {userInfoFromStore.email}</Text>
+          <Link href={"/FavoriteScreen"} style={styles.link}>
+            <Text style={styles.link}>Favorites</Text>
+          </Link>
+          {/* <Text style={styles.text}>Current Role: {userInfoFromStore.role}</Text> */}
+          <Pressable onPress={() => logout()} style={styles.button}>
+            <Text style={styles.buttonText}>Logout!</Text>
           </Pressable>
           {userInfoFromStore.role !== "seller" && (
-            <Pressable onPress={handleSellerRegister}>
-              <Text>Become a seller!</Text>
+            <Pressable onPress={handleSellerRegister} style={styles.button}>
+              <Text style={styles.buttonText}>Become a seller!</Text>
             </Pressable>
           )}
         </>
       ) : (
         <>
-          <Link href="/LoginScreen" style={profileStyles.title}>
-            <Text>Login</Text>
+          <Link href="/LoginScreen" style={styles.title}>
+            <Text style={styles.title}>Login</Text>
           </Link>
-          <Link href="/RegisterScreen" style={profileStyles.title}>
-            <Text>Register</Text>
+          <Link href="/RegisterScreen" style={styles.title}>
+            <Text style={styles.title}>Register</Text>
           </Link>
         </>
       )}
-      <Pressable onPress={() => console.log(userInfoFromStore)}>
-        <Text>Get user status</Text>
-      </Pressable>
+      {/* <Pressable onPress={() => console.log(userInfoFromStore)} style={styles.button}>
+        <Text style={styles.buttonText}>Get user status</Text>
+      </Pressable> */}
     </View>
   );
 }
 
-const profileStyles = StyleSheet.create({
+const styles = StyleSheet.create({
   profilesContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#f0f4f8",
+    padding: 20,
   },
   title: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#ffffff",
+    backgroundColor: "#646ff0",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 25,
+    shadowColor: "#646ff0",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 6,
+    marginVertical: 10,
+    transform: [{ scale: 1 }],
+  },
+  text: {
+    fontSize: 16,
+    color: "#333",
+    marginVertical: 8,
+  },
+  link: {
+    fontSize: 16,
+    color: "#646ff0",
+    textDecorationLine: "underline",
+    marginVertical: 8,
+  },
+  button: {
+    backgroundColor: "#ff4757",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 25,
     justifyContent: "center",
-    padding: 16,
-    backgroundColor: "yellow",
+    alignItems: "center",
+    marginVertical: 10,
+    shadowColor: "#ff4757",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 6,
+  },
+  buttonText: {
+    color: "#ffffff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  errorText: {
+    color: "#ff6b81",
+    fontSize: 14,
+    marginBottom: 10,
   },
 });
 

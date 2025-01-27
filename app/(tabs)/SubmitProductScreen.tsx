@@ -7,6 +7,8 @@ import * as FileSystem from "expo-file-system";
 import { useUserSession } from "../auth/firebaseAuth";
 import { Dropdown } from "react-native-element-dropdown";
 import { getAuth } from "firebase/auth";
+import { Ionicons } from "@expo/vector-icons";
+import * as SecureStore from 'expo-secure-store';
 global.Buffer = require("buffer").Buffer;
 
 function SubmitProductScreen() {
@@ -53,7 +55,8 @@ function SubmitProductScreen() {
       console.log("not logged in");
       return;
     }
-    const idToken = await userAuth.getIdToken();
+    const idToken = await SecureStore.getItemAsync('authToken');
+    console.log("idToken:",idToken);
     try {
       const uploadawsS3URL =
         "http://10.0.2.2:5001/ecom-firestore-11867/us-central1/uploadawsS3";
@@ -159,26 +162,27 @@ function SubmitProductScreen() {
 
       {imageIsSelected ? (
         <>
-          <Text>{imageName}</Text>
-          <Pressable onPress={() => setImageIsSelected(false)}>
-            <Text>Clear</Text>
-          </Pressable>
+          <Text style={{ flexDirection: "row", alignItems: "center" }}>
+            {imageName}
+            <Pressable onPress={() => setImageIsSelected(false)}>
+              <Ionicons name="close-sharp" size={20} color="red" />
+            </Pressable>
+          </Text>
         </>
       ) : (
         <>
           <Pressable
             onPress={handleFilePicking}
-            style={{ borderWidth: 1, margin: 10, padding: 10 }}
+            style={styles.imageInputButton}
           >
-            <Text>Pick a picture</Text>
+            <Text style={styles.imageInputButtonText}>Pick an image!</Text>
           </Pressable>
         </>
       )}
-      <Pressable
-        onPress={handleSubmit}
-        style={{ borderWidth: 1, margin: 10, padding: 10 }}
-      >
-        <Text>Submit</Text>
+      <Pressable onPress={handleSubmit} style={styles.submitButton}>
+        <Text style={styles.submitButtonText}>
+          Submit a product!
+        </Text>
       </Pressable>
     </View>
   );
@@ -193,7 +197,8 @@ const styles = StyleSheet.create({
   input: {
     height: 40,
     borderColor: "gray",
-    borderWidth: 1,
+    borderWidth: 0.8,
+    borderRadius: 12.5,
     marginVertical: 10,
     paddingHorizontal: 10,
     width: 300,
@@ -201,9 +206,50 @@ const styles = StyleSheet.create({
   dropdown: {
     margin: 16,
     height: 50,
-    borderBottomColor: "gray",
-    borderBottomWidth: 0.5,
     width: 300,
+    borderWidth: 0.8,
+    borderRadius: 12.5,
+    alignItems: "center",
+  },
+  imageInputButton: {
+    backgroundColor: "#ff4757",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 10,
+    shadowColor: "#ff4757",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 6,
+  },
+  imageInputButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+
+  },
+  submitButton: {
+    backgroundColor: "green",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 10,
+    shadowColor: "#ff4757",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 6,
+  },
+  submitButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+
   },
 });
 
