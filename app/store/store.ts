@@ -49,9 +49,16 @@ export const useProductStore = create<ProductStore>((set) => ({
   setProducts: (newProducts: Product[]) => set({ products: newProducts }),
 }));
 
+export interface FavoriteItem {
+  id: string;
+  productName: string;
+  productPrice: number;
+  productThumbnailUrl: string;
+}
+
 interface useFavoriteArray {
-  favoriteItems: CartItem[];
-  addFavorite: (item: CartItem) => void;
+  favoriteItems: FavoriteItem[];
+  addFavorite: (item: FavoriteItem) => void;
   deleteFavorite: (index: number) => void;
   deleteAllFavorite: () => void;
 }
