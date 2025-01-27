@@ -1,9 +1,24 @@
 import * as functions from "firebase-functions";
 import { db } from "./index";
+import * as admin from "firebase-admin";
 
 const registerSellers = functions.https.onRequest(async (req, res) => {
   try {
     const { email } = req.body;
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      res.status(401).json({ message: "Unauthorized!" });
+      return;
+    }
+    const idToken = authHeader.split("Bearer ")[1];
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const userEmail = decodedToken.email;
+    console.log("req.header bearer: ", idToken);
+
+    if (userEmail !== req.body.productOwner) {
+      res.status(403).json({ message: "Forbidden!" });
+      return;
+    }
     if (!email) {
       console.log("No email received!");
       res.status(404).json({ message: "Error 404: Didn't receive an email" });

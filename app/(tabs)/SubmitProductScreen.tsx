@@ -6,6 +6,7 @@ import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
 import { useUserSession } from "../auth/firebaseAuth";
 import { Dropdown } from "react-native-element-dropdown";
+import { getAuth } from "firebase/auth";
 global.Buffer = require("buffer").Buffer;
 
 function SubmitProductScreen() {
@@ -44,17 +45,15 @@ function SubmitProductScreen() {
     }
   };
 
-  /**
-   * Handles the submission of product data and image upload.
-   *
-   * This function first uploads the selected image to AWS S3 via a Cloud Function,
-   * obtaining URLs for the original image and its thumbnail. It then sets these URLs
-   * in the state and sends a request to create a new product in a Firestore collection.
-   *
-   * @throws Will log an error message if the submission process fails at any point.
-   */
-
   const handleSubmit = async () => {
+    const auth = getAuth();
+    const userAuth = auth.currentUser;
+    console.log("userAuth: ", userAuth);
+    if (!userAuth) {
+      console.log("not logged in");
+      return;
+    }
+    const idToken = await userAuth.getIdToken();
     try {
       const uploadawsS3URL =
         "http://10.0.2.2:5001/ecom-firestore-11867/us-central1/uploadawsS3";
@@ -63,6 +62,7 @@ function SubmitProductScreen() {
       const getImagesURL = await fetch(uploadawsS3URL, {
         method: "POST",
         headers: {
+          Authorization: `Bearer ${idToken}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({

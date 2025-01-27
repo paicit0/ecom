@@ -1,10 +1,27 @@
 import * as functions from "firebase-functions";
 import { db } from "./index";
 import { Timestamp } from "firebase-admin/firestore";
+import * as admin from "firebase-admin";
 
 const createProduct = functions.https.onRequest(async (req, res) => {
   try {
+    console.log("createProduct req.header: ", req.headers.authorization);
     console.log("createProduct req.body: ", req.body);
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      res.status(401).json({ message: "Unauthorized!" });
+      return;
+    }
+    const idToken = authHeader.split("Bearer ")[1];
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const userEmail = decodedToken.email;
+    console.log("req.header bearer: ", idToken);
+
+    if (userEmail !== req.body.productOwner) {
+      res.status(403).json({ message: "Forbidden!" });
+      return;
+    }
+
     const {
       productName,
       productDescription = "Contact the owner",
@@ -16,8 +33,15 @@ const createProduct = functions.https.onRequest(async (req, res) => {
       productOwner,
     } = req.body;
 
-    if (!productName || !productPrice || !productImageUrl || !productThumbnailUrl || !productOwner) {
+    if (
+      !productName ||
+      !productPrice ||
+      !productImageUrl ||
+      !productThumbnailUrl ||
+      !productOwner
+    ) {
       res.status(400).json({ message: "incomplete fields!" });
+      return;
     }
 
     const product = {
@@ -40,9 +64,11 @@ const createProduct = functions.https.onRequest(async (req, res) => {
     res.status(200).json({
       message: "Product submitted sucessfully! " + createOneProduct.id,
     });
+    return;
   } catch (error) {
     res.status(400).json({ message: "failed the create product!" });
     console.log(error);
+    return;
   }
 });
 
