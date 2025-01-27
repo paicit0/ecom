@@ -15,14 +15,16 @@ function SearchScreen() {
   // console.log("product: ", product);
 
   useEffect(() => {
-    const filterItem = product.filter((item) =>
-      item.productName.toLowerCase().startsWith(searchQuery.toLowerCase())
-    );
-    if (!searchQuery) {
-      setFilteredItems([]);
-    } else {
-      setFilteredItems(filterItem);
-    }
+    const getSearchItems = setTimeout(() => {
+      const filterItem = product.filter((item) =>
+        item.productName.toLowerCase().startsWith(searchQuery.toLowerCase())
+      );
+      if (!searchQuery) {
+        setFilteredItems([]);
+      } else {
+        setFilteredItems(filterItem);
+      }
+    }, 1000);
   }, [searchQuery]);
 
   // useEffect(() => {}, []);
@@ -34,7 +36,9 @@ function SearchScreen() {
       .indexOf(searchQuery.toLowerCase());
     const beforeMatch = item.productName.slice(0, searchForIndex);
     const match = item.productName.slice(searchForIndex, searchQuery.length);
-    const afterMatch = item.productName.slice(beforeMatch.length + match.length);
+    const afterMatch = item.productName.slice(
+      beforeMatch.length + match.length
+    );
     return (
       <Link
         href={{
@@ -88,7 +92,7 @@ function SearchScreen() {
 }
 
 const styles = StyleSheet.create({
-  mainContainer: { padding: 10, flex:1 },
+  mainContainer: { padding: 10, flex: 1 },
   searchBarContainer: {
     flexDirection: "row",
     alignItems: "center",
