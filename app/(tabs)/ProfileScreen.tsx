@@ -4,10 +4,11 @@ import { StyleSheet } from "react-native";
 // @ts-ignore
 import { useUserSession } from "../auth/firebaseAuth";
 import { useState, useEffect } from "react";
+import { getAuth } from "firebase/auth";
 function ProfileScreen() {
   const [error, setError] = useState("");
-  const userIsSignedIn = useUserSession(state=>state.userIsSignedIn);
-  const logout = useUserSession(state=>state.logout);
+  const userIsSignedIn = useUserSession((state) => state.userIsSignedIn);
+  const logout = useUserSession((state) => state.logout);
   const userInfoFromStore = useUserSession((state) => state.userInfo);
   const { getUserInfo } = useUserSession();
 
@@ -22,6 +23,14 @@ function ProfileScreen() {
   }, [userIsSignedIn]);
 
   const handleSellerRegister = async () => {
+    const auth = getAuth();
+    const userAuth = auth.currentUser;
+    console.log("userAuth: ", userAuth);
+    if (!userAuth) {
+      console.log("not logged in");
+      return;
+    }
+    const idToken = await userAuth.getIdToken();
     if (!userIsSignedIn) {
       setError("Please sign in first!");
       return;
@@ -32,7 +41,10 @@ function ProfileScreen() {
       console.log("Trying to register with: ", userInfoFromStore.email);
       const req = await fetch(emulatorRegisterSellersURL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ email: userInfoFromStore.email }),
       });
       console.log(req.status);
