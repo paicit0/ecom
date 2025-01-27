@@ -19,6 +19,7 @@ import { useProductStore } from "../store/store";
 export const HomeScreen = memo(function HomeScreen() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [category, setCategory] = useState<string>("");
   const [currentProductNumber, setCurrentProductNumber] = useState<number>(0);
   const getProductsUrl =
@@ -72,6 +73,8 @@ export const HomeScreen = memo(function HomeScreen() {
   }, []);
 
   const loadMore = async () => {
+    if (isLoading || isRefreshing) return;
+    setIsLoadingMore(true);
     try {
       console.log("LoadMore!");
       const response = await fetch(getProductsUrl, {
@@ -88,9 +91,11 @@ export const HomeScreen = memo(function HomeScreen() {
         const data = await response.json();
         setCurrentProductNumber((prev) => prev + LoadMoreProductNumber);
         storeProducts([...products, ...data.productsData]);
+        setIsLoadingMore(false);
       }
     } catch (error) {
       console.log("loadMore Error:", error);
+      setIsLoadingMore(false);
       return;
     }
   };
@@ -164,15 +169,7 @@ export const HomeScreen = memo(function HomeScreen() {
   };
 
   return (
-    <ScrollView
-      style={styles.mainContainer}
-      refreshControl={
-        <RefreshControl
-          refreshing={isRefreshing}
-          onRefresh={fetchProductData}
-        />
-      }
-    >
+    <>
       <View style={styles.header}>
         <EmptySearchBar />
       </View>
@@ -189,13 +186,13 @@ export const HomeScreen = memo(function HomeScreen() {
           <Text style={{ color: "red" }}>No Products to Display</Text>
         )}
         extraData={[isLoading, products]} // re renders if isLoading/ products change
-        onEndReachedThreshold={0.1}
-        // onEndReached={loadMore}
-        onEndReached={()=>console.log("End of FlashList reached!")}
-        bounces={false}
+        onEndReachedThreshold={0.5}
+        onEndReached={loadMore}
       />
-      <View style={{height: 50}}></View>
-    </ScrollView>
+      {isLoadingMore && (
+        <Text style={{ textAlign: "center", height: 30 }}>Loading...</Text>
+      )}
+    </>
   );
 });
 // console.log(Dimensions.get("window").width)
