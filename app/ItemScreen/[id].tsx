@@ -2,7 +2,7 @@ import { memo, useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useCart, useProductStore } from "../store/store";
+import { useCart, useFavorite, useProductStore } from "../store/store";
 import { Link, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
 import { useUserSession } from "../auth/firebaseAuth";
@@ -10,8 +10,10 @@ import { useUserSession } from "../auth/firebaseAuth";
 const ItemScreen = memo(function ItemScreen() {
   const { id } = useLocalSearchParams();
   const addItem = useCart((state) => state.addCart);
+  const addFavorite = useFavorite((state) => state.addFavorite);
   const cart = useCart((state) => state.cartItems);
-  const userEmail = useUserSession(state=>state.userInfo.email);
+  const favorite = useFavorite((state) => state.favoriteItems);
+  const userEmail = useUserSession((state) => state.userInfo.email);
 
   const products = useProductStore((state) => state.products);
   const product = products.find((item) => item.id.toString() === id);
@@ -25,12 +27,6 @@ const ItemScreen = memo(function ItemScreen() {
       </SafeAreaView>
     );
   }
-
-  console.log("ItemScreen: " + product.productName + ", ID: " + product.id);
-  console.log(
-    "Current Cart: " + JSON.stringify(cart.map(({ productName }) => ({ productName })))
-  );
-
   useEffect(() => {
     const updateCart = async () => {
       try {
@@ -72,6 +68,20 @@ const ItemScreen = memo(function ItemScreen() {
           >
             <Text style={styles.name}>{"$" + product.productPrice}</Text>
             <Text>Stock: {product.productStock}</Text>
+            <Pressable
+              onPress={() => {
+                console.log("Adding to favorite: " + product.productName);
+                addFavorite({
+                  productName: product.productName,
+                  id: product.id,
+                  productThumbnailUrl: product.productThumbnailUrl,
+                  productPrice: product.productPrice,
+                });
+                console.log("Current Favorite: ", favorite);
+              }}
+            >
+              <Text>Add Fav</Text>
+            </Pressable>
           </View>
           <Text style={styles.name}>{product.productName}</Text>
           <Text>{product.productDescription}</Text>
@@ -88,6 +98,7 @@ const ItemScreen = memo(function ItemScreen() {
               productThumbnailUrl: product.productThumbnailUrl,
               productPrice: product.productPrice,
             });
+            console.log("Current Cart: ", cart);
           }}
           style={styles.FooterCart}
         >
