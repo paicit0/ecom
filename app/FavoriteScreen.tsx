@@ -1,19 +1,23 @@
 import { useEffect } from "react";
-import { Text } from "react-native";
+import { Pressable, Text, StyleSheet, View } from "react-native";
 import { useUserSession } from "./auth/firebaseAuth";
 import { useFavorite } from "./store/store";
+import { Ionicons } from "@expo/vector-icons";
 
 function FavoriteScreen() {
-  const userFavorite = useFavorite((state) => state.favoriteItems);
+  const favoriteItems = useFavorite((state) => state.favoriteItems);
   const userEmail = useUserSession((state) => state.userInfo.email);
+  const deleteFavorite = useFavorite((state) => state.deleteFavorite);
+  const deleteAllFavorite = useFavorite((state) => state.deleteAllFavorite);
   useEffect(() => {
     const updateFavorite = async () => {
       try {
-        const updateUserUrlLocal = "http://10.0.2.2:5001/ecom-firestore-11867/us-central1/updateUser";
+        const updateUserUrlLocal =
+          "http://10.0.2.2:5001/ecom-firestore-11867/us-central1/updateUser";
         const update = await fetch(updateUserUrlLocal, {
           body: JSON.stringify({
             email: userEmail,
-            favorite: userFavorite,
+            favorite: favoriteItems,
           }),
         });
         console.log(update.status);
@@ -21,15 +25,30 @@ function FavoriteScreen() {
         console.log("update failed: ", error);
       }
     };
-  }, [userFavorite]);
+  }, [favoriteItems]);
   return (
-    <>
-      {userFavorite?.map(() => (
-        <Text>{}</Text>
+    <View style={styles.mainContainer}>
+      {favoriteItems?.map((item, index) => (
+        <>
+          <Text>{item.productName}</Text>
+          <Pressable onPress={() => deleteFavorite(index)}>
+            <Ionicons name="close-sharp" size={20} color="#666" />
+          </Pressable>
+        </>
       ))}
-      <Text>FavoriteScreen</Text>
-    </>
+      <Pressable onPress={() => deleteAllFavorite()}>
+        <Text>Delete All</Text>
+      </Pressable>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+    
+  }
+
+})
 
 export default FavoriteScreen;
