@@ -1,6 +1,6 @@
 // SubmitProductScreen.tsx
 import { useEffect, useState } from "react";
-import { View, Text, TextInput, Pressable } from "react-native";
+import { View, Text, TextInput, Pressable, Image } from "react-native";
 import { StyleSheet } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
@@ -8,7 +8,7 @@ import { useUserSession } from "../auth/firebaseAuth";
 import { Dropdown } from "react-native-element-dropdown";
 import { getAuth } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
-import * as SecureStore from 'expo-secure-store';
+import * as SecureStore from "expo-secure-store";
 global.Buffer = require("buffer").Buffer;
 
 function SubmitProductScreen() {
@@ -21,6 +21,7 @@ function SubmitProductScreen() {
   const [imageIsSelected, setImageIsSelected] = useState<boolean>(false);
   const [imageName, setImageName] = useState<string>("");
   const [imageBase64, setImageBase64] = useState<string>("");
+  const [imageUri, setImageUri] = useState<string>("");
   const [contentType, setContentType] = useState<string>("");
 
   const handleFilePicking = async () => {
@@ -37,6 +38,7 @@ function SubmitProductScreen() {
             encoding: FileSystem.EncodingType.Base64,
           }
         );
+        setImageUri(docRes.assets[0].uri);
         setImageBase64(fileContent);
         setContentType(docRes.assets[0].mimeType ?? "");
         setImageIsSelected(true);
@@ -55,8 +57,8 @@ function SubmitProductScreen() {
       console.log("not logged in");
       return;
     }
-    const idToken = await SecureStore.getItemAsync('authToken');
-    console.log("idToken:",idToken);
+    const idToken = await SecureStore.getItemAsync("authToken");
+    console.log("idToken:", idToken);
     try {
       const uploadawsS3URL =
         "http://10.0.2.2:5001/ecom-firestore-11867/us-central1/uploadawsS3";
@@ -116,8 +118,44 @@ function SubmitProductScreen() {
     { label: "Tool", value: "tool" },
   ];
 
+  useEffect(() => {
+    console.log("imageUri:", imageUri);
+  }, [imageUri]);
+
   return (
     <View style={styles.mainContainer}>
+      {imageIsSelected ? (
+        <>
+          <Image
+            style={{ height: 200, width: 200 }}
+            source={{ uri: imageUri }}
+            onError={(e) =>
+              console.log("Image loading error:", e.nativeEvent.error)
+            }
+          />
+          <Text style={{ flexDirection: "row", alignItems: "center" }}>
+            {imageName}
+            <Pressable onPress={() => setImageIsSelected(false)}>
+              <Ionicons name="close-sharp" size={20} color="red" />
+            </Pressable>
+          </Text>
+        </>
+      ) : (
+        <>
+          <Pressable
+            onPress={handleFilePicking}
+            style={styles.imageInputButton}
+          >
+            <Image
+              style={{ height: 200, width: 200 }}
+              onError={(e) =>
+                console.log("Image loading error:", e.nativeEvent.error)
+              }
+            />
+            <Text style={styles.imageInputButtonText}>Browse</Text>
+          </Pressable>
+        </>
+      )}
       <TextInput
         style={styles.input}
         placeholder="Name..."
@@ -160,29 +198,8 @@ function SubmitProductScreen() {
         valueField="value"
       />
 
-      {imageIsSelected ? (
-        <>
-          <Text style={{ flexDirection: "row", alignItems: "center" }}>
-            {imageName}
-            <Pressable onPress={() => setImageIsSelected(false)}>
-              <Ionicons name="close-sharp" size={20} color="red" />
-            </Pressable>
-          </Text>
-        </>
-      ) : (
-        <>
-          <Pressable
-            onPress={handleFilePicking}
-            style={styles.imageInputButton}
-          >
-            <Text style={styles.imageInputButtonText}>Pick an image!</Text>
-          </Pressable>
-        </>
-      )}
       <Pressable onPress={handleSubmit} style={styles.submitButton}>
-        <Text style={styles.submitButtonText}>
-          Submit a product!
-        </Text>
+        <Text style={styles.submitButtonText}>Submit a product!</Text>
       </Pressable>
     </View>
   );
@@ -226,10 +243,9 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   imageInputButtonText: {
-    color: '#ffffff',
+    color: "#ffffff",
     fontSize: 16,
-    fontWeight: '600',
-
+    fontWeight: "600",
   },
   submitButton: {
     backgroundColor: "green",
@@ -246,10 +262,9 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   submitButtonText: {
-    color: '#ffffff',
+    color: "#ffffff",
     fontSize: 16,
-    fontWeight: '600',
-
+    fontWeight: "600",
   },
 });
 
