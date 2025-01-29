@@ -27,7 +27,7 @@ export const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(AsyncStorage),
 });
 
-interface userSessionType {
+type userSessionType = {
   userIsSignedIn: boolean;
   login: (email: string, password: string) => void;
   logout: () => void;

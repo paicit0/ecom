@@ -5,7 +5,7 @@ import { memo } from "react";
 import { Link, useNavigation } from "expo-router";
 import { useCart } from "@/app/store/store";
 
-interface SearchBarProps {
+type SearchBarProps = {
   value: string;
   onChangeText: (text: string) => void;
   placeholder?: string;

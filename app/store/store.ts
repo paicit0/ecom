@@ -9,24 +9,23 @@ export type Product = {
   productPrice: number;
   productImageUrl: string;
   productThumbnailUrl: string;
-  productStock: number;
+  productStock: number | string;
   productOwner: string;
 };
 
-export interface CartItem {
+export type CartItem = {
   id: string;
   productName: string;
   productPrice: number;
   productThumbnailUrl: string;
-}
+};
 
-interface useCartArray {
+type useCartArray = {
   cartItems: CartItem[];
   addCart: (item: CartItem) => void;
   deleteCart: (index: number) => void;
   deleteAllCart: () => void;
-}
-
+};
 
 export const useCart = create<useCartArray>((set) => ({
   cartItems: [],
@@ -39,29 +38,29 @@ export const useCart = create<useCartArray>((set) => ({
   deleteAllCart: () => set({ cartItems: [] }),
 }));
 
-interface ProductStore {
+type ProductStore = {
   products: Product[];
   setProducts: (newProducts: Product[]) => void;
-}
+};
 
 export const useProductStore = create<ProductStore>((set) => ({
   products: [],
   setProducts: (newProducts: Product[]) => set({ products: newProducts }),
 }));
 
-export interface FavoriteItem {
+export type FavoriteItem = {
   id: string;
   productName: string;
   productPrice: number;
   productThumbnailUrl: string;
-}
+};
 
-interface useFavoriteArray {
+type useFavoriteArray = {
   favoriteItems: FavoriteItem[];
   addFavorite: (item: FavoriteItem) => void;
   deleteFavorite: (index: number) => void;
   deleteAllFavorite: () => void;
-}
+};
 
 export const useFavorite = create<useFavoriteArray>((set) => ({
   favoriteItems: [],
