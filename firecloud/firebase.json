@@ -21,11 +21,10 @@
       ],
       "emulators": {
         "firestore": {
-          "host": "HOST",
-          "port": "PORT"
+
         },
         "functions": {
-          "port": 5001
+
         }
       }
     }
