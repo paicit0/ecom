@@ -16,12 +16,6 @@ export { db };
 import { registerUsers } from "./registerUsers";
 export { registerUsers };
 
-import { securedToken } from "./securedToken";
-export { securedToken };
-
-import { loginUsers } from "./loginUsers";
-export { loginUsers };
-
 import { registerSellers } from "./registerSellers";
 export { registerSellers };
 
