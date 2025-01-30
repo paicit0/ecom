@@ -2,6 +2,7 @@ import * as functions from "firebase-functions";
 import { db } from "./index";
 import { Timestamp } from "firebase-admin/firestore";
 import * as admin from "firebase-admin";
+import { Product } from "../../../app/store/store";
 
 const createProduct = functions.https.onRequest(async (req, res) => {
   try {
@@ -31,7 +32,7 @@ const createProduct = functions.https.onRequest(async (req, res) => {
       productThumbnailUrl,
       productStock = "Contact the owner",
       productOwner,
-    } = req.body;
+    }: Product = req.body;
 
     if (
       !productName ||
