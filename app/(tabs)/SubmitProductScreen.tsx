@@ -62,14 +62,14 @@ function SubmitProductScreen() {
     try {
       const uploadawsS3URL = process.env.EXPO_PUBLIC_uploadawsS3_emulator;
       const createProductURL = process.env.EXPO_PUBLIC_createProduct_emulator;
-      if(!uploadawsS3URL || !createProductURL) {
-        console.log("urls not bussing!")
+      if (!uploadawsS3URL || !createProductURL) {
+        console.log("urls not bussing!");
         return;
       }
       const getImagesURL = await fetch(uploadawsS3URL, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${idToken}`,
+          authorization: `Bearer ${idToken}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -92,6 +92,7 @@ function SubmitProductScreen() {
         const createProductOnFirestore = await fetch(createProductURL, {
           method: "POST",
           headers: {
+            authorization: `Bearer ${idToken}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({

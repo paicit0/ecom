@@ -9,12 +9,23 @@ const createProduct = functions.https.onRequest(async (req, res) => {
     console.log("createProduct req.header: ", req.headers.authorization);
     console.log("createProduct req.body: ", req.body);
     const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    if (!authHeader || !authHeader.toLowerCase().startsWith("bearer ")) {
       res.status(401).json({ message: "Unauthorized!" });
       return;
     }
-    const idToken = authHeader.split("Bearer ")[1];
+    const idToken = authHeader.replace(/^Bearer\s+/i, "").trim();
     const decodedToken = await admin.auth().verifyIdToken(idToken);
+    try {
+      const decodedToken = await admin.auth().verifyIdToken(idToken);
+      if (!decodedToken) {
+        res.status(401).json("No auth token.");
+        return;
+      }
+    } catch (error) {
+      res.status(401).json({ error: "Unauthorized!" });
+      return;
+    }
+
     const userEmail = decodedToken.email;
     console.log("req.header bearer: ", idToken);
 
