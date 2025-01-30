@@ -20,9 +20,13 @@ function RegisterScreen() {
   const [error, setError] = useState("");
   const handleRegister = async () => {
     const registerUsersURL =
-      "https://registerusers-700548026300.us-central1.run.app";
+      process.env.EXPO_PUBLIC_registerUsers
     const registerUsersURLEmulator =
-      "http://10.0.2.2:5001//ecom-firestore-11867/us-central1/registerUsers";
+      process.env.EXPO_PUBLIC_registerUsers_emulator
+    if (!registerUsersURL || !registerUsersURLEmulator) {
+      console.log("url not bussing!");
+      return;
+    }
     try {
       if (password !== confirmPassword) {
         console.log("Passwords do not match");

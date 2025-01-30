@@ -19,9 +19,9 @@ function SubmitProductScreen() {
   const [productCategory, setProductCategory] = useState<string | null>(null);
   const [productStock, setProductStock] = useState<number>(NaN);
   const [imageIsSelected, setImageIsSelected] = useState<boolean>(false);
-  const [imageName, setImageName] = useState<string>("");
-  const [imageBase64, setImageBase64] = useState<string>("");
-  const [imageUri, setImageUri] = useState<string>("");
+  const [imageName, setImageName] = useState<string[]>([]);
+  const [imageBase64, setImageBase64] = useState<string[]>([]);
+  const [imageUri, setImageUri] = useState<string[]>([]);
   const [contentType, setContentType] = useState<string>("");
 
   const handleFilePicking = async () => {
@@ -38,11 +38,11 @@ function SubmitProductScreen() {
             encoding: FileSystem.EncodingType.Base64,
           }
         );
-        setImageUri(docRes.assets[0].uri);
-        setImageBase64(fileContent);
+        setImageName([...imageName, docRes.assets[0].name]);
+        setImageBase64([...imageBase64, fileContent]);
+        setImageUri([...imageUri, docRes.assets[0].uri]);
         setContentType(docRes.assets[0].mimeType ?? "");
         setImageIsSelected(true);
-        setImageName(docRes.assets[0].name);
       }
     } catch (error) {
       console.log("File selecting error: ", error);
@@ -60,10 +60,12 @@ function SubmitProductScreen() {
     const idToken = await SecureStore.getItemAsync("authToken");
     console.log("idToken:", idToken);
     try {
-      const uploadawsS3URL =
-        "http://10.0.2.2:5001/ecom-firestore-11867/us-central1/uploadawsS3";
-      const createProductURL =
-        "http://10.0.2.2:5001/ecom-firestore-11867/us-central1/createProduct";
+      const uploadawsS3URL = process.env.EXPO_PUBLIC_uploadawsS3_emulator;
+      const createProductURL = process.env.EXPO_PUBLIC_createProduct_emulator;
+      if(!uploadawsS3URL || !createProductURL) {
+        console.log("urls not bussing!")
+        return;
+      }
       const getImagesURL = await fetch(uploadawsS3URL, {
         method: "POST",
         headers: {
@@ -75,6 +77,7 @@ function SubmitProductScreen() {
           contentType: contentType,
         }),
       });
+      console.log("payload:", imageBase64, contentType);
       const response = await getImagesURL.json();
       console.log(response);
       const { imageUrl: productImageUrl, thumbnailUrl: productThumbnailUrl } =
@@ -118,44 +121,60 @@ function SubmitProductScreen() {
     { label: "Tool", value: "tool" },
   ];
 
-  useEffect(() => {
-    console.log("imageUri:", imageUri);
-  }, [imageUri]);
-
   return (
     <View style={styles.mainContainer}>
-      {imageIsSelected ? (
-        <>
-          <Image
-            style={{ height: 200, width: 200 }}
-            source={{ uri: imageUri }}
-            onError={(e) =>
-              console.log("Image loading error:", e.nativeEvent.error)
-            }
-          />
-          <Text style={{ flexDirection: "row", alignItems: "center" }}>
-            {imageName}
-            <Pressable onPress={() => setImageIsSelected(false)}>
-              <Ionicons name="close-sharp" size={20} color="red" />
+      <View style={styles.imageContainer}>
+        {imageIsSelected ? (
+          <>
+            {imageUri.map((uri, index) => (
+              <View key={index} style={{ flexDirection: "column" }}>
+                <Text>Image No. {index + 1}</Text>
+                <Image style={{ height: 200, width: 200 }} source={{ uri }} />
+              </View>
+            ))}
+            {imageName.length < 3 && imageName ? (
+              <>
+                <Pressable onPress={handleFilePicking}>
+                  <Ionicons name="add-outline" size={20} />
+                </Pressable>
+              </>
+            ) : null}
+          </>
+        ) : (
+          <>
+            <Pressable
+              onPress={handleFilePicking}
+              style={styles.imageInputButton}
+            >
+              <View style={{ height: 200, width: 200 }}></View>
+              <Text style={styles.imageInputButtonText}>Browse</Text>
             </Pressable>
-          </Text>
-        </>
-      ) : (
+          </>
+        )}
+      </View>
+
+      {imageName.length > 0 && (
         <>
           <Pressable
-            onPress={handleFilePicking}
-            style={styles.imageInputButton}
+            onPress={() => {
+              setImageIsSelected(false);
+              setImageName([]);
+              setImageBase64([]);
+              setImageUri([]);
+            }}
           >
-            <Image
-              style={{ height: 200, width: 200 }}
-              onError={(e) =>
-                console.log("Image loading error:", e.nativeEvent.error)
-              }
-            />
-            <Text style={styles.imageInputButtonText}>Browse</Text>
+            <Ionicons name="close-sharp" size={20} color="red" />
           </Pressable>
         </>
       )}
+
+      <Text style={{ flexDirection: "row", alignItems: "center" }}>
+        {imageName.map((image, index) => (
+          <View key={index}>
+            <Text key={index}>{imageName[index]}</Text>
+          </View>
+        ))}
+      </Text>
       <TextInput
         style={styles.input}
         placeholder="Name..."
@@ -220,6 +239,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     width: 300,
   },
+  imageContainer: {
+    flexDirection: "row",
+  },
   dropdown: {
     margin: 16,
     height: 50,
@@ -229,7 +251,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   imageInputButton: {
-    backgroundColor: "#ff4757",
+    backgroundColor: "grey",
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 25,

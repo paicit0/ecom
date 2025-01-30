@@ -1,20 +1,13 @@
 //HomeScreen.tsx
 import { memo, useEffect, useState } from "react";
-import {
-  StyleSheet,
-  View,
-  Text,
-  ActivityIndicator,
-  Dimensions,
-  RefreshControl,
-  ScrollView,
-} from "react-native";
+import { StyleSheet, View, Text, Dimensions } from "react-native";
 import { Image } from "expo-image";
 import { Product } from "../store/store";
 import { Link } from "expo-router";
 import { FlashList } from "@shopify/flash-list";
 import EmptySearchBar from "../../components/EmptySearchBar";
 import { useProductStore } from "../store/store";
+import Animated, { useAnimatedScrollHandler } from "react-native-reanimated";
 
 export const HomeScreen = memo(function HomeScreen() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -22,12 +15,16 @@ export const HomeScreen = memo(function HomeScreen() {
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [category, setCategory] = useState<string>("");
   const [currentProductNumber, setCurrentProductNumber] = useState<number>(0);
-  const getProductsUrl =
-    "http://10.0.2.2:5001/ecom-firestore-11867/us-central1/getProducts";
   const initialProductLoadNumber = 50;
   const LoadMoreProductNumber = 20;
   const storeProducts = useProductStore((state) => state.setProducts);
   const products = useProductStore((state) => state.products);
+  const getProductUrl = process.env.EXPO_PUBLIC_getProducts;
+  const getProductsEmuUrl = process.env.EXPO_PUBLIC_getProducts_emulator;
+  if (!getProductsEmuUrl || getProductUrl) {
+    console.log("url not bussin");
+    return;
+  }
 
   const fetchProductData = async (): Promise<void> => {
     try {
@@ -37,7 +34,7 @@ export const HomeScreen = memo(function HomeScreen() {
         "Skip:",
         currentProductNumber
       );
-      const response = await fetch(getProductsUrl, {
+      const response = await fetch(getProductsEmuUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -77,7 +74,7 @@ export const HomeScreen = memo(function HomeScreen() {
     setIsLoadingMore(true);
     try {
       console.log("LoadMore!");
-      const response = await fetch(getProductsUrl, {
+      const response = await fetch(getProductsEmuUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -219,20 +216,23 @@ const styles = StyleSheet.create({
     backgroundColor: "cyan",
   },
   itemContainer: {
+    flex: 1,
+    padding: 5,
     backgroundColor: "white",
+    width: Dimensions.get("window").width / 2,
   },
   cardContent: {
     backgroundColor: "blue",
   },
   imageItem: {
-    minHeight: 150,
-    minWidth: 150,
-    backgroundColor: "green",
+    minHeight: 125,
+    minWidth: 125,
+    // backgroundColor: "green",
   },
   priceStockContainer: {
     flexDirection: "row",
-    alignContent: "space-between",
-    width: Dimensions.get("window").width / 2,
+    justifyContent: "space-between",
+    // width: (Dimensions.get("window").width / 2) - 15,
   },
   itemPrice: {},
   itemStock: {},
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   badge: {},
-  renderStyle: {},
+  renderStyle: { flex: 1 },
   loadingImagePlaceholder: {
     backgroundColor: "#E0E0E0",
   },
