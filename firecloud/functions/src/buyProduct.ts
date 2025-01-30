@@ -4,6 +4,10 @@ import { FieldValue, Timestamp } from "firebase-admin/firestore";
 
 const buyProduct = functions.https.onRequest(async (req, res) => {
   try {
+    if (!req.body) {
+      res.status(404)
+      return;
+    }
     const { productId } = req.body;
 
     const productsCollection = db.collection("products").doc(productId);
