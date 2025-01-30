@@ -3,6 +3,7 @@ import { db } from "./index";
 import * as admin from "firebase-admin";
 
 const registerSellers = functions.https.onRequest(async (req, res) => {
+  console.log("registerSellers");
   try {
     const { email } = req.body;
     const authHeader = req.headers.authorization;
