@@ -60,13 +60,20 @@ function SubmitProductScreen() {
     const idToken = await SecureStore.getItemAsync("authToken");
     console.log("idToken:", idToken);
     try {
-      const uploadawsS3URL = process.env.EXPO_PUBLIC_uploadawsS3_emulator;
-      const createProductURL = process.env.EXPO_PUBLIC_createProduct_emulator;
-      if (!uploadawsS3URL || !createProductURL) {
+      const uploadawsS3_emu = process.env.EXPO_PUBLIC_uploadawsS3_emulator;
+      const uploadawsS3_prod = process.env.EXPO_PUBLIC_uploadawsS3_prod;
+      const createProduct_prod = process.env.EXPO_PUBLIC_createProduct_prod;
+      const createProduct_emu = process.env.EXPO_PUBLIC_createProduct_emulator;
+      if (
+        !uploadawsS3_emu ||
+        !uploadawsS3_prod ||
+        !createProduct_prod ||
+        !createProduct_emu
+      ) {
         console.log("urls not bussing!");
         return;
       }
-      const getImagesURL = await fetch(uploadawsS3URL, {
+      const getImagesURL = await fetch(uploadawsS3_emu, {
         method: "POST",
         headers: {
           authorization: `Bearer ${idToken}`,
@@ -89,7 +96,7 @@ function SubmitProductScreen() {
           imageUrl: productImageUrl,
           thumbnailUrl: productThumbnailUrl,
         });
-        const createProductOnFirestore = await fetch(createProductURL, {
+        const createProductOnFirestore = await fetch(createProduct_emu, {
           method: "POST",
           headers: {
             authorization: `Bearer ${idToken}`,

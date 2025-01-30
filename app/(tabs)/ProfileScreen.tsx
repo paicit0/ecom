@@ -38,11 +38,18 @@ function ProfileScreen() {
       setError("Please sign in first!");
       return;
     }
-    const emulatorRegisterSellersURL =
-      "http://10.0.2.2:5001/ecom-firestore-11867/us-central1/registerSellers";
+    const registerSellers_emu =
+      process.env.EXPO_PUBLIC_registerSellers_emulator;
+    const registerSellers_prod =
+      process.env.EXPO_PUBLIC_registerSellers_prod;
+      
+    if (!registerSellers_emu || !registerSellers_prod) {
+      console.log("url not busssinn");
+      return;
+    }
     try {
       console.log("Trying to register with: ", userInfoFromStore.email);
-      const req = await fetch(emulatorRegisterSellersURL, {
+      const req = await fetch(registerSellers_emu, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${idToken}`,

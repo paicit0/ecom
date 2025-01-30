@@ -19,11 +19,11 @@ function RegisterScreen() {
   const [dataMessage, setDataMessage] = useState<string>("");
   const [error, setError] = useState("");
   const handleRegister = async () => {
-    const registerUsersURL =
+    const registerUsers_prod =
       process.env.EXPO_PUBLIC_registerUsers
-    const registerUsersURLEmulator =
+    const registerUsers_emu =
       process.env.EXPO_PUBLIC_registerUsers_emulator
-    if (!registerUsersURL || !registerUsersURLEmulator) {
+    if (!registerUsers_prod || !registerUsers_emu) {
       console.log("url not bussing!");
       return;
     }
@@ -60,7 +60,7 @@ function RegisterScreen() {
           });
 
         if (registerFirebaseAuth) {
-          const registerUser = await fetch(registerUsersURL, {
+          const registerUser = await fetch(registerUsers_prod, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

@@ -17,8 +17,13 @@ export const CartScreen = memo(() => {
   useEffect(() => {
     const updateCart = async () => {
       try {
-        const updateUserUrlLocal = "http://10.0.2.2:5001/ecom-firestore-11867/us-central1/updateUser";
-        const update = await fetch(updateUserUrlLocal, {
+        const updateUser_emu = process.env.EXPO_PUBLIC_updateUser_emulator;
+        const updateUser_prod = process.env.EXPO_PUBLIC_updateUser_prod;
+        if (!updateUser_emu || !updateUser_prod) {
+          console.log("not bussin urls");
+          return;
+        }
+        const update = await fetch(updateUser_emu, {
           body: JSON.stringify({
             email: userEmail,
             favorite: cart,
@@ -61,7 +66,10 @@ export const CartScreen = memo(() => {
           <View style={styles.cartContainer} key={index}>
             <Text>{item.productName}</Text>
             <Text>${item.productPrice}</Text>
-            <Image style={styles.imageItem} source={{ uri: item.productThumbnailUrl }} />
+            <Image
+              style={styles.imageItem}
+              source={{ uri: item.productThumbnailUrl }}
+            />
             <Pressable onPress={() => deleteItem(index)}>
               <Ionicons
                 name="close-sharp"

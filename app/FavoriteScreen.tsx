@@ -12,9 +12,13 @@ function FavoriteScreen() {
   useEffect(() => {
     const updateFavorite = async () => {
       try {
-        const updateUserUrlLocal =
-          "http://10.0.2.2:5001/ecom-firestore-11867/us-central1/updateUser";
-        const update = await fetch(updateUserUrlLocal, {
+        const updateUser_emu = process.env.EXPO_PUBLIC_updateUser_emulator;
+        const updateUser_prod = process.env.EXPO_PUBLIC_updateUser_prod;
+        if (!updateUser_emu || !updateUser_prod) {
+          console.log("not bussin urls");
+          return;
+        }
+        const update = await fetch(updateUser_emu, {
           body: JSON.stringify({
             email: userEmail,
             favorite: favoriteItems,
@@ -46,9 +50,7 @@ function FavoriteScreen() {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    
-  }
-
-})
+  },
+});
 
 export default FavoriteScreen;

@@ -30,12 +30,13 @@ const ItemScreen = memo(function ItemScreen() {
   useEffect(() => {
     const updateCart = async () => {
       try {
-        const updateUserEmulatorUrl = process.env.EXPO_PUBLIC_updateUser_emulator;
-        if (!updateUserEmulatorUrl) {
+        const updateUser_emu = process.env.EXPO_PUBLIC_updateUser_emulator;
+        const updateUser_prod = process.env.EXPO_PUBLIC_updateUser_prod;
+        if (!updateUser_emu || !updateUser_prod) {
           console.log("url not bussing!");
           return;
         }
-        const update = await fetch(updateUserEmulatorUrl, {
+        const update = await fetch(updateUser_emu, {
           body: JSON.stringify({
             email: userEmail,
             cart: cart,
