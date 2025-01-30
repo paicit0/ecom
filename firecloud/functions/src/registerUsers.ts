@@ -21,6 +21,7 @@ const registerUsers = functions.https.onRequest(async (req, res) => {
 
     if (!email) {
       res.status(400).json({ message: "No email provided" });
+      return;
     }
 
     if (docGet.exists) {
