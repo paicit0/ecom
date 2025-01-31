@@ -49,7 +49,7 @@ function ProfileScreen() {
       return;
     }
     try {
-      console.log("Trying to register with: ", userInfoFromStore.email);
+      console.log("Trying to registerSellers with: ", userInfoFromStore.email);
       const req = await axios.post(
         registerSellers,
         { email: userInfoFromStore.email },
@@ -66,7 +66,7 @@ function ProfileScreen() {
         getUserInfo(userInfoFromStore.email);
       }
     } catch (error) {
-      console.error(error);
+      console.error("ProfileScreen.handleSellerRegister", error);
     }
   };
 
