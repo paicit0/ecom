@@ -10,6 +10,7 @@ function FavoriteScreen() {
   const userEmail = useUserSession((state) => state.userInfo.email);
   const deleteFavorite = useFavorite((state) => state.deleteFromFavorite);
   const deleteAllFavorite = useFavorite((state) => state.deleteAllFavorite);
+
   useEffect(() => {
     const updateFavorite = async () => {
       try {
@@ -36,7 +37,9 @@ function FavoriteScreen() {
         console.log("update failed: ", error);
       }
     };
+    updateFavorite();
   }, [favoriteItems]);
+  
   return (
     <View style={styles.mainContainer}>
       {favoriteItems?.map((item, index) => (
