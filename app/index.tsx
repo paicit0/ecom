@@ -20,6 +20,11 @@ function Index() {
     fetchPublishableKey();
   }, []);
 
+  console.log(
+    "Launching app in mode:",
+    process.env.EXPO_PUBLIC_CURRENT_APP_MODE
+  );
+
   return (
     <QueryClientProvider client={queryClient}>
       <StripeProvider
