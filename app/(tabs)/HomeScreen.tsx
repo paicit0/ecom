@@ -8,6 +8,7 @@ import { FlashList } from "@shopify/flash-list";
 import EmptySearchBar from "../../components/EmptySearchBar";
 import { useProductStore } from "../store/store";
 import Animated, { useAnimatedScrollHandler } from "react-native-reanimated";
+import axios from "axios";
 
 export const HomeScreen = memo(function HomeScreen() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -38,19 +39,22 @@ export const HomeScreen = memo(function HomeScreen() {
         "Skip:",
         currentProductNumber
       );
-      const response = await fetch(getProducts, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      const response = await axios.post(
+        getProducts,
+        {
           numberOfItems: initialProductLoadNumber,
           currentProductNumber: currentProductNumber,
-        }),
-      });
+        },
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
       console.log("fetchProductData Status:", response.status);
-      if (response.ok) {
-        const data = await response.json();
+      if (response.status === 200) {
+        const data = response.data;
         storeProducts(data.productsData);
         const imagesToPreload = data.productsData.map(
           (product: Product) => product.productThumbnailUrl
@@ -78,18 +82,21 @@ export const HomeScreen = memo(function HomeScreen() {
     setIsLoadingMore(true);
     try {
       console.log("LoadMore!");
-      const response = await fetch(getProducts, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      const response = await axios.post(
+        getProducts,
+        {
           numberOfItems: LoadMoreProductNumber,
           currentProductNumber: currentProductNumber + LoadMoreProductNumber,
-        }),
-      });
-      if (response.ok) {
-        const data = await response.json();
+        },
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.status === 200) {
+        const data = await response.data;
         setCurrentProductNumber((prev) => prev + LoadMoreProductNumber);
         storeProducts([...products, ...data.productsData]);
         setIsLoadingMore(false);
