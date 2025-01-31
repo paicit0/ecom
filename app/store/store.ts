@@ -15,9 +15,6 @@ export type Product = {
 
 export type CartItem = {
   id: string;
-  productName: string;
-  productPrice: number;
-  productThumbnailUrl: string;
 };
 
 type useCartArray = {
@@ -48,27 +45,38 @@ export const useProductStore = create<ProductStore>((set) => ({
   setProducts: (newProducts: Product[]) => set({ products: newProducts }),
 }));
 
-export type FavoriteItem = {
-  id: string;
-  productName: string;
-  productPrice: number;
-  productThumbnailUrl: string;
-};
-
 type useFavoriteArray = {
-  favoriteItems: FavoriteItem[];
-  addFavorite: (item: FavoriteItem) => void;
-  deleteFavorite: (index: number) => void;
+  favoriteItems: string[];
+  addFavorite: (itemId: string) => void;
+  deleteFavorite: (itemId: string) => void;
   deleteAllFavorite: () => void;
+  isFavorited: (itemId: string) => boolean;
 };
 
-export const useFavorite = create<useFavoriteArray>((set) => ({
+export const useFavorite = create<useFavoriteArray>((set, get) => ({
   favoriteItems: [],
-  addFavorite: (item) =>
-    set((state) => ({ favoriteItems: [...state.favoriteItems, item] })),
-  deleteFavorite: (index) =>
-    set((state) => ({
-      favoriteItems: state.favoriteItems.filter((item, i) => i !== index),
-    })),
+  addFavorite: (itemId) =>
+    set((state) => {
+      if (state.favoriteItems.includes(itemId)) {
+        console.log("Duplicated Item!");
+        return state;
+      }
+      const updatedFavoriteItems = [...state.favoriteItems, itemId];
+      console.log("Adding to favorite: " + itemId);
+      console.log("Current FavoriteItems", updatedFavoriteItems);
+      return { favoriteItems: updatedFavoriteItems };
+    }),
+  deleteFavorite: (itemId) =>
+    set((state) => {
+      const updatedFavoriteItems = state.favoriteItems.filter(
+        (item) => item !== itemId
+      );
+      console.log("Removing from favorite: " + itemId);
+      console.log("Current FavoriteItems", updatedFavoriteItems);
+      return {
+        favoriteItems: updatedFavoriteItems,
+      };
+    }),
   deleteAllFavorite: () => set({ favoriteItems: [] }),
+  isFavorited: (itemId) => new Set(get().favoriteItems).has(itemId),
 }));
