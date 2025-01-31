@@ -7,12 +7,12 @@ function LoginScreen() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const { userIsSignedIn, login, logout } = useUserSession();
+  const login = useUserSession((state) => state.login);
 
   const handleLogin = async () => {
     try {
-      login(email, password);
       console.log("Trying to login... ", email);
+      login(email, password);
     } catch (error) {
       console.log(error);
     }

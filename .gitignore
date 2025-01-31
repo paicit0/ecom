@@ -35,3 +35,4 @@ firecloud/awsS3Config.ts
 .env.dev
 .env
 firecloud/functions/.runtimeconfig.json
+app/auth/firebaseConfig.ts

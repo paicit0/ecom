@@ -1,3 +1,4 @@
+//registerSellers.ts
 import * as functions from "firebase-functions";
 import { db } from "./index";
 import * as admin from "firebase-admin";

@@ -15,5 +15,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-, "functions/testFunc.js", "app/tempo/registerFirestore.js"  ]
+, "firebase/functions/testFunc.js", "app/tempo/registerFirestore.js"  ]
 }

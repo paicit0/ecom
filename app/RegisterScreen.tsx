@@ -43,7 +43,7 @@ function RegisterScreen() {
         console.log(
           "Registering with payload: " + JSON.stringify({ email, password })
         );
-
+        
         const registerFirebaseAuth = await createUserWithEmailAndPassword(
           auth,
           email,
@@ -51,7 +51,7 @@ function RegisterScreen() {
         )
           .then((userCredential) => {
             const user = userCredential.user;
-            console.log("Registered on Firebase Authentication!");
+            console.log("Registered on Firebase Authentication!", user);
             return true;
           })
           .catch((error) => {

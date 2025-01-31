@@ -9,7 +9,6 @@ import { Dropdown } from "react-native-element-dropdown";
 import { getAuth } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
 import * as SecureStore from "expo-secure-store";
-import { createProduct } from "../../firecloud/functions/src";
 import axios from "axios";
 global.Buffer = require("buffer").Buffer;
 

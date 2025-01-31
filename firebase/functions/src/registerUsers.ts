@@ -41,7 +41,7 @@ const registerUsers = functions.https.onRequest(async (req, res) => {
     console.log("Registering failed: " + error);
     res
       .status(500)
-      .json({ message: "Registering failed on Cloud Function.", error: error }); // don't include "error" due to security risk.
+      .json({ message: "Registering failed on Cloud Function." }); // don't include "error" due to security risk.
   }
 });
 

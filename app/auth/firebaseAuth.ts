@@ -1,12 +1,13 @@
 //firebaseAuth.ts
 import { initializeApp } from "firebase/app";
 import {
+  connectAuthEmulator,
   initializeAuth,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   User,
 } from "firebase/auth";
-import { firebaseConfig } from "../../firecloud/firebaseConfig";
+import { firebaseConfig } from "./firebaseConfig";
 import * as SecureStore from "expo-secure-store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 //@ts-ignore
@@ -19,13 +20,25 @@ import {
   query,
   where,
   getDocs,
+  connectFirestoreEmulator,
 } from "firebase/firestore";
 
+// auth initialize configs
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 export const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(AsyncStorage),
 });
+
+if (
+  process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev" &&
+  process.env.EXPO_PUBLIC_AUTH_EMULATOR
+) {
+  connectAuthEmulator(auth, process.env.EXPO_PUBLIC_AUTH_EMULATOR);
+  console.log("Connected to Firebase Auth Emulator");
+  connectFirestoreEmulator(db, '10.0.2.2', 8080);
+
+}
 
 type userSessionType = {
   userIsSignedIn: boolean;
@@ -38,7 +51,7 @@ type userSessionType = {
     favorite: [] | null;
     cart: [] | null;
   };
-}
+};
 
 const SecureStorage: StateStorage = {
   getItem: async (name: string) => {
@@ -67,28 +80,33 @@ export const useUserSession = create<userSessionType>()(
       userInfo: { email: "", role: "", favorite: [], cart: [] },
       userIsSignedIn: false,
       login: async (email, password) => {
+        console.log("useUserSession.login in firebaseAuth!");
+        console.log("Auth Emulator Host:", process.env.EXPO_PUBLIC_AUTH);
+        console.log("Current Auth Instance:", auth);
         if (!email || !password) {
           console.log("No email or password received.");
           return;
         }
-        console.log("Saving userIsSignedIn to SecureStorage");
-        SecureStorage.setItem("userIsSignedIn", "true");
-
+        console.log("useUserSession.login before try block");
         try {
+          console.log("useUserSession.login try block");
           const userCredential = await signInWithEmailAndPassword(
             auth,
             email,
             password
           );
+          console.log("useUserSession.login ref block");
           const userRef = collection(db, "users");
           const emailQuery = query(userRef, where("email", "==", email));
           const querySnapshot = await getDocs(emailQuery);
+          console.log("useUserSession.login query block");
 
           if (querySnapshot.empty) {
             throw new Error("No user found with this email.");
           }
 
           const userData = querySnapshot.docs[0].data();
+          console.log("User data retrieved:", userData);
           console.log("Setting userIsSignedIn to true");
           set({ userIsSignedIn: true });
           set({
@@ -99,6 +117,8 @@ export const useUserSession = create<userSessionType>()(
               cart: userData.cart,
             },
           });
+          console.log("Saving userIsSignedIn to SecureStorage");
+          SecureStorage.setItem("userIsSignedIn", "true");
           await saveToken(userCredential.user);
         } catch (error) {
           console.error("Login failed:", error);
