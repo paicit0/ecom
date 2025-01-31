@@ -27,17 +27,19 @@ export const CartScreen = memo(() => {
           console.log("cart not bussin urls");
           return;
         }
-        const update = await axios(updateUser, {
-          headers: {
-            authentication: `Bearer ${idToken}`,
-            "Content-Type": "application/json",
-          },
-          method: "POST",
-          data: JSON.stringify({
+        const update = await axios.post(
+          updateUser,
+          {
             email: userEmail,
             favorite: cartItems,
-          }),
-        });
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${idToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
         console.log(update.status);
       } catch (error) {
         console.log("update failed: ", error);

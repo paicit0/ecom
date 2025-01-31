@@ -13,26 +13,59 @@ export type Product = {
   productOwner: string;
 };
 
-export type CartItem = {
+type cartItems = {
   id: string;
+  quantity: number;
 };
 
 type useCartArray = {
-  cartItems: CartItem[];
-  addCart: (item: CartItem) => void;
-  deleteCart: (index: number) => void;
+  cartItems: cartItems[];
+  addToCart: (itemId: string) => void;
+  deleteFromCart: (itemId: string) => void;
   deleteAllCart: () => void;
 };
 
 export const useCart = create<useCartArray>((set) => ({
   cartItems: [],
-  addCart: (item) =>
-    set((state) => ({ cartItems: [...state.cartItems, item] })),
-  deleteCart: (index) =>
-    set((state) => ({
-      cartItems: state.cartItems.filter((item, i) => i !== index),
-    })),
-  deleteAllCart: () => set({ cartItems: [] }),
+  addToCart: (itemId) =>
+    set((state) => {
+      const existingItemIndex = state.cartItems.findIndex(
+        (item) => item.id === itemId
+      );
+
+      if (existingItemIndex !== -1) {
+        const updatedCartItems = state.cartItems.map((item, index) =>
+          index === existingItemIndex
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+        console.log("Increasing quantity for item: " + itemId);
+        console.log("Current CartItems", updatedCartItems);
+        return { cartItems: updatedCartItems };
+      } else {
+        const updatedCartItems = [
+          ...state.cartItems,
+          { id: itemId, quantity: 1 },
+        ];
+        console.log("Adding to Cart: " + itemId);
+        console.log("Current CartItems", updatedCartItems);
+        return { cartItems: updatedCartItems };
+      }
+    }),
+  deleteFromCart: (itemId) =>
+    set((state) => {
+      const updatedCartItems = state.cartItems.filter(
+        (item) => item.id !== itemId
+      );
+      console.log("Removing from Cart: " + itemId);
+      console.log("Current CartItems", updatedCartItems);
+      return { cartItems: updatedCartItems };
+    }),
+  deleteAllCart: () =>
+    set(() => {
+      console.log("Clearing Cart");
+      return { cartItems: [] };
+    }),
 }));
 
 type ProductStore = {
@@ -47,26 +80,26 @@ export const useProductStore = create<ProductStore>((set) => ({
 
 type useFavoriteArray = {
   favoriteItems: string[];
-  addFavorite: (itemId: string) => void;
-  deleteFavorite: (itemId: string) => void;
+  addToFavorite: (itemId: string) => void;
+  deleteFromFavorite: (itemId: string) => void;
   deleteAllFavorite: () => void;
   isFavorited: (itemId: string) => boolean;
 };
 
 export const useFavorite = create<useFavoriteArray>((set, get) => ({
   favoriteItems: [],
-  addFavorite: (itemId) =>
+  addToFavorite: (itemId) =>
     set((state) => {
       if (state.favoriteItems.includes(itemId)) {
-        console.log("Duplicated Item!");
+        console.log("Duplicated Item in Favorite!!");
         return state;
       }
       const updatedFavoriteItems = [...state.favoriteItems, itemId];
-      console.log("Adding to favorite: " + itemId);
+      console.log("Adding to Favorite: " + itemId);
       console.log("Current FavoriteItems", updatedFavoriteItems);
       return { favoriteItems: updatedFavoriteItems };
     }),
-  deleteFavorite: (itemId) =>
+  deleteFromFavorite: (itemId) =>
     set((state) => {
       const updatedFavoriteItems = state.favoriteItems.filter(
         (item) => item !== itemId
