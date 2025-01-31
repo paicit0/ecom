@@ -3,6 +3,9 @@
 import { Redirect } from "expo-router";
 import { StripeProvider } from "@stripe/stripe-react-native";
 import { useState, useEffect } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 function Index() {
   const [publishableKey, setPublishableKey] = useState("");
@@ -18,9 +21,14 @@ function Index() {
   }, []);
 
   return (
-    <StripeProvider publishableKey={publishableKey} urlScheme="your-url-scheme">
-      <Redirect href="../(tabs)/HomeScreen" />
-    </StripeProvider>
+    <QueryClientProvider client={queryClient}>
+      <StripeProvider
+        publishableKey={publishableKey}
+        urlScheme="your-url-scheme"
+      >
+        <Redirect href="../(tabs)/HomeScreen" />
+      </StripeProvider>
+    </QueryClientProvider>
   );
 }
 
