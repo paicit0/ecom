@@ -6,6 +6,7 @@ import { useUserSession } from "../auth/firebaseAuth";
 import { useState, useEffect } from "react";
 import { getAuth } from "firebase/auth";
 import * as SecureStore from "expo-secure-store";
+import axios from "axios";
 
 function ProfileScreen() {
   const [error, setError] = useState("");
@@ -49,14 +50,17 @@ function ProfileScreen() {
     }
     try {
       console.log("Trying to register with: ", userInfoFromStore.email);
-      const req = await fetch(registerSellers, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${idToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: userInfoFromStore.email }),
-      });
+      const req = await axios.post(
+        registerSellers,
+        { email: userInfoFromStore.email },
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
       console.log(req.status);
       if (req.status === 200) {
         getUserInfo(userInfoFromStore.email);

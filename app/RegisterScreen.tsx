@@ -11,6 +11,7 @@ import { Link } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./auth/firebaseAuth";
+import axios from "axios";
 
 function RegisterScreen() {
   const [email, setEmail] = useState<string>("");
@@ -19,11 +20,12 @@ function RegisterScreen() {
   const [dataMessage, setDataMessage] = useState<string>("");
   const [error, setError] = useState("");
   const handleRegister = async () => {
-    const registerUsers_prod =
-      process.env.EXPO_PUBLIC_registerUsers
-    const registerUsers_emu =
-      process.env.EXPO_PUBLIC_registerUsers_emulator
-    if (!registerUsers_prod || !registerUsers_emu) {
+    const registerUsers =
+      process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
+        ? process.env.EXPO_PUBLIC_registerUsers_emulator
+        : process.env.EXPO_PUBLIC_registerUsers;
+
+    if (!registerUsers) {
       console.log("url not bussing!");
       return;
     }
@@ -60,20 +62,23 @@ function RegisterScreen() {
           });
 
         if (registerFirebaseAuth) {
-          const registerUser = await fetch(registerUsers_prod, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email: email,
-            }),
-          });
-          const data = await registerUser.json();
-          setDataMessage(data.message);
-          console.log(data.message);
-          if (data.error) {
-            console.log(data.error);
+          const registerUser = await axios.post(
+            registerUsers,
+            { email: email },
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          if (registerUser.status === 200) {
+            const data = await registerUser.data;
+            setDataMessage(data.message);
+            console.log(data.message);
+            if (data.error) {
+              console.log(data.error);
+            }
           }
         }
       }

@@ -10,6 +10,7 @@ import { getAuth } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
 import * as SecureStore from "expo-secure-store";
 import { createProduct } from "../../firecloud/functions/src";
+import axios from "axios";
 global.Buffer = require("buffer").Buffer;
 
 function SubmitProductScreen() {
@@ -74,36 +75,32 @@ function SubmitProductScreen() {
         console.log("urls not bussing!");
         return;
       }
-      const getImagesURL = await fetch(uploadawsS3, {
-        method: "POST",
-        headers: {
-          authorization: `Bearer ${idToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          imageBase64: imageBase64,
-          contentType: contentType,
-        }),
-      });
-      console.log("payload:", imageBase64, contentType);
-      const response = await getImagesURL.json();
-      console.log(response);
-      const { imageUrl: productImageUrl, thumbnailUrl: productThumbnailUrl } =
-        response;
-      console.log("getImagesURL Status:", getImagesURL.status);
-
-      if (getImagesURL.ok) {
-        console.log("Got image URLs:", {
-          imageUrl: productImageUrl,
-          thumbnailUrl: productThumbnailUrl,
-        });
-        const createProductOnFirestore = await fetch(createProduct, {
+      const getImagesURL = await axios.post(
+        uploadawsS3,
+        { imageBase64: imageBase64, contentType: contentType },
+        {
           method: "POST",
           headers: {
             authorization: `Bearer ${idToken}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
+        }
+      );
+      console.log("payload:", imageBase64, contentType);
+      const response = await getImagesURL.data;
+      console.log(response);
+      const { imageUrl: productImageUrl, thumbnailUrl: productThumbnailUrl } =
+        response;
+      console.log("getImagesURL Status:", getImagesURL.status);
+
+      if (getImagesURL.status === 200) {
+        console.log("Got image URLs:", {
+          imageUrl: productImageUrl,
+          thumbnailUrl: productThumbnailUrl,
+        });
+        const createProductOnFirestore = await axios.post(
+          createProduct,
+          {
             productName: productName,
             productPrice: productPrice,
             productDescription: productDescription,
@@ -112,12 +109,21 @@ function SubmitProductScreen() {
             productThumbnailUrl: productThumbnailUrl,
             productStock: productStock,
             productOwner: user.email,
-          }),
-        });
-        console.log(
-          "createProductOnFirestore Status: ",
-          createProductOnFirestore.status
+          },
+          {
+            method: "POST",
+            headers: {
+              authorization: `Bearer ${idToken}`,
+              "Content-Type": "application/json",
+            },
+          }
         );
+        if (createProductOnFirestore.status === 200) {
+          console.log(
+            "createProductOnFirestore",
+            createProductOnFirestore.status
+          );
+        }
       }
     } catch (error) {
       console.log("Submitting error: ", error);

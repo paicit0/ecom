@@ -6,6 +6,7 @@ import { useCart, useFavorite, useProductStore } from "../store/store";
 import { Link, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
 import { useUserSession } from "../auth/firebaseAuth";
+import axios from "axios";
 
 const ItemScreen = memo(function ItemScreen() {
   const { id }: { id: string } = useLocalSearchParams();
@@ -43,17 +44,22 @@ const ItemScreen = memo(function ItemScreen() {
           console.log("url not bussing!");
           return;
         }
-        const update = await fetch(updateUser, {
-          body: JSON.stringify({
-            email: userEmail,
-            cart: cartItems,
-          }),
-        });
+        const update = await axios.post(
+          updateUser,
+          { email: userEmail, cart: cartItems },
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
         console.log(update.status);
       } catch (error) {
         console.log("update failed: ", error);
       }
     };
+    updateCart();
   }, [cartItems]);
 
   useEffect(() => {

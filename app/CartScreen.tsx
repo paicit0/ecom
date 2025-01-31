@@ -40,14 +40,12 @@ export const CartScreen = memo(() => {
             },
           }
         );
-        console.log(update.status);
+        console.log("updateCart", update.status);
       } catch (error) {
         console.log("update failed: ", error);
       }
     };
-    setTimeout(() => {
-      updateCart();
-    }, 500);
+    updateCart();
   }, [cartItems]);
 
   const handleCartSubmit = () => {

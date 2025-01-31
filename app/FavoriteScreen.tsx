@@ -3,6 +3,7 @@ import { Pressable, Text, StyleSheet, View } from "react-native";
 import { useUserSession } from "./auth/firebaseAuth";
 import { useFavorite } from "./store/store";
 import { Ionicons } from "@expo/vector-icons";
+import axios from "axios";
 
 function FavoriteScreen() {
   const favoriteItems = useFavorite((state) => state.favoriteItems);
@@ -20,13 +21,17 @@ function FavoriteScreen() {
           console.log("not bussin urls");
           return;
         }
-        const update = await fetch(updateUser, {
-          body: JSON.stringify({
-            email: userEmail,
-            favorite: favoriteItems,
-          }),
-        });
-        console.log(update.status);
+        const update = await axios.post(
+          updateUser,
+          { email: userEmail, favorite: favoriteItems },
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        console.log("update", update.status);
       } catch (error) {
         console.log("update failed: ", error);
       }
