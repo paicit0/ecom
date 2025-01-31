@@ -7,6 +7,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { CartItem } from "./store/store";
 import { Link } from "expo-router";
 import { useUserSession } from "./auth/firebaseAuth";
+import * as SecureStore from "expo-secure-store";
 
 export const CartScreen = memo(() => {
   const cart = useCart((state) => state.cartItems);
@@ -17,13 +18,19 @@ export const CartScreen = memo(() => {
   useEffect(() => {
     const updateCart = async () => {
       try {
+        const idToken = await SecureStore.getItemAsync("authToken");
         const updateUser_emu = process.env.EXPO_PUBLIC_updateUser_emulator;
         const updateUser_prod = process.env.EXPO_PUBLIC_updateUser_prod;
         if (!updateUser_emu || !updateUser_prod) {
-          console.log("not bussin urls");
+          console.log("cart not bussin urls");
           return;
         }
         const update = await fetch(updateUser_emu, {
+          headers: {
+            authentication: `Bearer ${idToken}`,
+            "Content-Type": "application/json",
+          },
+          method: "POST",
           body: JSON.stringify({
             email: userEmail,
             favorite: cart,
@@ -34,6 +41,9 @@ export const CartScreen = memo(() => {
         console.log("update failed: ", error);
       }
     };
+    setTimeout(() => {
+      updateCart();
+    }, 500);
   }, [cart]);
 
   const handleCartSubmit = (cart: CartItem[]) => {
@@ -43,13 +53,13 @@ export const CartScreen = memo(() => {
     }
   };
 
-  const calculateTotal = () => {
-    let total = 0;
-    for (let i = 0; i < cart.length; i++) {
-      total = total + cart[i].productPrice;
-    }
-    return total;
-  };
+  // const calculateTotal = () => {
+  //   let total = 0;
+  //   for (let i = 0; i < cart.length; i++) {
+  //     total = total + cart[i].productPrice;
+  //   }
+  //   return total;
+  // };
 
   return (
     <ScrollView>
@@ -64,12 +74,12 @@ export const CartScreen = memo(() => {
 
         {cart.map((item, index) => (
           <View style={styles.cartContainer} key={index}>
-            <Text>{item.productName}</Text>
-            <Text>${item.productPrice}</Text>
+            <Text>{item.id}</Text>
+            {/* <Text>${item.productPrice}</Text>
             <Image
               style={styles.imageItem}
               source={{ uri: item.productThumbnailUrl }}
-            />
+            /> */}
             <Pressable onPress={() => deleteItem(index)}>
               <Ionicons
                 name="close-sharp"
