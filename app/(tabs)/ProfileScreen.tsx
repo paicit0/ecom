@@ -38,18 +38,18 @@ function ProfileScreen() {
       setError("Please sign in first!");
       return;
     }
-    const registerSellers_emu =
-      process.env.EXPO_PUBLIC_registerSellers_emulator;
-    const registerSellers_prod =
-      process.env.EXPO_PUBLIC_registerSellers_prod;
-      
-    if (!registerSellers_emu || !registerSellers_prod) {
+    const registerSellers =
+      process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
+        ? process.env.EXPO_PUBLIC_registerSellers_emulator
+        : process.env.EXPO_PUBLIC_registerSellers_prod;
+
+    if (!registerSellers) {
       console.log("url not busssinn");
       return;
     }
     try {
       console.log("Trying to register with: ", userInfoFromStore.email);
-      const req = await fetch(registerSellers_emu, {
+      const req = await fetch(registerSellers, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${idToken}`,

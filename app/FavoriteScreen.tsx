@@ -7,18 +7,20 @@ import { Ionicons } from "@expo/vector-icons";
 function FavoriteScreen() {
   const favoriteItems = useFavorite((state) => state.favoriteItems);
   const userEmail = useUserSession((state) => state.userInfo.email);
-  const deleteFavorite = useFavorite((state) => state.deleteFavorite);
+  const deleteFavorite = useFavorite((state) => state.deleteFromFavorite);
   const deleteAllFavorite = useFavorite((state) => state.deleteAllFavorite);
   useEffect(() => {
     const updateFavorite = async () => {
       try {
-        const updateUser_emu = process.env.EXPO_PUBLIC_updateUser_emulator;
-        const updateUser_prod = process.env.EXPO_PUBLIC_updateUser_prod;
-        if (!updateUser_emu || !updateUser_prod) {
+        const updateUser =
+          process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
+            ? process.env.EXPO_PUBLIC_updateUser_emulator
+            : process.env.EXPO_PUBLIC_updateUser_prod;
+        if (!updateUser) {
           console.log("not bussin urls");
           return;
         }
-        const update = await fetch(updateUser_emu, {
+        const update = await fetch(updateUser, {
           body: JSON.stringify({
             email: userEmail,
             favorite: favoriteItems,
@@ -33,12 +35,13 @@ function FavoriteScreen() {
   return (
     <View style={styles.mainContainer}>
       {favoriteItems?.map((item, index) => (
-        <>
-          <Text>{item.productName}</Text>
-          <Pressable onPress={() => deleteFavorite(index)}>
+        <View key={index} style={{ flex: 1 }}>
+          <Text>{item}</Text>
+          {/* <Text>{item.productName}</Text> */}
+          <Pressable onPress={() => deleteFavorite(index.toString())}>
             <Ionicons name="close-sharp" size={20} color="#666" />
           </Pressable>
-        </>
+        </View>
       ))}
       <Pressable onPress={() => deleteAllFavorite()}>
         <Text>Delete All</Text>
@@ -50,6 +53,7 @@ function FavoriteScreen() {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
+    flexDirection: "column",
   },
 });
 

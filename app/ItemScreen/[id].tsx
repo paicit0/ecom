@@ -8,11 +8,16 @@ import { Image } from "expo-image";
 import { useUserSession } from "../auth/firebaseAuth";
 
 const ItemScreen = memo(function ItemScreen() {
-  const { id } = useLocalSearchParams();
-  const addItem = useCart((state) => state.addCart);
-  const addFavorite = useFavorite((state) => state.addFavorite);
-  const cart = useCart((state) => state.cartItems);
-  const favorite = useFavorite((state) => state.favoriteItems);
+  const { id }: { id: string } = useLocalSearchParams();
+
+  const addToCart = useCart((state) => state.addToCart);
+  const cartItems = useCart((state) => state.cartItems);
+
+  const favoriteItems = useFavorite((state) => state.favoriteItems);
+  const addFavorite = useFavorite((state) => state.addToFavorite);
+  const deleteFavorite = useFavorite((state) => state.deleteFromFavorite);
+  const itemIsFavorited = useFavorite((state) => state.isFavorited);
+
   const userEmail = useUserSession((state) => state.userInfo.email);
 
   const products = useProductStore((state) => state.products);
@@ -30,16 +35,18 @@ const ItemScreen = memo(function ItemScreen() {
   useEffect(() => {
     const updateCart = async () => {
       try {
-        const updateUser_emu = process.env.EXPO_PUBLIC_updateUser_emulator;
-        const updateUser_prod = process.env.EXPO_PUBLIC_updateUser_prod;
-        if (!updateUser_emu || !updateUser_prod) {
+        const updateUser =
+          process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
+            ? process.env.EXPO_PUBLIC_updateUser_emulator
+            : process.env.EXPO_PUBLIC_updateUser_prod;
+        if (!updateUser) {
           console.log("url not bussing!");
           return;
         }
-        const update = await fetch(updateUser_emu, {
+        const update = await fetch(updateUser, {
           body: JSON.stringify({
             email: userEmail,
-            cart: cart,
+            cart: cartItems,
           }),
         });
         console.log(update.status);
@@ -47,13 +54,20 @@ const ItemScreen = memo(function ItemScreen() {
         console.log("update failed: ", error);
       }
     };
-  }, [cart]);
+  }, [cartItems]);
+
+  useEffect(() => {
+    console.log("itemIsFavorited:", itemIsFavorited(id));
+  });
+  useEffect(() => {
+    console.log("Going to Screen itemId :", id);
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <Link href="../(tabs)/HomeScreen">
-          <Ionicons name="arrow-back-outline"></Ionicons>
+          <Ionicons name="arrow-back-outline" size={20}></Ionicons>
         </Link>
         <View style={styles.headerImage}>
           <Image
@@ -73,20 +87,33 @@ const ItemScreen = memo(function ItemScreen() {
           >
             <Text style={styles.name}>{"$" + product.productPrice}</Text>
             <Text>Stock: {product.productStock}</Text>
-            <Pressable
-              onPress={() => {
-                console.log("Adding to favorite: " + product.productName);
-                addFavorite({
-                  productName: product.productName,
-                  id: product.id,
-                  productThumbnailUrl: product.productThumbnailUrl,
-                  productPrice: product.productPrice,
-                });
-                console.log("Current Favorite: ", favorite);
-              }}
-            >
-              <Text>Add Fav</Text>
-            </Pressable>
+            {itemIsFavorited(id) ? (
+              <Pressable
+                onPress={() => {
+                  deleteFavorite(product.id);
+                }}
+              >
+                <Ionicons
+                  name="heart"
+                  size={25}
+                  color="black"
+                  style={{ alignSelf: "center" }}
+                />
+              </Pressable>
+            ) : (
+              <Pressable
+                onPress={() => {
+                  addFavorite(product.id);
+                }}
+              >
+                <Ionicons
+                  name="heart-outline"
+                  size={25}
+                  color="black"
+                  style={{ alignSelf: "center" }}
+                />
+              </Pressable>
+            )}
           </View>
           <Text style={styles.name}>{product.productName}</Text>
           <Text>{product.productDescription}</Text>
@@ -96,14 +123,7 @@ const ItemScreen = memo(function ItemScreen() {
       <View style={[styles.ItemFooter, {}]}>
         <Pressable
           onPress={() => {
-            console.log("Adding to cart: " + product.productName);
-            addItem({
-              productName: product.productName,
-              id: product.id,
-              productThumbnailUrl: product.productThumbnailUrl,
-              productPrice: product.productPrice,
-            });
-            console.log("Current Cart: ", cart);
+            addToCart(id);
           }}
           style={styles.FooterCart}
         >

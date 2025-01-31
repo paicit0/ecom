@@ -19,9 +19,13 @@ export const HomeScreen = memo(function HomeScreen() {
   const LoadMoreProductNumber = 20;
   const storeProducts = useProductStore((state) => state.setProducts);
   const products = useProductStore((state) => state.products);
-  const getProductUrl_prod = process.env.EXPO_PUBLIC_getProducts_prod;
-  const getProducts_emu = process.env.EXPO_PUBLIC_getProducts_emulator;
-  if (!getProductUrl_prod || !getProducts_emu) {
+
+  const getProducts =
+    process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
+      ? process.env.EXPO_PUBLIC_getProducts_emulator
+      : process.env.EXPO_PUBLIC_getProducts_prod;
+
+  if (!getProducts) {
     console.log("url not bussin");
     return;
   }
@@ -34,7 +38,7 @@ export const HomeScreen = memo(function HomeScreen() {
         "Skip:",
         currentProductNumber
       );
-      const response = await fetch(getProducts_emu, {
+      const response = await fetch(getProducts, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -74,7 +78,7 @@ export const HomeScreen = memo(function HomeScreen() {
     setIsLoadingMore(true);
     try {
       console.log("LoadMore!");
-      const response = await fetch(getProducts_emu, {
+      const response = await fetch(getProducts, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

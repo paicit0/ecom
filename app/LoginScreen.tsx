@@ -21,7 +21,7 @@ function LoginScreen() {
   return (
     <View style={styles.container}>
       <Link href="../(tabs)/HomeScreen">
-        <Ionicons name="arrow-back-outline"></Ionicons>
+        <Ionicons name="arrow-back-outline" size={20}></Ionicons>
       </Link>
       <Text>LoginScreen</Text>
       <TextInput

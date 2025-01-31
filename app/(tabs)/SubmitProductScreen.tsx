@@ -9,6 +9,7 @@ import { Dropdown } from "react-native-element-dropdown";
 import { getAuth } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
 import * as SecureStore from "expo-secure-store";
+import { createProduct } from "../../firecloud/functions/src";
 global.Buffer = require("buffer").Buffer;
 
 function SubmitProductScreen() {
@@ -60,20 +61,20 @@ function SubmitProductScreen() {
     const idToken = await SecureStore.getItemAsync("authToken");
     console.log("idToken:", idToken);
     try {
-      const uploadawsS3_emu = process.env.EXPO_PUBLIC_uploadawsS3_emulator;
-      const uploadawsS3_prod = process.env.EXPO_PUBLIC_uploadawsS3_prod;
-      const createProduct_prod = process.env.EXPO_PUBLIC_createProduct_prod;
-      const createProduct_emu = process.env.EXPO_PUBLIC_createProduct_emulator;
-      if (
-        !uploadawsS3_emu ||
-        !uploadawsS3_prod ||
-        !createProduct_prod ||
-        !createProduct_emu
-      ) {
+      const uploadawsS3 =
+        process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
+          ? process.env.EXPO_PUBLIC_uploadawsS3_emulator
+          : process.env.EXPO_PUBLIC_uploadawsS3_prod;
+
+      const createProduct =
+        process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
+          ? process.env.EXPO_PUBLIC_createProduct_prod
+          : process.env.EXPO_PUBLIC_createProduct_emulator;
+      if (!uploadawsS3 || !createProduct) {
         console.log("urls not bussing!");
         return;
       }
-      const getImagesURL = await fetch(uploadawsS3_emu, {
+      const getImagesURL = await fetch(uploadawsS3, {
         method: "POST",
         headers: {
           authorization: `Bearer ${idToken}`,
@@ -96,7 +97,7 @@ function SubmitProductScreen() {
           imageUrl: productImageUrl,
           thumbnailUrl: productThumbnailUrl,
         });
-        const createProductOnFirestore = await fetch(createProduct_emu, {
+        const createProductOnFirestore = await fetch(createProduct, {
           method: "POST",
           headers: {
             authorization: `Bearer ${idToken}`,

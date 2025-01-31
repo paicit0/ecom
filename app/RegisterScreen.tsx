@@ -86,7 +86,7 @@ function RegisterScreen() {
   return (
     <View style={styles.container}>
       <Link href="../(tabs)/HomeScreen">
-        <Ionicons name="arrow-back-outline"></Ionicons>
+        <Ionicons name="arrow-back-outline" size={20}></Ionicons>
       </Link>
       <Text style={styles.title}>Register</Text>
       <Text>{dataMessage}</Text>
