@@ -9,7 +9,7 @@ const registerSellers = functions.https.onRequest(async (req, res) => {
     const { email } = req.body;
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      res.status(401).json({ message: "Unauthorized!" });
+      res.status(401).json({ message: "No authHeader/Header doesn't start with Bearer , Unauthorized!" });
       return;
     }
     const idToken = authHeader.split("Bearer ")[1];

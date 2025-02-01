@@ -26,6 +26,11 @@ function ProfileScreen() {
   }, [userIsSignedIn]);
 
   const handleSellerRegister = async () => {
+    if (!userIsSignedIn) {
+      setError("Please sign in first!");
+      return;
+    }
+    
     const auth = getAuth();
     const userAuth = auth.currentUser;
     console.log("userAuth: ", userAuth);
@@ -35,17 +40,14 @@ function ProfileScreen() {
     }
     const idToken = await SecureStore.getItemAsync("authToken");
     console.log("idToken:", idToken);
-    if (!userIsSignedIn) {
-      setError("Please sign in first!");
-      return;
-    }
+
     const registerSellers =
       process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
         ? process.env.EXPO_PUBLIC_registerSellers_emulator
         : process.env.EXPO_PUBLIC_registerSellers_prod;
 
     if (!registerSellers) {
-      console.log("url not busssinn");
+      console.log("ProfileScreen.handleSellerRegister: url not busssinn");
       return;
     }
     try {

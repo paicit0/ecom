@@ -87,9 +87,9 @@ const uploadawsS3 = functions.https.onRequest(async (req, res) => {
     const resThumbnailUrlArray: string[] = [];
 
     for (let i = 0; i < imageBase64.length; i++) {
-      console.log("imageBase64[i]", imageBase64[i]);
+      // console.log("imageBase64[i]", imageBase64[i]);
       const imageBuffer = Buffer.from(imageBase64[i], "base64");
-      console.log("imageBuffer", imageBuffer);
+      // console.log("imageBuffer", imageBuffer);
       const thumbnailBuffer = await createThumbnail(imageBuffer);
 
       const originalKey = `uploads/${uniqueName}-${i}`;

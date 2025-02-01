@@ -37,7 +37,7 @@ if (
   connectAuthEmulator(auth, process.env.EXPO_PUBLIC_AUTH_EMULATOR);
   console.log("Connected to Firebase Auth Emulator");
   connectFirestoreEmulator(db, '10.0.2.2', 8080);
-
+  console.log("Connected to Firebase Firestore Emulator");
 }
 
 type userSessionType = {
@@ -47,9 +47,9 @@ type userSessionType = {
   getUserInfo: (email: string | null) => void;
   userInfo: {
     email: string | null;
-    role: string | null;
-    favorite: [] | null;
-    cart: [] | null;
+    role?: string | null;
+    favorite?: [] | null;
+    cart?: [] | null;
   };
 };
 
@@ -65,29 +65,23 @@ const SecureStorage: StateStorage = {
   },
 };
 
-async function saveToken(user: User | null) {
-  if (user) {
-    const token = await user.getIdToken();
-    await SecureStore.setItemAsync("authToken", token);
-  } else {
-    await SecureStore.deleteItemAsync("authToken");
-  }
-}
-
 export const useUserSession = create<userSessionType>()(
   persist(
     (set) => ({
       userInfo: { email: "", role: "", favorite: [], cart: [] },
       userIsSignedIn: false,
       login: async (email, password) => {
-        console.log("useUserSession.login in firebaseAuth!");
-        console.log("Auth Emulator Host:", process.env.EXPO_PUBLIC_AUTH);
-        console.log("Current Auth Instance:", auth);
+        console.log("useUserSession.login: in firebaseAuth!");
+        console.log(
+          "useUserSession.login: Auth Emulator Host:",
+          process.env.EXPO_PUBLIC_AUTH
+        );
+        console.log("useUserSession.login: Current Auth Instance:", auth);
         if (!email || !password) {
-          console.log("No email or password received.");
+          console.log("useUserSession.login: No email or password received.");
           return;
         }
-        console.log("useUserSession.login before try block");
+        console.log("useUserSession.login: before try block");
         try {
           console.log("useUserSession.login try block");
           const userCredential = await signInWithEmailAndPassword(
@@ -95,19 +89,25 @@ export const useUserSession = create<userSessionType>()(
             email,
             password
           );
-          console.log("useUserSession.login ref block");
+          console.log(
+            "useUserSession.login: Login User credential:",
+            userCredential
+          );
+          console.log("useUserSession.login: ref block");
           const userRef = collection(db, "users");
           const emailQuery = query(userRef, where("email", "==", email));
           const querySnapshot = await getDocs(emailQuery);
           console.log("useUserSession.login query block");
 
           if (querySnapshot.empty) {
-            throw new Error("No user found with this email.");
+            throw new Error(
+              "useUserSession.login: No user found with this email."
+            );
           }
 
           const userData = querySnapshot.docs[0].data();
-          console.log("User data retrieved:", userData);
-          console.log("Setting userIsSignedIn to true");
+          console.log("useUserSession.login: User data retrieved:", userData);
+          console.log("useUserSession.login: Setting userIsSignedIn to true");
           set({ userIsSignedIn: true });
           set({
             userInfo: {
@@ -117,26 +117,30 @@ export const useUserSession = create<userSessionType>()(
               cart: userData.cart,
             },
           });
-          console.log("Saving userIsSignedIn to SecureStorage");
-          SecureStorage.setItem("userIsSignedIn", "true");
+          console.log(
+            "useUserSession.login: Saving userIsSignedIn to SecureStorage"
+          );
+          SecureStorage.setItem("useUserSession.login: userIsSignedIn", "true");
           await saveToken(userCredential.user);
-        } catch (error) {
-          console.error("Login failed:", error);
+        } catch (error: any) {
+          console.error("useUserSession.login: Login failed:", error.message);
         }
       },
 
       logout: async () => {
         try {
-          console.log("Removing userIsSignedIn from SecureStorage");
+          console.log(
+            "useUserSession.logout: Removing userIsSignedIn from SecureStorage"
+          );
           SecureStorage.removeItem("userIsSignedIn");
-          console.log("Setting userIsSignedIn to false");
+          console.log("useUserSession.logout: Setting userIsSignedIn to false");
           set({ userIsSignedIn: false });
-          console.log("Setting userInfo to default");
+          console.log("useUserSession.logout: Setting userInfo to default");
           set({ userInfo: { email: "", role: null, favorite: [], cart: [] } });
           await auth.signOut();
           await SecureStore.deleteItemAsync("authToken");
         } catch (error) {
-          console.error("Logout failed:", error);
+          console.error("useUserSession.logout: Logout failed:", error);
         }
       },
 
@@ -165,7 +169,7 @@ export const useUserSession = create<userSessionType>()(
             },
           }));
         } catch (error) {
-          console.log(error);
+          console.log("useUserSession.getUserInfo:", error);
         }
       },
     }),
@@ -175,6 +179,18 @@ export const useUserSession = create<userSessionType>()(
     }
   )
 );
+async function saveToken(user: User | null) {
+  try {
+    if (user) {
+      const token = await user.getIdToken();
+      await SecureStore.setItemAsync("authToken", token);
+    } else {
+      await SecureStore.deleteItemAsync("authToken");
+    }
+  } catch (error) {
+    console.error("useUserSession.saveToken:", error);
+  }
+}
 
 onAuthStateChanged(auth, (user) => {
   saveToken(user);

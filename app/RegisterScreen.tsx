@@ -23,10 +23,10 @@ function RegisterScreen() {
     const registerUsers =
       process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
         ? process.env.EXPO_PUBLIC_registerUsers_emulator
-        : process.env.EXPO_PUBLIC_registerUsers;
+        : process.env.EXPO_PUBLIC_registerUsers_prod;
 
     if (!registerUsers) {
-      console.log("url not bussing!");
+      console.log("RegisterScreen.handleRegister url not bussing!");
       return;
     }
     try {
@@ -51,7 +51,7 @@ function RegisterScreen() {
         )
           .then((userCredential) => {
             const user = userCredential.user;
-            console.log("Registered on Firebase Authentication!", user);
+            console.log("createUserWithEmailAndPassword successful.");
             return true;
           })
           .catch((error) => {

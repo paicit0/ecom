@@ -5,6 +5,7 @@ import * as admin from "firebase-admin";
 import { Product } from "../../../app/store/store";
 
 const createProduct = functions.https.onRequest(async (req, res) => {
+  console.log("createProduct");
   try {
     console.log("createProduct req.header: ", req.headers.authorization);
     console.log("createProduct req.body: ", req.body);
@@ -16,7 +17,7 @@ const createProduct = functions.https.onRequest(async (req, res) => {
     const idToken = authHeader.replace(/^Bearer\s+/i, "").trim();
     const decodedToken = await admin.auth().verifyIdToken(idToken);
     try {
-      const decodedToken = await admin.auth().verifyIdToken(idToken);
+      
       if (!decodedToken) {
         res.status(401).json("No auth token.");
         return;

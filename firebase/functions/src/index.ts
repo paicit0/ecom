@@ -1,5 +1,5 @@
 // "npm run build" everytime after an update in "functions" folder first before starting the emulator
-// "firebase emulators:start --only functions"
+// firebase emulators:start --import=./firebase-export --export-on-exit=./firebase-export
 // use http://10.0.2.2:5001 for android emulator
 // index.ts
 import { initializeApp } from "firebase-admin/app";

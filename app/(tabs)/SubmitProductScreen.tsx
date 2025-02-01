@@ -87,15 +87,12 @@ function SubmitProductScreen() {
       );
       console.log("payload:", imageBase64, contentType);
       const response = await getImagesURL.data;
-      console.log(response);
-      const { imageUrl: productImageUrl, thumbnailUrl: productThumbnailUrl } =
-        response;
       console.log("getImagesURL Status:", getImagesURL.status);
 
       if (getImagesURL.status === 200) {
         console.log("Got image URLs:", {
-          imageUrl: productImageUrl,
-          thumbnailUrl: productThumbnailUrl,
+          imageUrl: response.resImageUrlArray,
+          thumbnailUrl: response.resThumbnailUrlArray,
         });
         const createProductOnFirestore = await axios.post(
           createProduct,
@@ -104,8 +101,8 @@ function SubmitProductScreen() {
             productPrice: productPrice,
             productDescription: productDescription,
             productCategory: productCategory,
-            productImageUrl: productImageUrl,
-            productThumbnailUrl: productThumbnailUrl,
+            productImageUrl: response.resImageUrlArray,
+            productThumbnailUrl: response.resThumbnailUrlArray,
             productStock: productStock,
             productOwner: user.email,
           },
