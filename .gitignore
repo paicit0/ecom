@@ -36,3 +36,4 @@ firecloud/awsS3Config.ts
 .env
 firecloud/functions/.runtimeconfig.json
 app/auth/firebaseConfig.ts
+firebase/functions/firebase-export-1738435519613wApIsM
