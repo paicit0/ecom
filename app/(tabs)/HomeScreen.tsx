@@ -179,6 +179,7 @@ export const HomeScreen = memo(function HomeScreen() {
 
   return (
     <View style={{ flex: 1 }}>
+      <View style={{ height: 53 }} />
       <EmptySearchBar />
 
       <FlashList

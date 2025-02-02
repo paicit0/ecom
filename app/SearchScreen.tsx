@@ -59,8 +59,8 @@ function SearchScreen() {
     <View style={styles.mainContainer}>
       <View style={{ height: 53 }}></View>
       <View style={styles.searchBarContainer}>
-        <Link href="../(tabs)/HomeScreen" style={{ paddingRight: 10 }}>
-          <Ionicons name="arrow-back-outline" size={20}></Ionicons>
+        <Link href="../(tabs)/HomeScreen"  asChild>
+          <Ionicons name="arrow-back-outline" style={{ paddingRight: 10 }} size={20}></Ionicons>
         </Link>
         <View style={styles.input}>
           <TextInput
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 12,
     borderColor: "black",
-    height: 53,
+    height: 45,
     borderWidth: 0.5,
   },
   input: {
