@@ -56,7 +56,7 @@ const ItemScreen = memo(function ItemScreen() {
         );
         console.log(update.status);
       } catch (error) {
-        console.log("update failed: ", error);
+        console.log("[id] update failed: ", error);
       }
     };
     updateCart();

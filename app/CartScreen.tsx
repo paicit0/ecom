@@ -42,7 +42,7 @@ export const CartScreen = memo(() => {
         );
         console.log("updateCart", update.status);
       } catch (error) {
-        console.log("update failed: ", error);
+        console.log("CartScreen: update failed: ", error);
       }
     };
     updateCart();

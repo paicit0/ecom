@@ -34,7 +34,7 @@ function FavoriteScreen() {
         );
         console.log("update", update.status);
       } catch (error) {
-        console.log("update failed: ", error);
+        console.log("FavoriteScreen: update failed: ", error);
       }
     };
     updateFavorite();
