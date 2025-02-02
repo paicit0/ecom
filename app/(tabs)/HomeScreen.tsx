@@ -9,6 +9,7 @@ import EmptySearchBar from "../../components/EmptySearchBar";
 import { useProductStore } from "../store/store";
 import Animated, { useAnimatedScrollHandler } from "react-native-reanimated";
 import axios from "axios";
+import { Ionicons } from "@expo/vector-icons";
 
 export const HomeScreen = memo(function HomeScreen() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -177,10 +178,9 @@ export const HomeScreen = memo(function HomeScreen() {
   };
 
   return (
-    <>
-      <View style={styles.header}>
-        <EmptySearchBar />
-      </View>
+    <View style={{ flex: 1 }}>
+      <EmptySearchBar />
+
       <FlashList
         data={products}
         renderItem={render}
@@ -200,7 +200,7 @@ export const HomeScreen = memo(function HomeScreen() {
       {isLoadingMore && (
         <Text style={{ textAlign: "center", height: 30 }}>Loading...</Text>
       )}
-    </>
+    </View>
   );
 });
 // console.log(Dimensions.get("window").width)
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   loadingContainer: {},
-  header: {},
+  header: { width: "100%" },
   flashListStyle: {
     height: Dimensions.get("window").height,
     width: Dimensions.get("window").width,
