@@ -14,19 +14,18 @@ function FavoriteScreen() {
   useEffect(() => {
     const updateFavorite = async () => {
       try {
-        const updateUser =
+        const updateUserUrl =
           process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
             ? process.env.EXPO_PUBLIC_updateUser_emulator
             : process.env.EXPO_PUBLIC_updateUser_prod;
-        if (!updateUser) {
+        if (!updateUserUrl) {
           console.log("not bussin urls");
           return;
         }
         const update = await axios.post(
-          updateUser,
+          updateUserUrl,
           { email: userEmail, favorite: favoriteItems },
           {
-            method: "POST",
             headers: {
               "Content-Type": "application/json",
             },

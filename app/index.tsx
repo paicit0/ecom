@@ -11,7 +11,11 @@ function Index() {
   const [publishableKey, setPublishableKey] = useState("");
 
   const fetchPublishableKey = async () => {
-    const key = process.env.EXPO_PUBLIC_PUBLISHABLEKEY || "";
+    const key = process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+    if (!key) {
+      console.log("No EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY");
+      return;
+    }
     setPublishableKey(key);
     console.log(publishableKey);
   };

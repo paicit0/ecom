@@ -61,24 +61,24 @@ function SubmitProductScreen() {
     const idToken = await SecureStore.getItemAsync("authToken");
     console.log("idToken:", idToken);
 
-    const uploadawsS3 =
+    const uploadawsS3Url =
       process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
         ? process.env.EXPO_PUBLIC_uploadawsS3_emulator
         : process.env.EXPO_PUBLIC_uploadawsS3_prod;
 
-    const createProduct =
+    const createProductUrl =
       process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
         ? process.env.EXPO_PUBLIC_createProduct_emulator
         : process.env.EXPO_PUBLIC_createProduct_prod;
-    if (!uploadawsS3 || !createProduct) {
+    if (!uploadawsS3Url || !createProductUrl) {
       console.log("SubmitProductScreen: urls not bussing!");
       return;
     }
     try {
       console.log("try block reached");
-      console.log("uploadawsS3 url:", uploadawsS3);
+      console.log("uploadawsS3 url:", uploadawsS3Url);
       const getImagesURLs = await axios.post(
-        uploadawsS3,
+        uploadawsS3Url,
         { imageBase64: imageBase64s, contentType: contentType },
         {
           headers: {
@@ -99,9 +99,9 @@ function SubmitProductScreen() {
         });
         try {
           console.log(`SubmitProductScreen Sendings: Token: ${idToken}`);
-          console.log("createProduct url:", createProduct);
+          console.log("createProduct url:", createProductUrl);
           const createProductOnFirestore = await axios.post(
-            createProduct,
+            createProductUrl,
             {
               productName: productName,
               productPrice: productPrice,

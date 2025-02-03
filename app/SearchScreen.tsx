@@ -57,7 +57,7 @@ function SearchScreen() {
 
   return (
     <View style={styles.mainContainer}>
-      <View style={{ height: 53 }}></View>
+      <View style={{ height: 45 }}></View>
       <View style={styles.searchBarContainer}>
         <Link href="../(tabs)/HomeScreen"  asChild>
           <Ionicons name="arrow-back-outline" style={{ paddingRight: 10 }} size={20}></Ionicons>

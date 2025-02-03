@@ -20,12 +20,12 @@ function RegisterScreen() {
   const [dataMessage, setDataMessage] = useState<string>("");
   const [error, setError] = useState("");
   const handleRegister = async () => {
-    const registerUsers =
+    const registerUsersUrl =
       process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
         ? process.env.EXPO_PUBLIC_registerUsers_emulator
         : process.env.EXPO_PUBLIC_registerUsers_prod;
 
-    if (!registerUsers) {
+    if (!registerUsersUrl) {
       console.log("RegisterScreen.handleRegister url not bussing!");
       return;
     }
@@ -63,10 +63,9 @@ function RegisterScreen() {
 
         if (registerFirebaseAuth) {
           const registerUser = await axios.post(
-            registerUsers,
+            registerUsersUrl,
             { email: email },
             {
-              method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },

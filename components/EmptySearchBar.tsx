@@ -5,7 +5,11 @@ import { memo } from "react";
 import { Link } from "expo-router";
 import { useCart } from "@/app/store/store";
 
-const EmptySearchBar = memo(function SearchBar() {
+type SearchBarProps =  {
+  placeholder: string;
+}
+
+const EmptySearchBar = memo(function SearchBar({placeholder}: SearchBarProps) {
   const cart = useCart((state) => state.cartItems);
   return (
     <View style={styles.mainContainer}>
@@ -18,7 +22,7 @@ const EmptySearchBar = memo(function SearchBar() {
             style={{ flex: 1, flexDirection: "row", alignItems: "center" }}
           >
             <TextInput
-              placeholder="Search Items..."
+              placeholder={placeholder}
               editable={false}
               pointerEvents="none"
               style={styles.input}
@@ -47,7 +51,6 @@ const styles = StyleSheet.create({
   mainContainer: {
     width: "100%",
     padding: 10,
-    // flex: 1,
     flexDirection: "row",
   },
   searchBarContainer: {

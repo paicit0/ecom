@@ -1,18 +1,6 @@
 // store.ts
 import { create } from "zustand";
 
-export type Product = {
-  id: string;
-  productName: string;
-  productDescription: string;
-  productCategory: string;
-  productPrice: number;
-  productImageUrl: string;
-  productThumbnailUrl: string;
-  productStock: number | string;
-  productOwner: string;
-};
-
 type cartItems = {
   id: string;
   quantity: number;
@@ -68,6 +56,17 @@ export const useCart = create<useCartArray>((set) => ({
     }),
 }));
 
+export type Product = {
+  id: string;
+  productName: string;
+  productDescription: string;
+  productCategory: string;
+  productPrice: number;
+  productImageUrl: string;
+  productThumbnailUrl: string;
+  productStock: number | string;
+  productOwner: string;
+};
 type ProductStore = {
   products: Product[];
   setProducts: (newProducts: Product[]) => void;

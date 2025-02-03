@@ -36,21 +36,22 @@ if (
 ) {
   connectAuthEmulator(auth, process.env.EXPO_PUBLIC_AUTH_EMULATOR);
   console.log("Connected to Firebase Auth Emulator");
-  connectFirestoreEmulator(db, '10.0.2.2', 8080);
+  connectFirestoreEmulator(db, "10.0.2.2", 8080);
   console.log("Connected to Firebase Firestore Emulator");
 }
 
 type userSessionType = {
   userIsSignedIn: boolean;
-  login: (email: string, password: string) => void;
-  logout: () => void;
-  getUserInfo: (email: string | null) => void;
   userInfo: {
     email: string | null;
     role?: string | null;
     favorite?: [] | null;
     cart?: [] | null;
   };
+  login: (email: string, password: string) => void;
+  logout: () => void;
+  getUserInfo: (email: string | null) => void;
+  refreshToken: (user: User | null) => void;
 };
 
 const SecureStorage: StateStorage = {
@@ -72,11 +73,6 @@ export const useUserSession = create<userSessionType>()(
       userIsSignedIn: false,
       login: async (email, password) => {
         console.log("useUserSession.login: in firebaseAuth!");
-        console.log(
-          "useUserSession.login: Auth Emulator Host:",
-          process.env.EXPO_PUBLIC_AUTH
-        );
-        console.log("useUserSession.login: Current Auth Instance:", auth);
         if (!email || !password) {
           console.log("useUserSession.login: No email or password received.");
           return;
@@ -89,10 +85,10 @@ export const useUserSession = create<userSessionType>()(
             email,
             password
           );
-          console.log(
-            "useUserSession.login: Login User credential:",
-            userCredential
-          );
+          // console.log(
+          //   "useUserSession.login: Login User credential:",
+          //   userCredential
+          // );
           console.log("useUserSession.login: ref block");
           const userRef = collection(db, "users");
           const emailQuery = query(userRef, where("email", "==", email));
@@ -107,7 +103,6 @@ export const useUserSession = create<userSessionType>()(
 
           const userData = querySnapshot.docs[0].data();
           console.log("useUserSession.login: User data retrieved:", userData);
-          console.log("useUserSession.login: Setting userIsSignedIn to true");
           set({ userIsSignedIn: true });
           set({
             userInfo: {
@@ -117,11 +112,6 @@ export const useUserSession = create<userSessionType>()(
               cart: userData.cart,
             },
           });
-          console.log(
-            "useUserSession.login: Saving userIsSignedIn to SecureStorage"
-          );
-          SecureStorage.setItem("useUserSession.login: userIsSignedIn", "true");
-          await saveToken(userCredential.user);
         } catch (error: any) {
           console.error("useUserSession.login: Login failed:", error.message);
         }
@@ -129,27 +119,15 @@ export const useUserSession = create<userSessionType>()(
 
       logout: async () => {
         try {
-          console.log(
-            "useUserSession.logout: Removing userIsSignedIn from SecureStorage"
-          );
-          SecureStorage.removeItem("userIsSignedIn");
           console.log("useUserSession.logout: Setting userIsSignedIn to false");
           set({ userIsSignedIn: false });
           console.log("useUserSession.logout: Setting userInfo to default");
           set({ userInfo: { email: "", role: null, favorite: [], cart: [] } });
           await auth.signOut();
-          await SecureStore.deleteItemAsync("authToken");
         } catch (error) {
           console.error("useUserSession.logout: Logout failed:", error);
         }
       },
-
-      /**
-       * Retrieves user information (role, favorite, cart) from the database based on the given email.
-       * Updates the userInfo state with the retrieved data.
-       * @param email The user's email.
-       */
-
       getUserInfo: async (email) => {
         try {
           const userRef = collection(db, "users");
@@ -172,6 +150,9 @@ export const useUserSession = create<userSessionType>()(
           console.log("useUserSession.getUserInfo:", error);
         }
       },
+      refreshToken: async (user) => {
+        saveToken(user);
+      },
     }),
     {
       name: "storage",
@@ -180,9 +161,12 @@ export const useUserSession = create<userSessionType>()(
   )
 );
 async function saveToken(user: User | null) {
+  console.log("firebaseAuth.saveToken: before try block");
   try {
     if (user) {
-      const token = await user.getIdToken();
+      console.log("firebaseAuth.saveToken: Attempting to get ID token...");
+      const token = await user.getIdToken(true);
+      console.log("firebaseAuth.saveToken: Generating a tokenID: ", token);
       await SecureStore.setItemAsync("authToken", token);
     } else {
       await SecureStore.deleteItemAsync("authToken");
@@ -193,5 +177,6 @@ async function saveToken(user: User | null) {
 }
 
 onAuthStateChanged(auth, (user) => {
+  console.log("firebaseAuth.saveToken: onAuthStateChanged triggered:", user);
   saveToken(user);
 });
