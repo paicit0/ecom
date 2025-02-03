@@ -40,7 +40,7 @@ const uploadToS3 = async (buffer: Buffer, key: string, contentType: string) => {
 };
 
 const createThumbnail = async (imageBuffer: Buffer) => {
-  console.log("uploadawsS3.ts.createThumbnail");
+  console.log("uploadawsS3.createThumbnail");
   try {
     return await sharp(imageBuffer).resize({ width: 150 }).toBuffer();
   } catch (error) {
@@ -50,36 +50,38 @@ const createThumbnail = async (imageBuffer: Buffer) => {
 };
 
 const uploadawsS3 = functions.https.onRequest(async (req, res) => {
-  console.log("uploadawsS3.ts.uploadawsS3");
+  console.log("uploadawsS3.uploadawsS3 function reached");
   try {
     const uniqueName = uuidv4();
-    const { imageBase64, contentType } = req.body;
     const authHeader = req.headers.authorization;
-    console.log("uploadawsS3.ts req.body", req.body);
-    if (!authHeader || !authHeader.toLowerCase().startsWith("bearer ")) {
-      res.status(401).json({ error: "Unauthorized!" });
+    const { imageBase64, contentType } = req.body;
+    console.log("uploadawsS3 received headers:", authHeader);
+    if (!authHeader || !authHeader.toLowerCase().startsWith("bearer")) {
+      console.log("uploadawsS3: no/invalid auth in headers!");
+      res.status(401).json({ error: "uploadawsS3: no auth in headers!!" });
       return;
     }
     const idToken = authHeader.replace(/^Bearer\s+/i, "").trim();
     try {
       const decodedToken = await admin.auth().verifyIdToken(idToken);
       if (!decodedToken) {
-        res.status(401).json("No auth token.");
+        res.status(401).json({ error: "uploadawsS3: No auth token." });
         return;
       }
     } catch (error) {
-      res.status(401).json({ error: "Unauthorized!" });
+      console.log(error);
+      res.status(401).json({ error: `uploadawsS3: Unauthorized! ${error}` });
       return;
     }
 
     if (!Array.isArray(imageBase64)) {
-      res.status(400).json({ error: "imageBase64 must be an array" });
+      res.status(400).json({ error: "uploadawsS3: imageBase64 must be an array" });
       return;
     }
 
     const validContentTypes = ["image/jpeg", "image/png", "image/gif"];
     if (!validContentTypes.includes(contentType)) {
-      res.status(400).json({ error: "Invalid content type" });
+      res.status(400).json({ error: "uploadawsS3: Invalid content type" });
       return;
     }
 
@@ -105,13 +107,12 @@ const uploadawsS3 = functions.https.onRequest(async (req, res) => {
         resThumbnailUrlArray.push(thumbnailUrl);
       }
     }
-    console.log("imageUrlArray", resImageUrlArray);
-    console.log("thumbnailUrlArray", resThumbnailUrlArray);
+    console.log("Urls Array", resImageUrlArray, resThumbnailUrlArray);
     res.status(200).json({ resImageUrlArray, resThumbnailUrlArray });
     return;
   } catch (error) {
-    console.error("Error generating upload URL:", error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("uploadawsS3: Error generating upload URL:", error);
+    res.status(500).json({ error: "uploadawsS3: Internal server error" });
   }
 });
 

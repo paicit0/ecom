@@ -2,36 +2,31 @@ import * as functions from "firebase-functions";
 import { db } from "./index";
 import { Timestamp } from "firebase-admin/firestore";
 import * as admin from "firebase-admin";
-import { Product } from "../../../app/store/store";
+
+console.log("createProduct");
 
 const createProduct = functions.https.onRequest(async (req, res) => {
-  console.log("createProduct");
+  console.log("createProduct: function reached.");
   try {
-    console.log("createProduct req.header: ", req.headers.authorization);
-    console.log("createProduct req.body: ", req.body);
+    console.log("createProduct: req.header: ", req.headers.authorization);
+    console.log("createProduct: req.body: ", req.body);
     const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.toLowerCase().startsWith("bearer ")) {
-      res.status(401).json({ message: "Unauthorized!" });
+    if (!authHeader || !authHeader.toLowerCase().startsWith("bearer")) {
+      console.log("createProduct: no/invalid auth in headers!");
+      res.status(401).json({ error: "createProduct: no auth in headers!" });
       return;
     }
     const idToken = authHeader.replace(/^Bearer\s+/i, "").trim();
-    const decodedToken = await admin.auth().verifyIdToken(idToken);
     try {
-      
+      const decodedToken = await admin.auth().verifyIdToken(idToken);
       if (!decodedToken) {
-        res.status(401).json("No auth token.");
+        console.log("createProduct: No auth token.");
+        res.status(401).json({ error: "createProduct: No auth token." });
         return;
       }
     } catch (error) {
-      res.status(401).json({ error: "Unauthorized!" });
-      return;
-    }
-
-    const userEmail = decodedToken.email;
-    console.log("req.header bearer: ", idToken);
-
-    if (userEmail !== req.body.productOwner) {
-      res.status(403).json({ message: "Forbidden!" });
+      console.log(error);
+      res.status(401).json({ error: `createProduct: Unauthorized! ${error}` });
       return;
     }
 
@@ -44,7 +39,7 @@ const createProduct = functions.https.onRequest(async (req, res) => {
       productThumbnailUrl,
       productStock = "Contact the owner",
       productOwner,
-    }: Product = req.body;
+    } = req.body;
 
     if (
       !productName ||
@@ -53,7 +48,7 @@ const createProduct = functions.https.onRequest(async (req, res) => {
       !productThumbnailUrl ||
       !productOwner
     ) {
-      res.status(400).json({ message: "incomplete fields!" });
+      res.status(400).json({ error: "createProduct: incomplete fields!" });
       return;
     }
 
@@ -72,14 +67,14 @@ const createProduct = functions.https.onRequest(async (req, res) => {
     const productsCollection = db.collection("products");
     const createOneProduct = await productsCollection.add(product);
     console.log(
-      "Product added successfully! " + "Product ID: " + createOneProduct.id
+      "createProduct: Product added successfully! " + "Product ID: " + createOneProduct.id
     );
     res.status(200).json({
-      message: "Product submitted sucessfully! " + createOneProduct.id,
+      error: "createProduct: Product submitted sucessfully! " + createOneProduct.id,
     });
     return;
   } catch (error) {
-    res.status(400).json({ message: "failed the create product!" });
+    res.status(400).json({ error: "createProduct: failed the create product!" });
     console.log(error);
     return;
   }
