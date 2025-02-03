@@ -1,20 +1,20 @@
-rules_version = '2';
+  rules_version = '2';
 
-service cloud.firestore {
-  match /databases/{database}/documents {
-    // Allow anyone to read (for testing; restrict in production)
-    allow read: if true;
-
-    // Allow authenticated users to create, update, and delete their own documents
-    match /users/{userId} {
+  service cloud.firestore {
+    match /databases/{database}/documents {
+      // Allow anyone to read (for testing; restrict in production)
       allow read: if true;
-      allow create: if request.auth != null;
-      allow update, delete: if request.auth.uid == userId;
-    }
 
-    // Allow only admins to delete any document
-    match /{document=**} {
-      allow delete: if request.auth.token.role == "admin";
+      // Allow authenticated users to create, update, and delete their own documents
+      match /users/{userId} {
+        allow read: if true;
+        allow create: if request.auth != null;
+        allow update, delete: if request.auth.uid == userId;
+      }
+
+      // Allow only admins to delete any document
+      match /{document=**} {
+        allow delete: if request.auth.token.role == "admin";
+      }
     }
   }
-}
