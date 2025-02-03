@@ -12,12 +12,9 @@ function ProfileScreen() {
   const [error, setError] = useState("");
   const userIsSignedIn = useUserSession((state) => state.userIsSignedIn);
   const logout = useUserSession((state) => state.logout);
+  const refreshToken = useUserSession((state) => state.refreshToken);
   const userInfoFromStore = useUserSession((state) => state.userInfo);
   const { getUserInfo } = useUserSession();
-
-  useEffect(() => {
-    console.log(userInfoFromStore.role);
-  }, []);
 
   useEffect(() => {
     if (userIsSignedIn) {
@@ -30,7 +27,7 @@ function ProfileScreen() {
       setError("Please sign in first!");
       return;
     }
-    
+
     const auth = getAuth();
     const userAuth = auth.currentUser;
     console.log("userAuth: ", userAuth);
@@ -41,22 +38,21 @@ function ProfileScreen() {
     const idToken = await SecureStore.getItemAsync("authToken");
     console.log("idToken:", idToken);
 
-    const registerSellers =
+    const registerSellersUrl =
       process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
         ? process.env.EXPO_PUBLIC_registerSellers_emulator
         : process.env.EXPO_PUBLIC_registerSellers_prod;
 
-    if (!registerSellers) {
+    if (!registerSellersUrl) {
       console.log("ProfileScreen.handleSellerRegister: url not busssinn");
       return;
     }
     try {
       console.log("Trying to registerSellers with: ", userInfoFromStore.email);
       const req = await axios.post(
-        registerSellers,
+        registerSellersUrl,
         { email: userInfoFromStore.email },
         {
-          method: "POST",
           headers: {
             Authorization: `Bearer ${idToken}`,
             "Content-Type": "application/json",
@@ -81,7 +77,6 @@ function ProfileScreen() {
           <Link href={"/FavoriteScreen"} style={styles.link}>
             <Text style={styles.link}>Favorites</Text>
           </Link>
-          {/* <Text style={styles.text}>Current Role: {userInfoFromStore.role}</Text> */}
           <Pressable onPress={() => logout()} style={styles.button}>
             <Text style={styles.buttonText}>Logout!</Text>
           </Pressable>
