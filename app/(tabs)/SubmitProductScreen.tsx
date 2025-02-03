@@ -20,9 +20,9 @@ function SubmitProductScreen() {
   const [productCategory, setProductCategory] = useState<string | null>(null);
   const [productStock, setProductStock] = useState<number>(NaN);
   const [imageIsSelected, setImageIsSelected] = useState<boolean>(false);
-  const [imageName, setImageName] = useState<string[]>([]);
-  const [imageBase64, setImageBase64] = useState<string[]>([]);
-  const [imageUri, setImageUri] = useState<string[]>([]);
+  const [imageNames, setImageNames] = useState<string[]>([]);
+  const [imageBase64s, setImageBase64s] = useState<string[]>([]);
+  const [imageUris, setImageUris] = useState<string[]>([]);
   const [contentType, setContentType] = useState<string>("");
 
   const handleFilePicking = async () => {
@@ -31,7 +31,7 @@ function SubmitProductScreen() {
       const docRes = await DocumentPicker.getDocumentAsync({
         type: "image/*",
       });
-      console.log(docRes);
+      // console.log(docRes);
       if (docRes.assets) {
         const fileContent = await FileSystem.readAsStringAsync(
           docRes.assets[0].uri,
@@ -39,9 +39,9 @@ function SubmitProductScreen() {
             encoding: FileSystem.EncodingType.Base64,
           }
         );
-        setImageName([...imageName, docRes.assets[0].name]);
-        setImageBase64([...imageBase64, fileContent]);
-        setImageUri([...imageUri, docRes.assets[0].uri]);
+        setImageNames([...imageNames, docRes.assets[0].name]);
+        setImageBase64s([...imageBase64s, fileContent]);
+        setImageUris([...imageUris, docRes.assets[0].uri]);
         setContentType(docRes.assets[0].mimeType ?? "");
         setImageIsSelected(true);
       }
@@ -53,76 +53,105 @@ function SubmitProductScreen() {
   const handleSubmit = async () => {
     const auth = getAuth();
     const userAuth = auth.currentUser;
-    console.log("userAuth: ", userAuth);
+    console.log("auth.currentUser: ", auth.currentUser);
     if (!userAuth) {
       console.log("not logged in");
       return;
     }
     const idToken = await SecureStore.getItemAsync("authToken");
     console.log("idToken:", idToken);
-    try {
-      const uploadawsS3 =
-        process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
-          ? process.env.EXPO_PUBLIC_uploadawsS3_emulator
-          : process.env.EXPO_PUBLIC_uploadawsS3_prod;
 
-      const createProduct =
-        process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
-          ? process.env.EXPO_PUBLIC_createProduct_prod
-          : process.env.EXPO_PUBLIC_createProduct_emulator;
-      if (!uploadawsS3 || !createProduct) {
-        console.log("urls not bussing!");
-        return;
-      }
-      const getImagesURL = await axios.post(
+    const uploadawsS3 =
+      process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
+        ? process.env.EXPO_PUBLIC_uploadawsS3_emulator
+        : process.env.EXPO_PUBLIC_uploadawsS3_prod;
+
+    const createProduct =
+      process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
+        ? process.env.EXPO_PUBLIC_createProduct_emulator
+        : process.env.EXPO_PUBLIC_createProduct_prod;
+    if (!uploadawsS3 || !createProduct) {
+      console.log("SubmitProductScreen: urls not bussing!");
+      return;
+    }
+    try {
+      console.log("try block reached");
+      console.log("uploadawsS3 url:", uploadawsS3);
+      const getImagesURLs = await axios.post(
         uploadawsS3,
-        { imageBase64: imageBase64, contentType: contentType },
+        { imageBase64: imageBase64s, contentType: contentType },
         {
-          method: "POST",
           headers: {
             authorization: `Bearer ${idToken}`,
             "Content-Type": "application/json",
           },
         }
       );
-      console.log("payload:", imageBase64, contentType);
-      const response = await getImagesURL.data;
-      console.log("getImagesURL Status:", getImagesURL.status);
+      console.log(getImagesURLs.status);
+      console.log("payload:", imageBase64s.length, contentType);
+      const response = await getImagesURLs.data;
+      console.log("getImagesURL Status:", getImagesURLs.status);
 
-      if (getImagesURL.status === 200) {
+      if (getImagesURLs.status === 200) {
         console.log("Got image URLs:", {
           imageUrl: response.resImageUrlArray,
           thumbnailUrl: response.resThumbnailUrlArray,
         });
-        const createProductOnFirestore = await axios.post(
-          createProduct,
-          {
-            productName: productName,
-            productPrice: productPrice,
-            productDescription: productDescription,
-            productCategory: productCategory,
-            productImageUrl: response.resImageUrlArray,
-            productThumbnailUrl: response.resThumbnailUrlArray,
-            productStock: productStock,
-            productOwner: user.email,
-          },
-          {
-            method: "POST",
-            headers: {
-              authorization: `Bearer ${idToken}`,
-              "Content-Type": "application/json",
+        try {
+          console.log(`SubmitProductScreen Sendings: Token: ${idToken}`);
+          console.log("createProduct url:", createProduct);
+          const createProductOnFirestore = await axios.post(
+            createProduct,
+            {
+              productName: productName,
+              productPrice: productPrice,
+              productDescription: productDescription,
+              productCategory: productCategory,
+              productImageUrl: response.resImageUrlArray,
+              productThumbnailUrl: response.resThumbnailUrlArray,
+              productStock: productStock,
+              productOwner: user.email,
             },
-          }
-        );
-        if (createProductOnFirestore.status === 200) {
-          console.log(
-            "createProductOnFirestore",
-            createProductOnFirestore.status
+            {
+              headers: {
+                authorization: `Bearer ${idToken}`,
+                "Content-Type": "application/json",
+              },
+            }
           );
+          if (createProductOnFirestore.status === 200) {
+            console.log(
+              "createProductOnFirestore",
+              createProductOnFirestore.status
+            );
+          }
+        } catch (error) {
+          if (axios.isAxiosError(error)) {
+            if (error.response) {
+              console.log(
+                "SubmitProductScreen.createProductOnFirestore response:",
+                error.response.data.error
+              );
+            } else {
+              console.log(
+                "SubmitProductScreen.createProductOnFirestore:",
+                error
+              );
+            }
+          }
         }
       }
     } catch (error) {
-      console.log("Submitting error: ", error);
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          console.log(
+            "SubmitProductScreen.getImagesURL response:",
+            error.response.data.error
+          );
+        }
+      } else {
+        console.log("SubmitProductScreen.getImagesURL:", error);
+      }
     }
   };
 
@@ -137,13 +166,26 @@ function SubmitProductScreen() {
       <View style={styles.imageContainer}>
         {imageIsSelected ? (
           <>
-            {imageUri.map((uri, index) => (
+            {imageUris.map((uri, index) => (
               <View key={index} style={{ flexDirection: "column" }}>
                 <Text>Image No. {index + 1}</Text>
-                <Image style={{ height: 200, width: 200 }} source={{ uri }} />
+                <Image
+                  style={{ height: 200, width: 200 }}
+                  source={{ uri: uri }}
+                />
+                <Pressable
+                  onPress={() => {
+                    if (imageUris.length === 0) {
+                      setImageIsSelected(false);
+                    }
+                    setImageUris(imageUris.filter((img) => img !== uri));
+                  }}
+                >
+                  <Ionicons name="close-sharp" size={20} color="red" />
+                </Pressable>
               </View>
             ))}
-            {imageName.length < 3 && imageName ? (
+            {imageNames.length < 3 && imageNames ? (
               <>
                 <Pressable onPress={handleFilePicking}>
                   <Ionicons name="add-outline" size={20} />
@@ -164,28 +206,15 @@ function SubmitProductScreen() {
         )}
       </View>
 
-      {imageName.length > 0 && (
-        <>
-          <Pressable
-            onPress={() => {
-              setImageIsSelected(false);
-              setImageName([]);
-              setImageBase64([]);
-              setImageUri([]);
-            }}
-          >
-            <Ionicons name="close-sharp" size={20} color="red" />
-          </Pressable>
-        </>
-      )}
+      {/* {imageName.length > 0 && <></>} */}
 
-      <Text style={{ flexDirection: "row", alignItems: "center" }}>
+      {/* <Text style={{ flexDirection: "row", alignItems: "center" }}>
         {imageName.map((image, index) => (
           <View key={index}>
             <Text key={index}>{imageName[index]}</Text>
           </View>
         ))}
-      </Text>
+      </Text> */}
       <TextInput
         style={styles.input}
         placeholder="Name..."
