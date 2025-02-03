@@ -1,88 +1,133 @@
-import { memo, useEffect } from "react";
+import { memo, useEffect, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useCart, useFavorite, useProductStore } from "../store/store";
+import { useCart, useFavorite } from "../store/store";
 import { Link, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
 import { useUserSession } from "../auth/firebaseAuth";
 import axios from "axios";
+import { Product } from "../store/store";
+import { FlashList } from "@shopify/flash-list";
 
 const ItemScreen = memo(function ItemScreen() {
+  const [product, setProduct] = useState<Product>();
   const { id }: { id: string } = useLocalSearchParams();
 
   const addToCart = useCart((state) => state.addToCart);
-  const cartItems = useCart((state) => state.cartItems);
 
-  const favoriteItems = useFavorite((state) => state.favoriteItems);
   const addFavorite = useFavorite((state) => state.addToFavorite);
   const deleteFavorite = useFavorite((state) => state.deleteFromFavorite);
   const itemIsFavorited = useFavorite((state) => state.isFavorited);
 
-  const userEmail = useUserSession((state) => state.userInfo.email);
-
-  const products = useProductStore((state) => state.products);
-  const product = products.find((item) => item.id.toString() === id);
-
-  if (!product) {
-    return (
-      <SafeAreaView
-        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-      >
-        <Text>Product not found!</Text>
-      </SafeAreaView>
-    );
-  }
   useEffect(() => {
-    const updateCart = async () => {
+    const getTheProduct = async () => {
       try {
-        const updateUser =
+        const getTheProductUrl =
           process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
-            ? process.env.EXPO_PUBLIC_updateUser_emulator
-            : process.env.EXPO_PUBLIC_updateUser_prod;
-        if (!updateUser) {
-          console.log("url not bussing!");
+            ? process.env.EXPO_PUBLIC_getTheProduct_emulator
+            : process.env.EXPO_PUBLIC_getTheProduct_prod;
+        if (!getTheProductUrl) {
+          console.log("ItemScreen/[id]: url not bussing!");
           return;
         }
-        const update = await axios.post(
-          updateUser,
-          { email: userEmail, cart: cartItems },
+        console.log("ItemScreen/[id]: getTheProductUrl:", getTheProductUrl);
+        const getTheProduct = await axios.post(
+          getTheProductUrl,
+          { productId: id },
           {
-            method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
           }
         );
-        console.log(update.status);
+
+        const getTheProductData = await getTheProduct.data;
+        console.log("getTheProduct", getTheProductData);
+
+        if (getTheProductData) {
+          setProduct(getTheProductData);
+          console.log("getTheProduct: Product State:", product);
+        }
       } catch (error) {
-        console.log("[id] update failed: ", error);
+        console.log("ItemScreen/[id].getTheProduct:", error);
       }
     };
-    updateCart();
-  }, [cartItems]);
 
-  useEffect(() => {
-    console.log("itemIsFavorited:", itemIsFavorited(id));
-  });
-  useEffect(() => {
-    console.log("Going to Screen itemId :", id);
+    getTheProduct();
   }, []);
 
+  // useEffect(() => {
+  //   const updateCart = async () => {
+  //     try {
+  //       const updateUserUrl =
+  //         process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
+  //           ? process.env.EXPO_PUBLIC_updateUser_emulator
+  //           : process.env.EXPO_PUBLIC_updateUser_prod;
+  //       if (!updateUserUrl) {
+  //         console.log("ItemScreen/[id]: url not bussing!");
+  //         return;
+  //       }
+  //       console.log("ItemScreen/[id]: updateUserUrl:", updateUserUrl);
+  //       const update = await axios.post(
+  //         updateUserUrl,
+  //         { email: userEmail, cart: cartItems },
+  //         {
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //           },
+  //         }
+  //       );
+  //       console.log(update.status);
+  //     } catch (error) {
+  //       console.log("ItemScreen/[id].updateCart: update failed: ", error);
+  //     }
+  //   };
+  //   updateCart();
+  // }, [cartItems]);
+
+  // useEffect(() => {
+  //   console.log("Going to Screen itemId :", id);
+  // }, []);
+
+  const render = ({ item }: { item: Product }) => {
+    return (
+      <View>
+        <Image
+          // style={styles.imageItem}
+          source={{ uri: item.productThumbnailUrl[0] }}
+          contentFit="cover"
+          transition={200}
+        />
+      </View>
+    );
+  };
+
+  if (!product) {
+    return (
+      <View>
+        <Text>No Product Found... Please contact the admin.</Text>
+      </View>
+    );
+  }
+
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <ScrollView>
         <Link href="../(tabs)/HomeScreen">
           <Ionicons name="arrow-back-outline" size={20}></Ionicons>
         </Link>
-        <View style={styles.headerImage}>
-          <Image
-            style={styles.image}
-            source={{ uri: product.productImageUrl }}
-            contentFit="cover"
-            transition={200}
-          />
-        </View>
+        <FlashList
+          data={[product]}
+          renderItem={render}
+          keyExtractor={(item, index) => `${item.id}-${index}`}
+          // contentContainerStyle={}
+          showsVerticalScrollIndicator={false}
+          estimatedItemSize={250}
+          horizontal={true}
+          ListEmptyComponent={() => (
+            <Text style={{ color: "red" }}>No Images to Display</Text>
+          )}
+        />
         <View style={styles.mainDescription}>
           <View
             style={{
@@ -91,42 +136,50 @@ const ItemScreen = memo(function ItemScreen() {
               justifyContent: "space-between",
             }}
           >
-            <Text style={styles.name}>{"$" + product.productPrice}</Text>
-            <Text>Stock: {product.productStock}</Text>
+            <View style={styles.productPrice}>
+              <Text style={styles.productPriceText}>
+                {"$" + product.productPrice}
+              </Text>
+            </View>
+            <View style={styles.productStock}>
+              <Text>Stock: {product.productStock}</Text>
+            </View>
+
             {itemIsFavorited(id) ? (
               <Pressable
                 onPress={() => {
-                  deleteFavorite(product.id);
+                  deleteFavorite(id);
                 }}
               >
-                <Ionicons
-                  name="heart"
-                  size={25}
-                  color="black"
-                  style={{ alignSelf: "center" }}
-                />
+                <View style={styles.favoriteButton}>
+                  <Ionicons name="heart" size={24} color="black" />
+                </View>
               </Pressable>
             ) : (
               <Pressable
                 onPress={() => {
-                  addFavorite(product.id);
+                  addFavorite(id);
                 }}
               >
-                <Ionicons
-                  name="heart-outline"
-                  size={25}
-                  color="black"
-                  style={{ alignSelf: "center" }}
-                />
+                <View style={styles.favoriteButton}>
+                  <Ionicons name="heart-outline" size={24} color="black" />
+                </View>
               </Pressable>
             )}
           </View>
-          <Text style={styles.name}>{product.productName}</Text>
-          <Text>{product.productDescription}</Text>
+
+          <View style={styles.productName}>
+            <Text style={styles.productNameText}>{product.productName}</Text>
+          </View>
+          <View style={styles.productDescription}>
+            <Text style={styles.productDescriptionText}>
+              {product.productDescription}
+            </Text>
+          </View>
         </View>
       </ScrollView>
 
-      <View style={[styles.ItemFooter, {}]}>
+      <View style={styles.ItemFooter}>
         <Pressable
           onPress={() => {
             addToCart(id);
@@ -145,7 +198,7 @@ const ItemScreen = memo(function ItemScreen() {
           <Text style={{ color: "white", alignSelf: "center" }}>Buy Now</Text>
         </Pressable>
       </View>
-    </SafeAreaView>
+    </View>
   );
 });
 
@@ -167,91 +220,41 @@ const styles = StyleSheet.create({
     height: 200,
     resizeMode: "contain",
   },
-  name: {
+  productName: {
+    marginTop: 12,
+  },
+  productNameText: {
     fontSize: 28,
     fontWeight: "bold",
-    marginTop: 12,
     color: "#333",
+  },
+  productDescription: {},
+  productDescriptionText: {},
+  productPrice: {
+    marginTop: 12,
+  },
+  productPriceText: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "green",
+  },
+  productStock: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  favoriteButton: {
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
   },
   idContainer: {
     marginTop: 8,
   },
   idText: {
     fontSize: 16,
-    color: "#666",
     fontWeight: "600",
-  },
-  statsContainer: {
-    margin: 16,
-    padding: 16,
-    backgroundColor: "#fff",
-    borderRadius: 12,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 12,
-    color: "#333",
-  },
-  statRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  statLabel: {
-    width: 150,
-    fontSize: 16,
     color: "#666",
-    marginRight: 8,
-  },
-  statBarContainer: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  statBar: {
-    height: 8,
-    backgroundColor: "#6890F0",
-    borderRadius: 4,
-  },
-  statValue: {
-    marginLeft: 16,
-    fontSize: 16,
-    color: "#333",
-  },
-  typesContainer: {
-    margin: 16,
-    padding: 16,
-    backgroundColor: "#fff",
-    borderRadius: 12,
-  },
-  typesList: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  typeTag: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 16,
-  },
-  typeText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  abilitiesContainer: {
-    margin: 16,
-    padding: 16,
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    marginBottom: 24,
-  },
-  abilityText: {
-    fontSize: 16,
-    color: "#666",
-    marginBottom: 8,
-    textTransform: "capitalize",
   },
   ItemFooter: {
     flexDirection: "row",
