@@ -29,5 +29,8 @@ export { createProduct };
 import { getProducts } from "./getProducts";
 export { getProducts };
 
+import { getTheProduct } from "./getTheProduct";
+export { getTheProduct };
+
 // import { updateUser } from "./updateUser";
 // export { updateUser };
