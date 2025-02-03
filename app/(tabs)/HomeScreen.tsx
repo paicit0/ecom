@@ -1,6 +1,6 @@
 //HomeScreen.tsx
 import { memo, useEffect, useState } from "react";
-import { StyleSheet, View, Text, Dimensions } from "react-native";
+import { StyleSheet, View, Text, Dimensions, Pressable } from "react-native";
 import { Image } from "expo-image";
 import { Product } from "../store/store";
 import { Link } from "expo-router";
@@ -9,7 +9,6 @@ import EmptySearchBar from "../../components/EmptySearchBar";
 import { useProductStore } from "../store/store";
 import Animated, { useAnimatedScrollHandler } from "react-native-reanimated";
 import axios from "axios";
-import { Ionicons } from "@expo/vector-icons";
 
 export const HomeScreen = memo(function HomeScreen() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -19,44 +18,45 @@ export const HomeScreen = memo(function HomeScreen() {
   const [currentProductNumber, setCurrentProductNumber] = useState<number>(0);
   const initialProductLoadNumber = 50;
   const LoadMoreProductNumber = 20;
-  const storeProducts = useProductStore((state) => state.setProducts);
+  const setProducts = useProductStore((state) => state.setProducts);
   const products = useProductStore((state) => state.products);
 
-  const getProducts =
+  const getProductsUrl =
     process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
       ? process.env.EXPO_PUBLIC_getProducts_emulator
       : process.env.EXPO_PUBLIC_getProducts_prod;
 
-  if (!getProducts) {
-    console.log("url not bussin");
+  if (!getProductsUrl) {
+    console.log("HomeScreen: url not bussin");
     return;
   }
 
-  const fetchProductData = async (): Promise<void> => {
+  const fetchProductData = async () => {
     try {
       console.log(
-        "fetchProductData with: Load:",
+        "HomeScreen: fetchProductData with: Load:",
         initialProductLoadNumber,
-        "Skip:",
+        "HomeScreen: Skip:",
         currentProductNumber
       );
-      const response = await axios.post(
-        getProducts,
+      console.log("HomeScreen.fetchProductData: getProductsUrl:", getProductsUrl)
+      const getProducts = await axios.post(
+        getProductsUrl,
         {
           numberOfItems: initialProductLoadNumber,
           currentProductNumber: currentProductNumber,
         },
         {
-          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
         }
       );
-      console.log("fetchProductData Status:", response.status);
-      if (response.status === 200) {
-        const data = response.data;
-        storeProducts(data.productsData);
+      console.log("HomeScreen: fetchProductData Status:", getProducts.status);
+      if (getProducts.status === 200) {
+        const data = getProducts.data;
+        console.log(data);
+        setProducts(data.productsData);
         const imagesToPreload = data.productsData.map(
           (product: Product) => product.productThumbnailUrl
         );
@@ -66,7 +66,7 @@ export const HomeScreen = memo(function HomeScreen() {
         setIsRefreshing(false);
       }
     } catch (error) {
-      console.log("fetchProductData Error:", error);
+      console.log("HomeScreen: fetchProductData Error:", error);
       return;
     } finally {
       setIsLoading(false);
@@ -74,47 +74,45 @@ export const HomeScreen = memo(function HomeScreen() {
     }
   };
 
-  useEffect(() => {
-    fetchProductData();
-  }, []);
-
   const loadMore = async () => {
+    console.log("HomeScreen: loadMore triggered.")
     if (isLoading || isRefreshing) return;
     setIsLoadingMore(true);
     try {
-      console.log("LoadMore!");
-      const response = await axios.post(
-        getProducts,
+      console.log("HomeScreen.loadMore: getProductsUrl:", getProductsUrl)
+      const loadMoreProducts = await axios.post(
+        getProductsUrl,
         {
           numberOfItems: LoadMoreProductNumber,
           currentProductNumber: currentProductNumber + LoadMoreProductNumber,
         },
         {
-          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
         }
       );
-      if (response.status === 200) {
-        const data = await response.data;
+      if (loadMoreProducts.status === 200) {
+        const loadMoreProductsData = await loadMoreProducts.data;
         setCurrentProductNumber((prev) => prev + LoadMoreProductNumber);
-        storeProducts([...products, ...data.productsData]);
+        setProducts([...products, ...loadMoreProductsData.productsData]);
         setIsLoadingMore(false);
       }
     } catch (error) {
-      console.log("loadMore Error:", error);
+      console.log("HomeScreen: loadMore Error:", error);
       setIsLoadingMore(false);
       return;
     }
   };
 
   useEffect(() => {
-    // products.forEach(product => {
-    //   console.log("product id:", product.id);
-    // });
+    console.log(products);
+    fetchProductData();
+  }, []);
+
+  useEffect(() => {
     console.log(
-      "how many products in useProductStore.products:",
+      "HomeScreen: useProductStore.products.length:",
       products.length
     );
   }, [products]);
@@ -151,11 +149,12 @@ export const HomeScreen = memo(function HomeScreen() {
               pathname: "/ItemScreen/[id]",
               params: { id: item.id },
             }}
+            asChild
           >
-            <View style={styles.itemContainer}>
+            <Pressable style={styles.itemContainer}>
               <Image
                 style={styles.imageItem}
-                source={{ uri: item.productThumbnailUrl }}
+                source={{ uri: item.productThumbnailUrl[0] }}
                 contentFit="cover"
                 transition={200}
               />
@@ -170,7 +169,7 @@ export const HomeScreen = memo(function HomeScreen() {
                 <Text style={styles.itemPrice}>${item.productPrice}</Text>
                 <Text style={styles.itemStock}>Stock: {item.productStock}</Text>
               </View>
-            </View>
+            </Pressable>
           </Link>
         </View>
       );
@@ -179,8 +178,8 @@ export const HomeScreen = memo(function HomeScreen() {
 
   return (
     <View style={{ flex: 1 }}>
-      <View style={{ height: 53 }} />
-      <EmptySearchBar />
+      <View style={{ height: 45 }} />
+      <EmptySearchBar placeholder="Search..." />
 
       <FlashList
         data={products}
@@ -212,6 +211,7 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {},
   header: { width: "100%" },
+  renderStyle: {},
   flashListStyle: {
     height: Dimensions.get("window").height,
     width: Dimensions.get("window").width,
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   verticalListContainer: {
-    backgroundColor: "black",
+    // backgroundColor: "black",
   },
   horizontalListContainer: {
     backgroundColor: "cyan",
@@ -254,7 +254,6 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   badge: {},
-  renderStyle: { flex: 1 },
   loadingImagePlaceholder: {
     backgroundColor: "#E0E0E0",
   },
