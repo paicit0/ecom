@@ -177,6 +177,6 @@ async function saveToken(user: User | null) {
 }
 
 onAuthStateChanged(auth, (user) => {
-  console.log("firebaseAuth.saveToken: onAuthStateChanged triggered:", user);
+  console.log("firebaseAuth.saveToken: onAuthStateChanged triggered:", user?.email);
   saveToken(user);
 });
