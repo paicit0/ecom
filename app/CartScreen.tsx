@@ -19,16 +19,16 @@ export const CartScreen = memo(() => {
     const updateCart = async () => {
       try {
         const idToken = await SecureStore.getItemAsync("authToken");
-        const updateUserUrl =
+        const updateCartUrl =
           process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
-            ? process.env.EXPO_PUBLIC_updateUser_emulator
-            : process.env.EXPO_PUBLIC_updateUser_prod;
-        if (!updateUserUrl) {
-          console.log("cart not bussin urls");
+            ? process.env.EXPO_PUBLIC_updateCart_emulator
+            : process.env.EXPO_PUBLIC_updateCart_prod;
+        if (!updateCartUrl) {
+          console.log("CartScreen: cart not bussin urls");
           return;
         }
         const update = await axios.post(
-          updateUserUrl,
+          updateCartUrl,
           {
             email: userEmail,
             favorite: cartItemsArray,
