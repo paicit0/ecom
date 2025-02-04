@@ -32,5 +32,8 @@ export { getProducts };
 import { getTheProduct } from "./getTheProduct";
 export { getTheProduct };
 
-// import { updateUser } from "./updateUser";
-// export { updateUser };
+import { updateCart } from "./updateCart";
+export { updateCart };
+
+import { updateFavorite } from "./updateFavorite";
+export { updateFavorite };
