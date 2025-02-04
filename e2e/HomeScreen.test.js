@@ -4,8 +4,8 @@ import HomeScreen from '../app/HomeScreen';
 import CartScreen from '../app/CartScreen';
 
 const mockProduct = [
-  { id: 1, name: 'bulbasaur' },
-  { id: 2, name: 'ivysaur' },
+  { id: 1, name: 'cocoa' },
+  { id: 2, name: 'wrench' },
 ];
 
 describe('<HomeScreen />', () => {
