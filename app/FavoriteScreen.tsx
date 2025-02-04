@@ -6,7 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 
 function FavoriteScreen() {
-  const favoriteItems = useFavorite((state) => state.favoriteItems);
+  const favoriteItems = useFavorite((state) => state.favoriteItemsArray);
   const userEmail = useUserSession((state) => state.userInfo.email);
   const deleteFavorite = useFavorite((state) => state.deleteFromFavorite);
   const deleteAllFavorite = useFavorite((state) => state.deleteAllFavorite);
