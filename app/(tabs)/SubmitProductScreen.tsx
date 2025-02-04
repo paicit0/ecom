@@ -10,10 +10,10 @@ import { getAuth } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
 import * as SecureStore from "expo-secure-store";
 import axios from "axios";
+
 global.Buffer = require("buffer").Buffer;
 
 function SubmitProductScreen() {
-  const user = useUserSession((state) => state.userInfo);
   const [productName, setProductName] = useState<string>("");
   const [productPrice, setProductPrice] = useState<number>(NaN);
   const [productDescription, setProductDescription] = useState<string>("");
@@ -24,6 +24,9 @@ function SubmitProductScreen() {
   const [imageBase64s, setImageBase64s] = useState<string[]>([]);
   const [imageUris, setImageUris] = useState<string[]>([]);
   const [contentType, setContentType] = useState<string>("");
+
+  const userInfo = useUserSession((state) => state.userInfo);
+  const refreshToken = useUserSession((state) => state.refreshToken);
 
   const handleFilePicking = async () => {
     console.log("handleFilePicking");
@@ -51,16 +54,38 @@ function SubmitProductScreen() {
   };
 
   const handleSubmit = async () => {
+    if (
+      !productName ||
+      !productDescription ||
+      !productPrice ||
+      !productStock ||
+      !productCategory
+    ) {
+      console.log("SubmitProduct.handleSubmit: missing field(s).");
+    }
+
     const auth = getAuth();
     const userAuth = auth.currentUser;
-    console.log("auth.currentUser: ", auth.currentUser);
+
+    // refreshToken(userAuth);
+    console.log(
+      "SubmitProduct.handleSubmit: auth.currentUser: ",
+      auth.currentUser
+    );
+    // console.log("SubmitProduct.handleSubmit: refreshing firebase token");
     if (!userAuth) {
-      console.log("not logged in");
+      console.log("SubmitProduct.handleSubmit: not logged in");
       return;
     }
-    const idToken = await SecureStore.getItemAsync("authToken");
-    console.log("idToken:", idToken);
 
+    let idToken;
+    try {
+      idToken = await userAuth.getIdToken(true);
+    } catch (error) {
+      console.log("SubmitProduct.handleSubmit: error getting idToken:", error);
+      return;
+    }
+    console.log("SubmitProduct.handleSubmit: new idToken:", idToken);
     const uploadawsS3Url =
       process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
         ? process.env.EXPO_PUBLIC_uploadawsS3_emulator
@@ -110,7 +135,7 @@ function SubmitProductScreen() {
               productImageUrl: response.resImageUrlArray,
               productThumbnailUrl: response.resThumbnailUrlArray,
               productStock: productStock,
-              productOwner: user.email,
+              productOwner: userInfo.email,
             },
             {
               headers: {
@@ -220,12 +245,14 @@ function SubmitProductScreen() {
         placeholder="Name..."
         value={productName}
         onChangeText={setProductName}
+        autoCapitalize="none"
       />
       <TextInput
         style={styles.input}
         placeholder="Description..."
         value={productDescription}
         onChangeText={setProductDescription}
+        autoCapitalize="none"
       />
       <TextInput
         style={styles.input}
@@ -235,6 +262,7 @@ function SubmitProductScreen() {
         onChangeText={(num) => {
           setProductPrice(parseInt(num));
         }}
+        autoCapitalize="none"
       />
       <TextInput
         style={styles.input}
@@ -244,6 +272,7 @@ function SubmitProductScreen() {
         onChangeText={(num) => {
           setProductStock(parseInt(num));
         }}
+        autoCapitalize="none"
       />
       <Dropdown
         style={styles.dropdown}
