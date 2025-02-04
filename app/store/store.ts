@@ -7,52 +7,52 @@ type cartItems = {
 };
 
 type useCartArray = {
-  cartItems: cartItems[];
+  cartItemsArray: cartItems[];
   addToCart: (itemId: string) => void;
   deleteFromCart: (itemId: string) => void;
   deleteAllCart: () => void;
 };
 
 export const useCart = create<useCartArray>((set) => ({
-  cartItems: [],
+  cartItemsArray: [],
   addToCart: (itemId) =>
     set((state) => {
-      const existingItemIndex = state.cartItems.findIndex(
+      const existingItemIndex = state.cartItemsArray.findIndex(
         (item) => item.id === itemId
       );
 
       if (existingItemIndex !== -1) {
-        const updatedCartItems = state.cartItems.map((item, index) =>
+        const updatedCartItems = state.cartItemsArray.map((item, index) =>
           index === existingItemIndex
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
         console.log("Increasing quantity for item: " + itemId);
         console.log("Current CartItems", updatedCartItems);
-        return { cartItems: updatedCartItems };
+        return { cartItemsArray: updatedCartItems };
       } else {
         const updatedCartItems = [
-          ...state.cartItems,
+          ...state.cartItemsArray,
           { id: itemId, quantity: 1 },
         ];
         console.log("Adding to Cart: " + itemId);
         console.log("Current CartItems", updatedCartItems);
-        return { cartItems: updatedCartItems };
+        return { cartItemsArray: updatedCartItems };
       }
     }),
   deleteFromCart: (itemId) =>
     set((state) => {
-      const updatedCartItems = state.cartItems.filter(
+      const updatedCartItems = state.cartItemsArray.filter(
         (item) => item.id !== itemId
       );
       console.log("Removing from Cart: " + itemId);
       console.log("Current CartItems", updatedCartItems);
-      return { cartItems: updatedCartItems };
+      return { cartItemsArray: updatedCartItems };
     }),
   deleteAllCart: () =>
     set(() => {
       console.log("Clearing Cart");
-      return { cartItems: [] };
+      return { cartItemsArray: [] };
     }),
 }));
 
@@ -62,8 +62,8 @@ export type Product = {
   productDescription: string;
   productCategory: string;
   productPrice: number;
-  productImageUrl: string;
-  productThumbnailUrl: string;
+  productImageUrl: string[];
+  productThumbnailUrl: string[];
   productStock: number | string;
   productOwner: string;
 };
@@ -78,7 +78,7 @@ export const useProductStore = create<ProductStore>((set) => ({
 }));
 
 type useFavoriteArray = {
-  favoriteItems: string[];
+  favoriteItemsArray: string[];
   addToFavorite: (itemId: string) => void;
   deleteFromFavorite: (itemId: string) => void;
   deleteAllFavorite: () => void;
@@ -86,29 +86,29 @@ type useFavoriteArray = {
 };
 
 export const useFavorite = create<useFavoriteArray>((set, get) => ({
-  favoriteItems: [],
+  favoriteItemsArray: [],
   addToFavorite: (itemId) =>
     set((state) => {
-      if (state.favoriteItems.includes(itemId)) {
+      if (state.favoriteItemsArray.includes(itemId)) {
         console.log("Duplicated Item in Favorite!!");
         return state;
       }
-      const updatedFavoriteItems = [...state.favoriteItems, itemId];
+      const updatedFavoriteItems = [...state.favoriteItemsArray, itemId];
       console.log("Adding to Favorite: " + itemId);
       console.log("Current FavoriteItems", updatedFavoriteItems);
-      return { favoriteItems: updatedFavoriteItems };
+      return { favoriteItemsArray: updatedFavoriteItems };
     }),
   deleteFromFavorite: (itemId) =>
     set((state) => {
-      const updatedFavoriteItems = state.favoriteItems.filter(
+      const updatedFavoriteItems = state.favoriteItemsArray.filter(
         (item) => item !== itemId
       );
       console.log("Removing from favorite: " + itemId);
       console.log("Current FavoriteItems", updatedFavoriteItems);
       return {
-        favoriteItems: updatedFavoriteItems,
+        favoriteItemsArray: updatedFavoriteItems,
       };
     }),
-  deleteAllFavorite: () => set({ favoriteItems: [] }),
-  isFavorited: (itemId) => new Set(get().favoriteItems).has(itemId),
+  isFavorited: (itemId) => get().favoriteItemsArray.includes(itemId),
+  deleteAllFavorite: () => set({ favoriteItemsArray: [] }),
 }));
