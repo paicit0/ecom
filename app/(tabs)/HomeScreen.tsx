@@ -54,8 +54,8 @@ export const HomeScreen = memo(function HomeScreen() {
       );
       console.log("HomeScreen: fetchProductData Status:", getProducts.status);
       if (getProducts.status === 200) {
-        const data = getProducts.data;
-        console.log(data);
+        const data = await getProducts.data;
+        console.log("Homescreen: data:",data);
         setProducts(data.productsData);
         const imagesToPreload = data.productsData.map(
           (product: Product) => product.productThumbnailUrl
