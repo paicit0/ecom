@@ -10,7 +10,7 @@ import * as SecureStore from "expo-secure-store";
 import axios from "axios";
 
 export const CartScreen = memo(() => {
-  const cartItems = useCart((state) => state.cartItems);
+  const cartItemsArray = useCart((state) => state.cartItemsArray);
   const deleteFromCart = useCart((state) => state.deleteFromCart);
   const deleteAllCart = useCart((state) => state.deleteAllCart);
   const userEmail = useUserSession((state) => state.userInfo.email);
@@ -31,7 +31,7 @@ export const CartScreen = memo(() => {
           updateUserUrl,
           {
             email: userEmail,
-            favorite: cartItems,
+            favorite: cartItemsArray,
           },
           {
             headers: {
@@ -46,7 +46,7 @@ export const CartScreen = memo(() => {
       }
     };
     updateCart();
-  }, [cartItems]);
+  }, [cartItemsArray]);
 
   const handleCartSubmit = () => {
     try {
@@ -74,7 +74,7 @@ export const CartScreen = memo(() => {
           <Text style={{ textAlign: "center" }}>Your Cart</Text>
         </View>
 
-        {cartItems.map((item, index) => (
+        {cartItemsArray.map((item, index) => (
           <View style={styles.cartContainer} key={index}>
             <Text>id {item.id}</Text>
             <Text>quantity {item.quantity}</Text>
@@ -94,11 +94,11 @@ export const CartScreen = memo(() => {
           </View>
         ))}
 
-        {cartItems.length === 0 && (
+        {cartItemsArray.length === 0 && (
           <Text style={{ textAlign: "center" }}>Your cart is empty!</Text>
         )}
 
-        {cartItems.length > 0 && (
+        {cartItemsArray.length > 0 && (
           <View>
             <Pressable onPress={deleteAllCart}>
               <Text>Delete All</Text>
