@@ -150,7 +150,7 @@ export const useUserSession = create<userSessionType>()(
           console.log("useUserSession.getUserInfo:", error);
         }
       },
-      refreshToken: async (user) => {
+      refreshToken: async (user: User | null) => {
         saveToken(user);
       },
     }),
