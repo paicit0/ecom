@@ -4,19 +4,32 @@ import * as admin from "firebase-admin";
 
 const updateCart = functions.https.onRequest(async (req, res) => {
   try {
-    console.log("updateCart req.body: ", req.body);
+    console.log("updateCart: req.body:", req.body);
     const { cart, cartOwnerId } = req.body;
-    console.log("req.body: ", cart);
     const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      res.status(401).json({ message: "Unauthorized!" });
+    console.log("updateCart: req.body: ", req.body);
+    console.log("updateCart: authHeader: ", authHeader);
+
+    console.log("updateCart received headers:", authHeader);
+    if (!authHeader || !authHeader.toLowerCase().startsWith("bearer")) {
+      console.log("updateCart: no/invalid auth in headers!");
+      res
+        .status(401)
+        .json({ error: "updateCart: no/invalid auth in headers." });
       return;
     }
-    const idToken = authHeader.split("Bearer ")[1];
-    const decodedToken = await admin.auth().verifyIdToken(idToken);
-    const userEmail = decodedToken.email;
-    console.log("req.header bearer: ", idToken);
-    console.log("userEmail:", userEmail);
+    const idToken = authHeader.replace(/^Bearer\s+/i, "").trim();
+    try {
+      const decodedToken = await admin.auth().verifyIdToken(idToken);
+      if (!decodedToken) {
+        res.status(401).json({ error: "updateCart: No auth token." });
+        return;
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(401).json({ error: `updateCart: Unauthorized! ${error}` });
+      return;
+    }
 
     const cartRef = db.collection("cart");
     const getCart = await cartRef.where("cartOwnerId", "==", cartOwnerId).get();
