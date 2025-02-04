@@ -5,12 +5,12 @@
 
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
+import { firebaseConfig } from "../../../app/auth/firebaseConfig";
 import dotenv from "dotenv";
 
 dotenv.config();
-
-initializeApp();
-const db = getFirestore();
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 export { db };
 
@@ -32,8 +32,5 @@ export { getProducts };
 import { getTheProduct } from "./getTheProduct";
 export { getTheProduct };
 
-import { updateCart } from "./updateCart";
-export { updateCart };
-
-import { updateFavorite } from "./updateFavorite";
-export { updateFavorite };
+// import { updateUser } from "./updateUser";
+// export { updateUser };
