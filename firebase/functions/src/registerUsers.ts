@@ -4,12 +4,14 @@ import { Timestamp } from "firebase-admin/firestore";
 
 const registerUsers = functions.https.onRequest(async (req, res) => {
   try {
-    console.log("Connected! Proceeding...");
-    const { email } = await req.body;
+    console.log("registerUsers: Connected.");
+    const { uid, email } = await req.body;
+    console.log("registerUsers: req.body", req.body);
     const usersCollectionEmail = db.collection("users").doc(email);
     const docGet = await usersCollectionEmail.get();
 
     const user = {
+      id: uid,
       email: email,
       pictureURL: "",
       timestamp: Timestamp.now(),
@@ -20,28 +22,26 @@ const registerUsers = functions.https.onRequest(async (req, res) => {
     };
 
     if (!email) {
-      res.status(400).json({ message: "No email provided" });
+      res.status(400).json({ message: "registerUsers: No email provided" });
       return;
     }
 
     if (docGet.exists) {
-      console.log("User already exists!");
-      res.status(409).json({ message: "User already exists!" });
+      console.log("registerUsers: User already exists!");
+      res.status(409).json({ message: "registerUsers: User already exists!" });
       return;
     } else {
       const addUser = await db.collection("users").add(user);
       const addUserGet = await addUser.get();
-      console.log("User registered successfully! ID: ", addUserGet.id);
+      console.log("registerUsers: User registered successfully! DocumentID: ", addUserGet.id);
       res.status(201).json({
-        message: "User registered successfully! ID: ",
+        message: "registerUsers: User registered successfully! DocumentID: ",
         id: addUserGet.id,
       });
     }
   } catch (error) {
-    console.log("Registering failed: " + error);
-    res
-      .status(500)
-      .json({ message: "Registering failed on Cloud Function." }); // don't include "error" due to security risk.
+    console.log("registerUsers: Registering failed: " + error);
+    res.status(500).json({ message: "registerUsers: Registering failed" }); // don't include "error" due to security risk.
   }
 });
 
