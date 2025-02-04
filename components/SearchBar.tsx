@@ -16,7 +16,7 @@ const SearchBar = memo(function SearchBar({
   onChangeText,
   placeholder = "Search...",
 }: SearchBarProps) {
-  const cart = useCart((state) => state.cartItems);
+  const cart = useCart((state) => state.cartItemsArray);
   return (
     <View style={styles.container}>
       <Ionicons name="search" size={20} color="#666" style={styles.icon} />
