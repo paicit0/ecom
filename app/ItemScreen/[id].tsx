@@ -1,5 +1,13 @@
 import { memo, useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Pressable,
+  ActivityIndicator,
+  Dimensions,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useCart, useFavorite } from "../store/store";
 import { Link, useLocalSearchParams } from "expo-router";
@@ -11,13 +19,17 @@ import { FlashList } from "@shopify/flash-list";
 
 const ItemScreen = memo(function ItemScreen() {
   const [product, setProduct] = useState<Product>();
+  const [loading, setLoading] = useState<boolean>(true);
+
   const { id }: { id: string } = useLocalSearchParams();
 
   const addToCart = useCart((state) => state.addToCart);
 
-  const addFavorite = useFavorite((state) => state.addToFavorite);
-  const deleteFavorite = useFavorite((state) => state.deleteFromFavorite);
-  const itemIsFavorited = useFavorite((state) => state.isFavorited);
+  const addToFavorite = useFavorite((state) => state.addToFavorite);
+  const deleteFromFavorite = useFavorite((state) => state.deleteFromFavorite);
+  const favoriteItemsArray = useFavorite((state) => state.favoriteItemsArray);
+
+  const itemIsFavorited = (id: string) => favoriteItemsArray.includes(id);
 
   useEffect(() => {
     const getTheProduct = async () => {
@@ -46,13 +58,15 @@ const ItemScreen = memo(function ItemScreen() {
 
         if (getTheProductData) {
           setProduct(getTheProductData);
-          console.log("getTheProduct: Product State:", product);
         }
       } catch (error) {
         console.log("ItemScreen/[id].getTheProduct:", error);
+      } finally {
+        setLoading(false);
       }
     };
-
+    console.log(itemIsFavorited);
+    console.log("getTheProduct: Product State:", product);
     getTheProduct();
   }, []);
 
@@ -89,12 +103,12 @@ const ItemScreen = memo(function ItemScreen() {
   //   console.log("Going to Screen itemId :", id);
   // }, []);
 
-  const render = ({ item }: { item: Product }) => {
+  const render = ({ item }: { item: string }) => {
     return (
       <View>
         <Image
-          // style={styles.imageItem}
-          source={{ uri: item.productThumbnailUrl[0] }}
+          style={styles.imageItem}
+          source={{ uri: item }}
           contentFit="cover"
           transition={200}
         />
@@ -102,79 +116,91 @@ const ItemScreen = memo(function ItemScreen() {
     );
   };
 
+  if (loading) {
+    return (
+      <View
+        style={{ flex: 1, alignContent: "center", justifyContent: "center" }}
+      >
+        <ActivityIndicator size="large" color="green" />
+      </View>
+    );
+  }
+
   if (!product) {
     return (
-      <View>
-        <Text>No Product Found... Please contact the admin.</Text>
+      <View
+        style={{ flex: 1, alignContent: "center", justifyContent: "center" }}
+      >
+        <Text>No Product Found... It may have been deleted.</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <ScrollView>
-        <Link href="../(tabs)/HomeScreen">
-          <Ionicons name="arrow-back-outline" size={20}></Ionicons>
-        </Link>
-        <FlashList
-          data={[product]}
-          renderItem={render}
-          keyExtractor={(item, index) => `${item.id}-${index}`}
-          // contentContainerStyle={}
-          showsVerticalScrollIndicator={false}
-          estimatedItemSize={250}
-          horizontal={true}
-          ListEmptyComponent={() => (
-            <Text style={{ color: "red" }}>No Images to Display</Text>
-          )}
-        />
-        <View style={styles.mainDescription}>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <View style={styles.productPrice}>
-              <Text style={styles.productPriceText}>
-                {"$" + product.productPrice}
+    <View style={styles.mainContainer}>
+      <ScrollView accessible={false}>
+        <View style={{ flex: 1 }}>
+          <Link href="../(tabs)/HomeScreen">
+            <Ionicons name="arrow-back-outline" size={20}></Ionicons>
+          </Link>
+          <View style={styles.FlashListStyle}>
+            <FlashList
+              data={product.productThumbnailUrl}
+              renderItem={render}
+              keyExtractor={(item) => item}
+              showsVerticalScrollIndicator={false}
+              estimatedItemSize={200}
+              snapToAlignment="start"  
+              horizontal={true}
+              pagingEnabled={true}
+              disableIntervalMomentum={true}
+              ListEmptyComponent={() => (
+                <Text style={{ color: "red" }}>No Images to Display</Text>
+              )}
+            />
+          </View>
+
+          <View style={styles.mainDescription}>
+            <View style={styles.itemHeader}>
+              <View style={styles.productPrice}>
+                <Text style={styles.productPriceText}>
+                  {"$" + product.productPrice}
+                </Text>
+              </View>
+              <View style={styles.productStock}>
+                <Text>Stock: {product.productStock}</Text>
+              </View>
+              {itemIsFavorited(id) ? (
+                <Pressable
+                  onPress={() => {
+                    deleteFromFavorite(id);
+                  }}
+                >
+                  <View style={styles.favoriteButton}>
+                    <Ionicons name="heart" size={24} color="black" />
+                  </View>
+                </Pressable>
+              ) : (
+                <Pressable
+                  onPress={() => {
+                    addToFavorite(id);
+                  }}
+                >
+                  <View style={styles.favoriteButton}>
+                    <Ionicons name="heart-outline" size={24} color="black" />
+                  </View>
+                </Pressable>
+              )}
+            </View>
+
+            <View style={styles.productName}>
+              <Text style={styles.productNameText}>{product.productName}</Text>
+            </View>
+            <View style={styles.productDescription}>
+              <Text style={styles.productDescriptionText}>
+                {product.productDescription}
               </Text>
             </View>
-            <View style={styles.productStock}>
-              <Text>Stock: {product.productStock}</Text>
-            </View>
-
-            {itemIsFavorited(id) ? (
-              <Pressable
-                onPress={() => {
-                  deleteFavorite(id);
-                }}
-              >
-                <View style={styles.favoriteButton}>
-                  <Ionicons name="heart" size={24} color="black" />
-                </View>
-              </Pressable>
-            ) : (
-              <Pressable
-                onPress={() => {
-                  addFavorite(id);
-                }}
-              >
-                <View style={styles.favoriteButton}>
-                  <Ionicons name="heart-outline" size={24} color="black" />
-                </View>
-              </Pressable>
-            )}
-          </View>
-
-          <View style={styles.productName}>
-            <Text style={styles.productNameText}>{product.productName}</Text>
-          </View>
-          <View style={styles.productDescription}>
-            <Text style={styles.productDescriptionText}>
-              {product.productDescription}
-            </Text>
           </View>
         </View>
       </ScrollView>
@@ -203,17 +229,32 @@ const ItemScreen = memo(function ItemScreen() {
 });
 
 const styles = StyleSheet.create({
-  container: {
+  mainContainer: {
     flex: 1,
     backgroundColor: "#f5f5f5",
   },
-  headerImage: {
+  imageItem: {
+    minHeight: 150,
+    minWidth: 150,
+  },
+  FlashListStyle: {
+    flex: 1,
+    height: (Dimensions.get("window").height / 2) * 0.8,
+    width: Dimensions.get("window").width,
+    marginTop: 35,
+    borderBottomColor: "black",
+    borderWidth: 1,
+  },
+  itemHeader: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    padding: 20,
-    backgroundColor: "#fff",
+    borderBottomColor: "black",
+    borderWidth: 1,
   },
   mainDescription: {
-    padding: 20,
+    // padding: 20
   },
   image: {
     width: 200,
@@ -231,7 +272,8 @@ const styles = StyleSheet.create({
   productDescription: {},
   productDescriptionText: {},
   productPrice: {
-    marginTop: 12,
+    alignItems: "center",
+    justifyContent: "center",
   },
   productPriceText: {
     fontSize: 28,
@@ -239,14 +281,12 @@ const styles = StyleSheet.create({
     color: "green",
   },
   productStock: {
-    flex: 1,
     alignItems: "center",
     justifyContent: "center",
   },
   favoriteButton: {
     alignItems: "center",
     justifyContent: "center",
-    flex: 1,
   },
   idContainer: {
     marginTop: 8,
