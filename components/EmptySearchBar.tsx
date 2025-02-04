@@ -10,7 +10,7 @@ type SearchBarProps =  {
 }
 
 const EmptySearchBar = memo(function SearchBar({placeholder}: SearchBarProps) {
-  const cart = useCart((state) => state.cartItems);
+  const cart = useCart((state) => state.cartItemsArray);
   return (
     <View style={styles.mainContainer}>
       <View style={styles.searchBarContainer}>
@@ -78,6 +78,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: -5,
     right: -5,
+    zIndex: 1,
     backgroundColor: "red",
     color: "white",
     borderRadius: 10,
