@@ -15,8 +15,8 @@ const registerUsers = functions.https.onRequest(async (req, res) => {
       timestamp: Timestamp.now(),
       role: "normalUser",
       balance: 0,
-      cart: [],
-      favorite: [],
+      cartItemsArray: [],
+      favoriteItemsArray: [],
     };
 
     if (!email) {
