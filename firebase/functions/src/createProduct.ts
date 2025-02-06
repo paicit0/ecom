@@ -3,10 +3,7 @@ import { db } from "./index";
 import { Timestamp } from "firebase-admin/firestore";
 import * as admin from "firebase-admin";
 
-console.log("createProduct");
-
 const createProduct = functions.https.onRequest(async (req, res) => {
-  console.log("createProduct: function reached.");
   try {
     console.log("createProduct: req.header: ", req.headers.authorization);
     console.log("createProduct: req.body: ", req.body);
@@ -67,14 +64,18 @@ const createProduct = functions.https.onRequest(async (req, res) => {
     const productsCollection = db.collection("products");
     const createOneProduct = await productsCollection.add(product);
     console.log(
-      "createProduct: Product added successfully! " + "Product ID: " + createOneProduct.id
+      "createProduct: Product submitted successfully! Product ID:" +
+        createOneProduct.id
     );
-    res.status(200).json({
-      error: "createProduct: Product submitted sucessfully! " + createOneProduct.id,
+    res.status(201).json({
+      error:
+        "createProduct: Product submitted sucessfully! " + createOneProduct.id,
     });
     return;
   } catch (error) {
-    res.status(400).json({ error: "createProduct: failed the create product!" });
+    res
+      .status(400)
+      .json({ error: "createProduct: failed the create product!" });
     console.log(error);
     return;
   }
