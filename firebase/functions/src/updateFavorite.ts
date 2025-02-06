@@ -5,47 +5,81 @@ import * as admin from "firebase-admin";
 const updateFavorite = functions.https.onRequest(async (req, res) => {
   try {
     console.log("updateFavorite: req.body:", req.body);
-    const { favorite, id } = req.body;
+    const { email, favoriteItemsArray } = req.body;
     const authHeader = req.headers.authorization;
-    console.log("updateFavorite: received req.body: ", req.body);
-    console.log("updateFavorite: received authHeader: ", authHeader);
-    console.log("updateFavorite: received favorite: ", favorite);
 
-    console.log("updateFavorite received headers:", authHeader);
+    console.log("updateFavorite: req.body: ", email, favoriteItemsArray);
+    console.log("updateFavorite: req.headers.authorization:", authHeader);
+
+    if (!email || !favoriteItemsArray) {
+      res
+        .status(401)
+        .json({
+          error:
+            "updateFavorite: no/invalid email or favoriteItemsArray in body.",
+        });
+      return;
+    }
+
     if (!authHeader || !authHeader.toLowerCase().startsWith("bearer")) {
-      console.log("updateFavorite: no/invalid auth in headers!");
+      console.error("updateFavorite: no/invalid auth in headers!");
       res
         .status(401)
         .json({ error: "updateFavorite: no/invalid auth in headers." });
       return;
     }
+
     const idToken = authHeader.replace(/^Bearer\s+/i, "").trim();
+    console.log("updateFavorite: idToken:", idToken);
+
     try {
       const decodedToken = await admin.auth().verifyIdToken(idToken);
+      console.log("updateFavorite: decodedToken.uid:", decodedToken.uid);
+
       if (!decodedToken) {
-        res.status(401).json({ error: "updateFavorite: No auth token." });
+        console.error("updateFavorite: Failed to decode token");
+        res
+          .status(401)
+          .json({ error: "updateFavorite: Invalid or missing token." });
         return;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       res.status(401).json({ error: `updateFavorite: Unauthorized! ${error}` });
       return;
     }
-
-    const favoriteRef = db.collection("user").doc(id);
-    const favoriteDoc = await favoriteRef.get();
-    if (!favoriteDoc.exists) {
-      res.status(404);
+    console.log(
+      "updateFavorite: in collection 'users', finding a document with 'email'=",
+      email
+    );
+    const usersRef = db.collection("users").where("email", "==", email);
+    console.log("updateFavorite: usersRef", usersRef);
+    const usersDoc = await usersRef.get();
+    console.log("updateFavorite: usersDoc", usersDoc);
+    if (!usersDoc.empty) {
+      console.log("updateFavorite: usersDoc Found!");
+      const usersDocRef = usersDoc.docs[0].ref;
+      console.log("updateFavorite: usersDocRef:", usersDocRef);
+      await usersDocRef.set(
+        { favoriteItemsArray: favoriteItemsArray },
+        { merge: true }
+      );
+      console.log(
+        `updateFavorite: favoriteItemsArray updated! user email:${email}`
+      );
+      res.status(201).json({
+        message: `updateFavorite: favoriteItemsArray updated! user email:${email}`,
+      });
+      return;
     } else {
-      // const favoriteDocRef = favoriteDoc.docs[0].ref;
-      // await favoriteDocRef.update({ favorite });
-      res.status(200);
+      console.error("updateFavorite: usersDoc not Found");
+      res
+        .status(404)
+        .json({ error: "updateFavorite: favoriteItemsArray not found." });
     }
-
-    res.status(200);
   } catch (error) {
-    console.log("getProducts error: ", error);
-    res.status(400);
+    console.error("updateFavorite internal errors: ", error);
+    res.status(400).json({ error: "updateFavorite: internal errors" });
   }
 });
 

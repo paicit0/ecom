@@ -5,46 +5,77 @@ import * as admin from "firebase-admin";
 const updateCart = functions.https.onRequest(async (req, res) => {
   try {
     console.log("updateCart: req.body:", req.body);
-    const { cart, cartOwnerId } = req.body;
+    const { email, cartItemsArray } = req.body;
     const authHeader = req.headers.authorization;
-    console.log("updateCart: req.body: ", req.body);
-    console.log("updateCart: authHeader: ", authHeader);
 
-    console.log("updateCart received headers:", authHeader);
+    console.log("updateCart: req.body: ", email, cartItemsArray);
+    console.log("updateCart: received req.headers.authorization:", authHeader);
+
+    if (!email || !cartItemsArray) {
+      res
+        .status(401)
+        .json({
+          error: "updateCart: no/invalid email or cartItemsArray in body.",
+        });
+      return;
+    }
+
     if (!authHeader || !authHeader.toLowerCase().startsWith("bearer")) {
-      console.log("updateCart: no/invalid auth in headers!");
+      console.error("updateCart: no/invalid auth in headers!");
       res
         .status(401)
         .json({ error: "updateCart: no/invalid auth in headers." });
       return;
     }
+
     const idToken = authHeader.replace(/^Bearer\s+/i, "").trim();
+    console.log("updateCart: idToken:", idToken);
+
     try {
       const decodedToken = await admin.auth().verifyIdToken(idToken);
+      console.log("updateCart: decodedToken.uid:", decodedToken.uid);
+
       if (!decodedToken) {
-        res.status(401).json({ error: "updateCart: No auth token." });
+        console.error("updateCart: Failed to decode token");
+        res
+          .status(401)
+          .json({ error: "updateCart: Invalid or missing token." });
         return;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       res.status(401).json({ error: `updateCart: Unauthorized! ${error}` });
       return;
     }
 
-    const cartRef = db.collection("cart");
-    const getCart = await cartRef.where("cartOwnerId", "==", cartOwnerId).get();
-    if (getCart.empty) {
-      res.status(404);
+    console.log(
+      "updateCart: in collection 'users', finding a document with 'email'=",
+      email
+    );
+    const usersRef = db.collection("users").where("email", "==", email);
+    console.log("updateCart: usersRef:", usersRef);
+    const usersDoc = await usersRef.get();
+    console.log("updateCart: usersRef:", usersDoc);
+    if (!usersDoc.empty) {
+      console.log("updateCart: usersDoc exists!");
+      const usersDocRef = usersDoc.docs[0].ref;
+      console.log("updateCart: usersDocRef:", usersDocRef);
+      await usersDocRef.set(
+        { cartItemsArray: cartItemsArray },
+        { merge: true }
+      );
+      console.log(`updateCart: cartItemsArray updated! user: ${email}`);
+      res.status(201).json({
+        message: `updateCart: cartItemsArray updated! user: ${email}`,
+      });
+      return;
     } else {
-      const cartDocRef = getCart.docs[0].ref;
-      await cartDocRef.update({ cart });
-      res.status(200);
+      console.error("updateCart: cartItemsArray not found.");
+      res.status(404).json({ error: "updateCart: cartItemsArray not found." });
     }
-
-    res.status(200);
   } catch (error) {
-    console.log("getProducts error: ", error);
-    res.status(400);
+    console.error("updateCart: internal errors: ", error);
+    res.status(400).json({ error: "updateCart: internal errors" });
   }
 });
 
