@@ -1,5 +1,5 @@
-import { Link } from "expo-router";
-import { View, Text, Pressable } from "react-native";
+import { Link, useRouter } from "expo-router";
+import { View, Text, Pressable, ActivityIndicator } from "react-native";
 import { StyleSheet } from "react-native";
 // @ts-ignore
 import { useUserSession } from "../auth/firebaseAuth";
@@ -9,12 +9,14 @@ import * as SecureStore from "expo-secure-store";
 import axios from "axios";
 
 function ProfileScreen() {
-  const [error, setError] = useState("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
   const userIsSignedIn = useUserSession((state) => state.userIsSignedIn);
   const logout = useUserSession((state) => state.logout);
   const refreshToken = useUserSession((state) => state.refreshToken);
   const userInfoFromStore = useUserSession((state) => state.userInfo);
   const { getUserInfo } = useUserSession();
+  const router = useRouter();
 
   useEffect(() => {
     if (userIsSignedIn) {
@@ -30,13 +32,13 @@ function ProfileScreen() {
 
     const auth = getAuth();
     const userAuth = auth.currentUser;
-    console.log("userAuth: ", userAuth);
+    console.log("ProfileScreen: userAuth: ", userAuth);
     if (!userAuth) {
-      console.log("not logged in");
+      console.log("ProfileScreen: not logged in");
       return;
     }
     const idToken = await SecureStore.getItemAsync("authToken");
-    console.log("idToken:", idToken);
+    console.log("ProfileScreen: idToken:", idToken);
 
     const registerSellersUrl =
       process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
@@ -44,12 +46,15 @@ function ProfileScreen() {
         : process.env.EXPO_PUBLIC_registerSellers_prod;
 
     if (!registerSellersUrl) {
-      console.log("ProfileScreen.handleSellerRegister: url not busssinn");
+      console.log("ProfileScreen: url not busssinn");
       return;
     }
     try {
-      console.log("Trying to registerSellers with: ", userInfoFromStore.email);
-      const req = await axios.post(
+      console.log(
+        "ProfileScreen: Trying to registerSellers with: ",
+        userInfoFromStore.email
+      );
+      const registerSeller = await axios.post(
         registerSellersUrl,
         { email: userInfoFromStore.email },
         {
@@ -59,14 +64,47 @@ function ProfileScreen() {
           },
         }
       );
-      console.log(req.status);
-      if (req.status === 200) {
+      console.log(
+        "ProfileScreen: registerSeller.status",
+        registerSeller.status
+      );
+      if (registerSeller.status === 200) {
         getUserInfo(userInfoFromStore.email);
       }
     } catch (error) {
-      console.error("ProfileScreen.handleSellerRegister", error);
+      console.error("ProfileScreen: ", error);
     }
   };
+
+  const handleLogout = async () => {
+    setLoading(true);
+    try {
+      const tryLogout = await logout();
+      if (tryLogout.success) {
+        router.replace("../(tabs)/HomeScreen");
+      }
+    } catch (error) {
+      console.error("ProfileScreen: handleLogout Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          alignContent: "center",
+          justifyContent: "center",
+          alignSelf: "center",
+        }}
+      >
+        <Text>Logging out...</Text>
+        <ActivityIndicator size="large" color="green" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.profilesContainer}>
@@ -77,7 +115,7 @@ function ProfileScreen() {
           <Link href={"/FavoriteScreen"} style={styles.link}>
             <Text style={styles.link}>Favorites</Text>
           </Link>
-          <Pressable onPress={() => logout()} style={styles.button}>
+          <Pressable onPress={handleLogout} style={styles.button}>
             <Text style={styles.buttonText}>Logout!</Text>
           </Pressable>
           {userInfoFromStore.role !== "seller" && (
