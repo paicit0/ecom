@@ -23,6 +23,7 @@ const ItemScreen = memo(function ItemScreen() {
 
   const { id }: { id: string } = useLocalSearchParams();
 
+  const cart = useCart((state) => state.cartItemsArray);
   const addToCart = useCart((state) => state.addToCart);
 
   const addToFavorite = useFavorite((state) => state.addToFavorite);
@@ -150,7 +151,7 @@ const ItemScreen = memo(function ItemScreen() {
               keyExtractor={(item) => item}
               showsVerticalScrollIndicator={false}
               estimatedItemSize={200}
-              snapToAlignment="start"  
+              snapToAlignment="start"
               horizontal={true}
               pagingEnabled={true}
               disableIntervalMomentum={true}
@@ -212,6 +213,11 @@ const ItemScreen = memo(function ItemScreen() {
           }}
           style={styles.FooterCart}
         >
+          {cart.length > 0 && (
+            <Text style={styles.badge}>
+              {cart.length > 99 ? "99+" : cart.length}
+            </Text>
+          )}
           <Ionicons
             name="cart-outline"
             size={20}
@@ -311,6 +317,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     padding: 8,
+  },
+  badge: {
+    position: "absolute",
+    top: -5,
+    right: -5,
+    zIndex: 1,
+    backgroundColor: "red",
+    color: "white",
+    borderRadius: 10,
+    paddingHorizontal: 5,
+    fontSize: 12,
   },
 });
 
