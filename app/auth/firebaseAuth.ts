@@ -48,8 +48,11 @@ type userSessionType = {
     favorite?: [] | null;
     cart?: [] | null;
   };
-  login: (email: string, password: string) => void;
-  logout: () => void;
+  login: (
+    email: string,
+    password: string
+  ) => Promise<{ success: boolean; message: string }>;
+  logout: () => Promise<{ success: boolean; message: string }>;
   getUserInfo: (email: string | null) => void;
   refreshToken: (user: User | null) => void;
 };
@@ -75,11 +78,9 @@ export const useUserSession = create<userSessionType>()(
         console.log("useUserSession.login: in firebaseAuth!");
         if (!email || !password) {
           console.log("useUserSession.login: No email or password received.");
-          return;
+          return { success: false, message: "Email and password are required" };
         }
-        console.log("useUserSession.login: before try block");
         try {
-          console.log("useUserSession.login try block");
           const userCredential = await signInWithEmailAndPassword(
             auth,
             email,
@@ -89,12 +90,9 @@ export const useUserSession = create<userSessionType>()(
           //   "useUserSession.login: Login User credential:",
           //   userCredential
           // );
-          console.log("useUserSession.login: ref block");
           const userRef = collection(db, "users");
           const emailQuery = query(userRef, where("email", "==", email));
           const querySnapshot = await getDocs(emailQuery);
-          console.log("useUserSession.login query block");
-
           if (querySnapshot.empty) {
             throw new Error(
               "useUserSession.login: No user found with this email."
@@ -112,8 +110,11 @@ export const useUserSession = create<userSessionType>()(
               cart: userData.cart,
             },
           });
-        } catch (error: any) {
-          console.error("useUserSession.login: Login failed:", error.message);
+
+          return { success: true, message: "useUserSession.login: Login successful." };
+        } catch (error) {
+          console.error("useUserSession.login: Login failed:", error);
+          return { success: false, message: `useUserSession.login: ${error}` };
         }
       },
 
@@ -124,8 +125,10 @@ export const useUserSession = create<userSessionType>()(
           console.log("useUserSession.logout: Setting userInfo to default");
           set({ userInfo: { email: "", role: null, favorite: [], cart: [] } });
           await auth.signOut();
+          return { success: true, message: "useUserSession.logout: Logout successful." };
         } catch (error) {
           console.error("useUserSession.logout: Logout failed:", error);
+          return { success: true, message: `useUserSession.logout: ${error}` };;
         }
       },
       getUserInfo: async (email) => {
@@ -161,7 +164,6 @@ export const useUserSession = create<userSessionType>()(
   )
 );
 async function saveToken(user: User | null) {
-  console.log("firebaseAuth.saveToken: before try block");
   try {
     if (user) {
       console.log("firebaseAuth.saveToken: Attempting to get ID token...");
@@ -177,6 +179,9 @@ async function saveToken(user: User | null) {
 }
 
 onAuthStateChanged(auth, (user) => {
-  console.log("firebaseAuth.saveToken: onAuthStateChanged triggered:", user?.email);
+  console.log(
+    "firebaseAuth.saveToken: onAuthStateChanged triggered:",
+    user?.email
+  );
   saveToken(user);
 });
