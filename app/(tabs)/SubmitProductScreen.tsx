@@ -1,5 +1,5 @@
 // SubmitProductScreen.tsx
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { View, Text, TextInput, Pressable, Image } from "react-native";
 import { StyleSheet } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
@@ -8,7 +8,6 @@ import { useUserSession } from "../auth/firebaseAuth";
 import { Dropdown } from "react-native-element-dropdown";
 import { getAuth } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
-import * as SecureStore from "expo-secure-store";
 import axios from "axios";
 
 global.Buffer = require("buffer").Buffer;

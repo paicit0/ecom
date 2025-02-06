@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  ActivityIndicator,
 } from "react-native";
 import "firebase/compat/database";
 import { Link, useRouter } from "expo-router";
@@ -13,6 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, useUserSession } from "./auth/firebaseAuth";
 import axios from "axios";
+import AnimatedLoadingIndicator from "../components/AnimatedLoadingIndicator";
 
 function RegisterScreen() {
   const [email, setEmail] = useState<string>("");
@@ -115,16 +115,8 @@ function RegisterScreen() {
 
   if (loading) {
     return (
-      <View
-        style={{
-          flex: 1,
-          alignContent: "center",
-          justifyContent: "center",
-          alignSelf: "center",
-        }}
-      >
-        <Text>Registering your account! ...</Text>
-        <ActivityIndicator size="large" color="green" />
+      <View style={{ marginTop: 60 }}>
+        <AnimatedLoadingIndicator loading={loading} />
       </View>
     );
   }

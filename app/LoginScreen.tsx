@@ -1,15 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Link, Redirect, useRouter } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  Pressable,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
 import { useUserSession } from "./auth/firebaseAuth";
+import AnimatedLoadingIndicator from "../components/AnimatedLoadingIndicator";
 function LoginScreen() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -47,16 +41,8 @@ function LoginScreen() {
 
   if (loading) {
     return (
-      <View
-        style={{
-          flex: 1,
-          alignContent: "center",
-          justifyContent: "center",
-          alignSelf: "center",
-        }}
-      >
-        <Text>Trying to get you signed in...</Text>
-        <ActivityIndicator size="large" color="green" />
+      <View style={{ marginTop: 60 }}>
+        <AnimatedLoadingIndicator loading={loading} />
       </View>
     );
   }

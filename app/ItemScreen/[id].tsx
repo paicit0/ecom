@@ -5,17 +5,16 @@ import {
   StyleSheet,
   ScrollView,
   Pressable,
-  ActivityIndicator,
   Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useCart, useFavorite } from "../store/store";
 import { Link, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
-import { useUserSession } from "../auth/firebaseAuth";
 import axios from "axios";
 import { Product } from "../store/store";
 import { FlashList } from "@shopify/flash-list";
+import AnimatedLoadingIndicator from "../../components/AnimatedLoadingIndicator";
 
 const ItemScreen = memo(function ItemScreen() {
   const [product, setProduct] = useState<Product>();
@@ -119,10 +118,8 @@ const ItemScreen = memo(function ItemScreen() {
 
   if (loading) {
     return (
-      <View
-        style={{ flex: 1, alignContent: "center", justifyContent: "center" }}
-      >
-        <ActivityIndicator size="large" color="green" />
+      <View style={{ marginTop: 60 }}>
+        <AnimatedLoadingIndicator loading={loading} />
       </View>
     );
   }

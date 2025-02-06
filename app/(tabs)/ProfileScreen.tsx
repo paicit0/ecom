@@ -1,5 +1,9 @@
 import { Link, useRouter } from "expo-router";
-import { View, Text, Pressable, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+} from "react-native";
 import { StyleSheet } from "react-native";
 // @ts-ignore
 import { useUserSession } from "../auth/firebaseAuth";
@@ -7,13 +11,13 @@ import { useState, useEffect } from "react";
 import { getAuth } from "firebase/auth";
 import * as SecureStore from "expo-secure-store";
 import axios from "axios";
+import AnimatedLoadingIndicator from "../../components/AnimatedLoadingIndicator";
 
 function ProfileScreen() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const userIsSignedIn = useUserSession((state) => state.userIsSignedIn);
   const logout = useUserSession((state) => state.logout);
-  const refreshToken = useUserSession((state) => state.refreshToken);
   const userInfoFromStore = useUserSession((state) => state.userInfo);
   const { getUserInfo } = useUserSession();
   const router = useRouter();
@@ -92,16 +96,8 @@ function ProfileScreen() {
 
   if (loading) {
     return (
-      <View
-        style={{
-          flex: 1,
-          alignContent: "center",
-          justifyContent: "center",
-          alignSelf: "center",
-        }}
-      >
-        <Text>Logging out...</Text>
-        <ActivityIndicator size="large" color="green" />
+      <View style={{ marginTop: 60 }}>
+        <AnimatedLoadingIndicator loading={loading} />
       </View>
     );
   }

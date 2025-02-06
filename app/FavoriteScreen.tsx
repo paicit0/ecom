@@ -6,6 +6,7 @@ import {
   View,
   ActivityIndicator,
   ScrollView,
+  Animated,
 } from "react-native";
 import { useFavorite } from "./store/store";
 import { Ionicons } from "@expo/vector-icons";
@@ -13,6 +14,7 @@ import axios from "axios";
 import { getAuth } from "firebase/auth";
 import * as SecureStore from "expo-secure-store";
 import { Link } from "expo-router";
+import AnimatedLoadingIndicator from "../components/AnimatedLoadingIndicator";
 
 function FavoriteScreen() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -91,15 +93,8 @@ function FavoriteScreen() {
 
   if (loading) {
     return (
-      <View
-        style={{
-          flex: 1,
-          alignContent: "center",
-          justifyContent: "center",
-          alignSelf: "center",
-        }}
-      >
-        <ActivityIndicator size="large" color="green" />
+      <View style={{ marginTop: 60 }}>
+        <AnimatedLoadingIndicator loading={loading} />
       </View>
     );
   }

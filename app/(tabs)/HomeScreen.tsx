@@ -7,7 +7,6 @@ import { Link } from "expo-router";
 import { FlashList } from "@shopify/flash-list";
 import EmptySearchBar from "../../components/EmptySearchBar";
 import { useProductStore } from "../store/store";
-import Animated, { useAnimatedScrollHandler } from "react-native-reanimated";
 import axios from "axios";
 
 export const HomeScreen = memo(function HomeScreen() {

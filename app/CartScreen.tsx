@@ -1,12 +1,6 @@
 // CartScreen.tsx
 import { memo, useEffect, useState } from "react";
-import {
-  View,
-  StyleSheet,
-  Pressable,
-  ScrollView,
-  ActivityIndicator,
-} from "react-native";
+import { View, StyleSheet, Pressable, ScrollView } from "react-native";
 import { Text, Image } from "react-native";
 import { useCart } from "./store/store";
 import { Ionicons } from "@expo/vector-icons";
@@ -14,9 +8,10 @@ import { Link, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import axios from "axios";
 import { getAuth } from "firebase/auth";
+import AnimatedLoadingIndicator from "../components/AnimatedLoadingIndicator";
 
 export const CartScreen = memo(() => {
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const cartItemsArray = useCart((state) => state.cartItemsArray);
   const deleteFromCart = useCart((state) => state.deleteFromCart);
@@ -93,15 +88,8 @@ export const CartScreen = memo(() => {
 
   if (loading) {
     return (
-      <View
-        style={{
-          flex: 1,
-          alignContent: "center",
-          justifyContent: "center",
-          alignSelf: "center",
-        }}
-      >
-        <ActivityIndicator size="large" color="green" />
+      <View style={{ marginTop: 60 }}>
+        <AnimatedLoadingIndicator loading={loading} />
       </View>
     );
   }
