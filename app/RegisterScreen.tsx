@@ -5,39 +5,46 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import "firebase/compat/database";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "./auth/firebaseAuth";
+import { auth, useUserSession } from "./auth/firebaseAuth";
 import axios from "axios";
 
 function RegisterScreen() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState<boolean>(false);
   const [dataMessage, setDataMessage] = useState<string>("");
   const [error, setError] = useState("");
+
+  const login = useUserSession((state) => state.login);
+  const router = useRouter();
+
   const handleRegister = async () => {
+    setLoading(true);
     const registerUsersUrl =
       process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
         ? process.env.EXPO_PUBLIC_registerUsers_emulator
         : process.env.EXPO_PUBLIC_registerUsers_prod;
 
     if (!registerUsersUrl) {
-      console.log("RegisterScreen.handleRegister url not bussing!");
+      console.error("RegisterScreen.handleRegister url not bussing!");
       return;
     }
     try {
       if (password !== confirmPassword) {
-        console.log("Passwords do not match");
+        console.error("Passwords do not match");
         return;
       } else if (password.length < 6) {
-        console.log("Password must be at least 6 characters");
+        console.error("Password must be at least 6 characters");
         return;
       } else if (email.length < 5) {
-        console.log("Email must be at least 5 characters");
+        console.error("Email must be at least 5 characters");
         return;
       } else {
         console.log(
@@ -57,10 +64,10 @@ function RegisterScreen() {
           .catch((error) => {
             const errorCode = error.code;
             const errorMessage = error.message;
-            console.log(errorMessage);
+            console.error(errorMessage);
             return false;
           });
-          console.log("RegisterScreen: payload:", uid, email)
+        console.log("RegisterScreen: payload:", uid, email);
         if (registerFirebaseAuth) {
           const registerUser = await axios.post(
             registerUsersUrl,
@@ -71,9 +78,26 @@ function RegisterScreen() {
               },
             }
           );
-          if (registerUser.status === 200) {
+          console.log(
+            "RegisterScreen: registerUser.status:",
+            registerUser.status
+          );
+          if (registerUser.status === 201) {
             const data = await registerUser.data;
+            console.log("RegisterScreen: registerUser.data", data);
             setDataMessage(data.message);
+            console.log("RegisterScreen: Logging in with:", email, password);
+            const tryLogin = await login(email, password);
+            console.log("RegisterScreen: tryLogin returns:", tryLogin);
+            if (tryLogin.success) {
+              console.log(
+                "RegisterScreen: tryLogin.success, redirecting to:../(tabs)/HomeScreen"
+              );
+              router.replace("../(tabs)/HomeScreen");
+              return;
+            } else {
+              console.error("RegisterScreen: Login failed");
+            }
             console.log(data.message);
             if (data.error) {
               console.log(data.error);
@@ -84,8 +108,26 @@ function RegisterScreen() {
     } catch (error: any) {
       setError(error);
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          alignContent: "center",
+          justifyContent: "center",
+          alignSelf: "center",
+        }}
+      >
+        <Text>Registering your account! ...</Text>
+        <ActivityIndicator size="large" color="green" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
