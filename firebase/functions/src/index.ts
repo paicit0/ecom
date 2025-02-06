@@ -12,6 +12,15 @@ dotenv.config();
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+console.log("index: CURRENT_APP_MODE=", process.env.CURRENT_APP_MODE);
+
+if (process.env.CURRENT_APP_MODE === "prod") {
+  console.log = function noConsole() {};
+  console.error = function noConsole() {};
+  console.warn = function noConsole() {};
+  console.debug = function noConsole() {};
+}
+
 export { db };
 
 import { registerUsers } from "./registerUsers";
