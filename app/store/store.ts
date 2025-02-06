@@ -27,16 +27,15 @@ export const useCart = create<useCartArray>((set) => ({
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
-        console.log("Increasing quantity for item: " + itemId);
-        console.log("Current CartItems", updatedCartItems);
+        console.log("store.useCart:: Current CartItems", updatedCartItems);
         return { cartItemsArray: updatedCartItems };
       } else {
         const updatedCartItems = [
           ...state.cartItemsArray,
           { id: itemId, quantity: 1 },
         ];
-        console.log("Adding to Cart: " + itemId);
-        console.log("Current CartItems", updatedCartItems);
+        console.log("store.useCart: Adding to Cart: " + itemId);
+        console.log("store.useCart: Current CartItems", updatedCartItems);
         return { cartItemsArray: updatedCartItems };
       }
     }),
@@ -45,13 +44,13 @@ export const useCart = create<useCartArray>((set) => ({
       const updatedCartItems = state.cartItemsArray.filter(
         (item) => item.id !== itemId
       );
-      console.log("Removing from Cart: " + itemId);
-      console.log("Current CartItems", updatedCartItems);
+      console.log("store.useCart: Removing from Cart: " + itemId);
+      console.log("store.useCart: Current CartItems", updatedCartItems);
       return { cartItemsArray: updatedCartItems };
     }),
   deleteAllCart: () =>
     set(() => {
-      console.log("Clearing Cart");
+      console.log("store.useCart: Clearing Cart");
       return { cartItemsArray: [] };
     }),
 }));
@@ -94,8 +93,8 @@ export const useFavorite = create<useFavoriteArray>((set, get) => ({
         return state;
       }
       const updatedFavoriteItems = [...state.favoriteItemsArray, itemId];
-      console.log("Adding to Favorite: " + itemId);
-      console.log("Current FavoriteItems", updatedFavoriteItems);
+      console.log("store.useFavorite: Adding to Favorite: " + itemId);
+      console.log("store.useFavorite: Current FavoriteItems", updatedFavoriteItems);
       return { favoriteItemsArray: updatedFavoriteItems };
     }),
   deleteFromFavorite: (itemId) =>
@@ -103,8 +102,8 @@ export const useFavorite = create<useFavoriteArray>((set, get) => ({
       const updatedFavoriteItems = state.favoriteItemsArray.filter(
         (item) => item !== itemId
       );
-      console.log("Removing from favorite: " + itemId);
-      console.log("Current FavoriteItems", updatedFavoriteItems);
+      console.log("store.useFavorite: Removing from favorite: " + itemId);
+      console.log("store.useFavorite: Current FavoriteItems", updatedFavoriteItems);
       return {
         favoriteItemsArray: updatedFavoriteItems,
       };
