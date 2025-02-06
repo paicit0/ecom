@@ -1,19 +1,27 @@
 // CartScreen.tsx
-import { memo, useEffect } from "react";
-import { View, StyleSheet, Pressable, ScrollView } from "react-native";
+import { memo, useEffect, useState } from "react";
+import {
+  View,
+  StyleSheet,
+  Pressable,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
 import { Text, Image } from "react-native";
 import { useCart } from "./store/store";
 import { Ionicons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
-import { useUserSession } from "./auth/firebaseAuth";
 import * as SecureStore from "expo-secure-store";
 import axios from "axios";
 import { getAuth } from "firebase/auth";
 
 export const CartScreen = memo(() => {
+  const [loading, setLoading] = useState<boolean>(false);
+
   const cartItemsArray = useCart((state) => state.cartItemsArray);
   const deleteFromCart = useCart((state) => state.deleteFromCart);
   const deleteAllCart = useCart((state) => state.deleteAllCart);
+
   const router = useRouter();
   const auth = getAuth();
   const userAuth = auth.currentUser;
@@ -24,10 +32,11 @@ export const CartScreen = memo(() => {
     return;
   }
   const updateCart = async () => {
-    if (!userAuth.email || !cartItemsArray.length) {
-      return;
-    }
+    setLoading(true);
     try {
+      if (!userAuth.email || !cartItemsArray.length) {
+        return;
+      }
       const idToken = await SecureStore.getItemAsync("authToken");
       const updateCartUrl =
         process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
@@ -58,6 +67,8 @@ export const CartScreen = memo(() => {
       console.log("CartScreen: updateCart.status", updateCart.status);
     } catch (error) {
       console.error("CartScreen: update failed: ", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -80,9 +91,39 @@ export const CartScreen = memo(() => {
   //   return total;
   // };
 
+  if (loading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          alignContent: "center",
+          justifyContent: "center",
+          alignSelf: "center",
+        }}
+      >
+        <ActivityIndicator size="large" color="green" />
+      </View>
+    );
+  }
+
+  if (!cartItemsArray.length) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          alignContent: "center",
+          justifyContent: "center",
+          alignSelf: "center",
+        }}
+      >
+        <Text>There's no item in your cart...</Text>
+      </View>
+    );
+  }
+
   return (
-    <ScrollView>
-      <View>
+    <View style={styles.mainContainer}>
+      <ScrollView>
         <View style={{ height: 60 }}></View>
         <View>
           <Link href="../(tabs)/HomeScreen">
@@ -110,11 +151,6 @@ export const CartScreen = memo(() => {
             </Pressable>
           </View>
         ))}
-
-        {cartItemsArray.length === 0 && (
-          <Text style={{ textAlign: "center" }}>Your cart is empty!</Text>
-        )}
-
         {cartItemsArray.length > 0 && (
           <View>
             <Pressable onPress={deleteAllCart}>
@@ -125,12 +161,19 @@ export const CartScreen = memo(() => {
         <Pressable onPress={() => handleCartSubmit()}>
           <Text>Checkout</Text>
         </Pressable>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 });
 
 const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+    flexDirection: "column",
+    alignContent: "center",
+    justifyContent: "center",
+    alignSelf: "center",
+  },
   cartContainer: {
     flex: 1,
   },
