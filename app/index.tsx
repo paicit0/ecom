@@ -17,7 +17,7 @@ function Index() {
       return;
     }
     setPublishableKey(key);
-    console.log(publishableKey);
+    console.log("Index: StripePublishableKey", publishableKey);
   };
 
   useEffect(() => {
@@ -25,9 +25,16 @@ function Index() {
   }, []);
 
   console.log(
-    "Launching app in mode:",
+    "Index: Launching app in mode:",
     process.env.EXPO_PUBLIC_CURRENT_APP_MODE
   );
+
+  if (process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "prod") {
+    console.log = function no_console() {};
+    console.error = function no_console() {};
+    console.warn = function no_console() {};
+    console.debug = function no_console() {};
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
