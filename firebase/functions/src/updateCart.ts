@@ -54,11 +54,11 @@ const updateCart = functions.https.onRequest(async (req, res) => {
     );
     const usersRef = db.collection("users").where("email", "==", email);
     console.log("updateCart: usersRef:", usersRef);
-    const usersDoc = await usersRef.get();
-    console.log("updateCart: usersRef:", usersDoc);
-    if (!usersDoc.empty) {
+    const usersQuerySnapshot = await usersRef.get();
+    console.log("updateCart: usersQuerySnapshot:", usersQuerySnapshot);
+    if (!usersQuerySnapshot.empty) {
       console.log("updateCart: usersDoc exists!");
-      const usersDocRef = usersDoc.docs[0].ref;
+      const usersDocRef = usersQuerySnapshot.docs[0].ref;
       console.log("updateCart: usersDocRef:", usersDocRef);
       await usersDocRef.set(
         { cartItemsArray: cartItemsArray },

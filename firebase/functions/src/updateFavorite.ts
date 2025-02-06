@@ -12,12 +12,10 @@ const updateFavorite = functions.https.onRequest(async (req, res) => {
     console.log("updateFavorite: req.headers.authorization:", authHeader);
 
     if (!email || !favoriteItemsArray) {
-      res
-        .status(401)
-        .json({
-          error:
-            "updateFavorite: no/invalid email or favoriteItemsArray in body.",
-        });
+      res.status(401).json({
+        error:
+          "updateFavorite: no/invalid email or favoriteItemsArray in body.",
+      });
       return;
     }
 
@@ -44,7 +42,7 @@ const updateFavorite = functions.https.onRequest(async (req, res) => {
         return;
       }
     } catch (error) {
-      console.error(error);
+      console.error("updateFavorite: decoding token internal error:", error);
       res.status(401).json({ error: `updateFavorite: Unauthorized! ${error}` });
       return;
     }
@@ -54,11 +52,11 @@ const updateFavorite = functions.https.onRequest(async (req, res) => {
     );
     const usersRef = db.collection("users").where("email", "==", email);
     console.log("updateFavorite: usersRef", usersRef);
-    const usersDoc = await usersRef.get();
-    console.log("updateFavorite: usersDoc", usersDoc);
-    if (!usersDoc.empty) {
-      console.log("updateFavorite: usersDoc Found!");
-      const usersDocRef = usersDoc.docs[0].ref;
+    const usersQuerySnapshot = await usersRef.get();
+    console.log("updateFavorite: usersQuerySnapshot", usersQuerySnapshot);
+    if (!usersQuerySnapshot.empty) {
+      console.log("updateFavorite: usersQuerySnapshot Found!");
+      const usersDocRef = usersQuerySnapshot.docs[0].ref;
       console.log("updateFavorite: usersDocRef:", usersDocRef);
       await usersDocRef.set(
         { favoriteItemsArray: favoriteItemsArray },
@@ -78,7 +76,7 @@ const updateFavorite = functions.https.onRequest(async (req, res) => {
         .json({ error: "updateFavorite: favoriteItemsArray not found." });
     }
   } catch (error) {
-    console.error("updateFavorite internal errors: ", error);
+    console.error("updateFavorite: internal errors: ", error);
     res.status(400).json({ error: "updateFavorite: internal errors" });
   }
 });
