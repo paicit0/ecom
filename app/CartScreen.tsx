@@ -26,13 +26,19 @@ export const CartScreen = memo(() => {
   const auth = getAuth();
   const userAuth = auth.currentUser;
 
-  if (!userAuth) {
-    console.log("CartScreen: no userAuth, redirecting to /LoginScreen");
-    router.replace("/LoginScreen");
-    return;
-  }
+  useEffect(() => {
+    if (!userAuth) {
+      console.log("CartScreen: no userAuth, redirecting to /LoginScreen");
+      router.replace("/LoginScreen");
+    }
+  }, [userAuth, router]);
+
   const updateCart = async () => {
     setLoading(true);
+    if (!userAuth) {
+      console.error("CartScreen: no userAuth found");
+      return;
+    }
     try {
       if (!userAuth.email || !cartItemsArray.length) {
         return;
@@ -73,7 +79,9 @@ export const CartScreen = memo(() => {
   };
 
   useEffect(() => {
-    updateCart();
+    if (cartItemsArray.length > 0) {
+      updateCart();
+    }
   }, [cartItemsArray]);
 
   const handleCartSubmit = () => {
@@ -82,14 +90,6 @@ export const CartScreen = memo(() => {
       console.error("Error submitting cart: ", error);
     }
   };
-
-  // const calculateTotal = () => {
-  //   let total = 0;
-  //   for (let i = 0; i < cart.length; i++) {
-  //     total = total + cart[i].productPrice;
-  //   }
-  //   return total;
-  // };
 
   if (loading) {
     return (
