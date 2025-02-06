@@ -20,7 +20,12 @@ function LoginScreen() {
 
   const handleLogin = async () => {
     setLoading(true);
+
     try {
+      if (!email || !password) {
+        console.error("LoginScreen: No email or password!");
+        return;
+      }
       console.log("LoginScreen: Trying to login... ", email);
       const tryLogin = await login(email, password);
       console.log("LoginScreen: tryLogin returns:", tryLogin);
