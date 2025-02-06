@@ -30,7 +30,7 @@ function SearchScreen() {
   // useEffect(() => {}, []);
 
   const render = ({ item }: { item: Product }) => {
-    console.log("search query: ", searchQuery);
+    console.log("SearchScreen: search query: ", searchQuery);
     const searchForIndex = item.productName
       .toLowerCase()
       .indexOf(searchQuery.toLowerCase());
