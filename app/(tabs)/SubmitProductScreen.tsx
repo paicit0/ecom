@@ -28,8 +28,22 @@ function SubmitProductScreen() {
   const userInfo = useUserSession((state) => state.userInfo);
   const refreshToken = useUserSession((state) => state.refreshToken);
 
+  const clearAllFields = () => {
+    setProductName("");
+    setProductPrice(NaN);
+    setProductDescription("");
+    setProductCategory(null);
+    setProductStock(NaN);
+    setImageIsSelected(false);
+    setImageNames([]);
+    setImageBase64s([]);
+    setImageUris([]);
+    setContentType("");
+
+  }
+
   const handleFilePicking = async () => {
-    console.log("handleFilePicking");
+    console.log("SubmitProductScreen: handleFilePicking");
     try {
       const docRes = await DocumentPicker.getDocumentAsync({
         type: "image/*",
@@ -49,7 +63,7 @@ function SubmitProductScreen() {
         setImageIsSelected(true);
       }
     } catch (error) {
-      console.log("File selecting error: ", error);
+      console.log("SubmitProductScreen: File selecting error: ", error);
     }
   };
 
@@ -81,11 +95,12 @@ function SubmitProductScreen() {
     let idToken;
     try {
       idToken = await userAuth.getIdToken(true);
+      console.log("SubmitProduct.handleSubmit: new idToken:", idToken);
     } catch (error) {
       console.log("SubmitProduct.handleSubmit: error getting idToken:", error);
       return;
     }
-    console.log("SubmitProduct.handleSubmit: new idToken:", idToken);
+    
     const uploadawsS3Url =
       process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
         ? process.env.EXPO_PUBLIC_uploadawsS3_emulator
@@ -100,8 +115,7 @@ function SubmitProductScreen() {
       return;
     }
     try {
-      console.log("try block reached");
-      console.log("uploadawsS3 url:", uploadawsS3Url);
+      console.log("SubmitProductScreen: uploadawsS3 url:", uploadawsS3Url);
       const getImagesURLs = await axios.post(
         uploadawsS3Url,
         { imageBase64: imageBase64s, contentType: contentType },
@@ -113,18 +127,28 @@ function SubmitProductScreen() {
         }
       );
       console.log(getImagesURLs.status);
-      console.log("payload:", imageBase64s.length, contentType);
+      console.log(
+        "SubmitProductScreen: payload:",
+        imageBase64s.length,
+        contentType
+      );
       const response = await getImagesURLs.data;
-      console.log("getImagesURL Status:", getImagesURLs.status);
+      console.log(
+        "SubmitProductScreen: getImagesURL Status:",
+        getImagesURLs.status
+      );
 
-      if (getImagesURLs.status === 200) {
-        console.log("Got image URLs:", {
+      if (getImagesURLs.status === 201) {
+        console.log("SubmitProductScreen: Got image URLs:", {
           imageUrl: response.resImageUrlArray,
           thumbnailUrl: response.resThumbnailUrlArray,
         });
         try {
-          console.log(`SubmitProductScreen Sendings: Token: ${idToken}`);
-          console.log("createProduct url:", createProductUrl);
+          console.log(`SubmitProductScreen: Sendings: Token: ${idToken}`);
+          console.log(
+            "SubmitProductScreen: createProduct url:",
+            createProductUrl
+          );
           const createProductOnFirestore = await axios.post(
             createProductUrl,
             {
@@ -144,11 +168,21 @@ function SubmitProductScreen() {
               },
             }
           );
-          if (createProductOnFirestore.status === 200) {
-            console.log(
-              "createProductOnFirestore",
-              createProductOnFirestore.status
-            );
+          console.log(
+            "SubmitProductScreen: createProductOnFirestore.status:",
+            createProductOnFirestore.status
+          );
+          if (createProductOnFirestore.status === 201) {
+            setProductName("");
+            setProductPrice(NaN);
+            setProductDescription("");
+            setProductCategory(null);
+            setProductStock(NaN);
+            setImageIsSelected(false);
+            setImageNames([]);
+            setImageBase64s([]);
+            setImageUris([]);
+            setContentType("");
           }
         } catch (error) {
           if (axios.isAxiosError(error)) {
@@ -289,6 +323,7 @@ function SubmitProductScreen() {
       <Pressable onPress={handleSubmit} style={styles.submitButton}>
         <Text style={styles.submitButtonText}>Submit a product!</Text>
       </Pressable>
+      <Pressable onPress={clearAllFields}><Text>Clear All</Text></Pressable>
     </View>
   );
 }
