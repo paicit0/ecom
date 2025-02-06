@@ -31,6 +31,8 @@ module.exports = {
     "indent": ["error", 2],
     "max-len": ["error", { "ignoreComments": true, "code": 120 }],
     "object-curly-spacing": ["error", "always"],
+    "no-empty": 0,
+    "@typescript-eslint/no-empty-function": "off",
   },
 };
 
