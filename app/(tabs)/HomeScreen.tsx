@@ -17,7 +17,7 @@ export const HomeScreen = memo(function HomeScreen() {
   const [category, setCategory] = useState<string>("");
   const [currentProductNumber, setCurrentProductNumber] = useState<number>(0);
   const initialProductLoadNumber = 50;
-  const LoadMoreProductNumber = 20;
+  const loadMoreProductNumber = 20;
   const setProducts = useProductStore((state) => state.setProducts);
   const products = useProductStore((state) => state.products);
 
@@ -39,7 +39,10 @@ export const HomeScreen = memo(function HomeScreen() {
         "HomeScreen: Skip:",
         currentProductNumber
       );
-      console.log("HomeScreen.fetchProductData: getProductsUrl:", getProductsUrl)
+      console.log(
+        "HomeScreen.fetchProductData: getProductsUrl:",
+        getProductsUrl
+      );
       const getProducts = await axios.post(
         getProductsUrl,
         {
@@ -55,7 +58,7 @@ export const HomeScreen = memo(function HomeScreen() {
       console.log("HomeScreen: fetchProductData Status:", getProducts.status);
       if (getProducts.status === 200) {
         const data = await getProducts.data;
-        console.log("Homescreen: data:",data);
+        // console.log("Homescreen: data:", data);
         setProducts(data.productsData);
         const imagesToPreload = data.productsData.map(
           (product: Product) => product.productThumbnailUrl
@@ -75,16 +78,16 @@ export const HomeScreen = memo(function HomeScreen() {
   };
 
   const loadMore = async () => {
-    console.log("HomeScreen: loadMore triggered.")
+    console.log("HomeScreen: loadMore triggered.");
     if (isLoading || isRefreshing) return;
     setIsLoadingMore(true);
     try {
-      console.log("HomeScreen.loadMore: getProductsUrl:", getProductsUrl)
+      console.log("HomeScreen.loadMore: getProductsUrl:", getProductsUrl);
       const loadMoreProducts = await axios.post(
         getProductsUrl,
         {
-          numberOfItems: LoadMoreProductNumber,
-          currentProductNumber: currentProductNumber + LoadMoreProductNumber,
+          numberOfItems: loadMoreProductNumber,
+          currentProductNumber: currentProductNumber + loadMoreProductNumber,
         },
         {
           headers: {
@@ -94,7 +97,7 @@ export const HomeScreen = memo(function HomeScreen() {
       );
       if (loadMoreProducts.status === 200) {
         const loadMoreProductsData = await loadMoreProducts.data;
-        setCurrentProductNumber((prev) => prev + LoadMoreProductNumber);
+        setCurrentProductNumber((prev) => prev + loadMoreProductNumber);
         setProducts([...products, ...loadMoreProductsData.productsData]);
         setIsLoadingMore(false);
       }
@@ -180,7 +183,6 @@ export const HomeScreen = memo(function HomeScreen() {
     <View style={{ flex: 1 }}>
       <View style={{ height: 45 }} />
       <EmptySearchBar placeholder="Search..." />
-
       <FlashList
         data={products}
         renderItem={render}
@@ -191,15 +193,22 @@ export const HomeScreen = memo(function HomeScreen() {
         estimatedItemSize={190}
         horizontal={false}
         ListEmptyComponent={() => (
-          <Text style={{ color: "red" }}>No Products to Display</Text>
+          <Pressable onPress={fetchProductData}>
+            <Text>Press to refresh (Placeholder)</Text>
+          </Pressable>
         )}
         extraData={[isLoading, products]} // re renders if isLoading/ products change
         onEndReachedThreshold={0.5}
-        onEndReached={loadMore}
+        // onEndReached={loadMore}
       />
       {isLoadingMore && (
         <Text style={{ textAlign: "center", height: 30 }}>Loading...</Text>
       )}
+      {process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev" && (<>
+      <Pressable onPress={()=>{
+        setCurrentProductNumber(0);
+        fetchProductData();
+      }}><Text>devtool refresh all</Text></Pressable></>)}
     </View>
   );
 });
