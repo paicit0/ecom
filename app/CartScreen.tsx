@@ -4,47 +4,64 @@ import { View, StyleSheet, Pressable, ScrollView } from "react-native";
 import { Text, Image } from "react-native";
 import { useCart } from "./store/store";
 import { Ionicons } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { useUserSession } from "./auth/firebaseAuth";
 import * as SecureStore from "expo-secure-store";
 import axios from "axios";
+import { getAuth } from "firebase/auth";
 
 export const CartScreen = memo(() => {
   const cartItemsArray = useCart((state) => state.cartItemsArray);
   const deleteFromCart = useCart((state) => state.deleteFromCart);
   const deleteAllCart = useCart((state) => state.deleteAllCart);
-  const userEmail = useUserSession((state) => state.userInfo.email);
+  const router = useRouter();
+  const auth = getAuth();
+  const userAuth = auth.currentUser;
+
+  if (!userAuth) {
+    console.log("CartScreen: no userAuth, redirecting to /LoginScreen");
+    router.replace("/LoginScreen");
+    return;
+  }
+  const updateCart = async () => {
+    if (!userAuth.email || !cartItemsArray.length) {
+      return;
+    }
+    try {
+      const idToken = await SecureStore.getItemAsync("authToken");
+      const updateCartUrl =
+        process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
+          ? process.env.EXPO_PUBLIC_updateCart_emulator
+          : process.env.EXPO_PUBLIC_updateCart_prod;
+      if (!updateCartUrl) {
+        console.error("CartScreen: cart not bussin urls");
+        return;
+      }
+      console.log(
+        "CartScreen: Payload to updateCart:",
+        userAuth.email,
+        cartItemsArray
+      );
+      const updateCart = await axios.post(
+        updateCartUrl,
+        {
+          email: userAuth.email,
+          cartItemsArray: cartItemsArray,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("CartScreen: updateCart.status", updateCart.status);
+    } catch (error) {
+      console.error("CartScreen: update failed: ", error);
+    }
+  };
 
   useEffect(() => {
-    const updateCart = async () => {
-      try {
-        const idToken = await SecureStore.getItemAsync("authToken");
-        const updateCartUrl =
-          process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
-            ? process.env.EXPO_PUBLIC_updateCart_emulator
-            : process.env.EXPO_PUBLIC_updateCart_prod;
-        if (!updateCartUrl) {
-          console.log("CartScreen: cart not bussin urls");
-          return;
-        }
-        const update = await axios.post(
-          updateCartUrl,
-          {
-            email: userEmail,
-            favorite: cartItemsArray,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${idToken}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        console.log("updateCart", update.status);
-      } catch (error) {
-        console.log("CartScreen: update failed: ", error);
-      }
-    };
     updateCart();
   }, [cartItemsArray]);
 
@@ -103,11 +120,11 @@ export const CartScreen = memo(() => {
             <Pressable onPress={deleteAllCart}>
               <Text>Delete All</Text>
             </Pressable>
-            <Pressable onPress={() => handleCartSubmit()}>
-              <Text>Checkout</Text>
-            </Pressable>
           </View>
         )}
+        <Pressable onPress={() => handleCartSubmit()}>
+          <Text>Checkout</Text>
+        </Pressable>
       </View>
     </ScrollView>
   );
