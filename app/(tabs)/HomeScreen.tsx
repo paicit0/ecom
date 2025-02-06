@@ -108,11 +108,6 @@ export const HomeScreen = memo(function HomeScreen() {
   };
 
   useEffect(() => {
-    console.log(products);
-    fetchProductData();
-  }, []);
-
-  useEffect(() => {
     console.log(
       "HomeScreen: useProductStore.products.length:",
       products.length
