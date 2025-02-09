@@ -46,3 +46,9 @@ export { updateCart };
 
 import { updateFavorite } from "./updateFavorite";
 export { updateFavorite };
+
+import { getFavorite } from "./getFavorite";
+export { getFavorite };
+
+import { getCart } from "./getCart";
+export { getCart };
