@@ -43,15 +43,12 @@ const ItemScreen = memo(function ItemScreen() {
           return;
         }
         console.log("ItemScreen/[id]: getTheProductUrl:", getTheProductUrl);
-        const getTheProduct = await axios.post(
-          getTheProductUrl,
-          { productId: id },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const getTheProduct = await axios.get(getTheProductUrl, {
+          params: { productId: id },
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
         const getTheProductData = await getTheProduct.data;
         console.log("getTheProduct", getTheProductData);
@@ -65,9 +62,9 @@ const ItemScreen = memo(function ItemScreen() {
         setLoading(false);
       }
     };
-    console.log(itemIsFavorited);
-    console.log("getTheProduct: Product State:", product);
+    
     getTheProduct();
+    console.log("getTheProduct: Product State:", product);
   }, []);
 
   // useEffect(() => {

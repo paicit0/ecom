@@ -42,18 +42,16 @@ export const HomeScreen = memo(function HomeScreen() {
         "HomeScreen.fetchProductData: getProductsUrl:",
         getProductsUrl
       );
-      const getProducts = await axios.post(
-        getProductsUrl,
-        {
+      const getProducts = await axios.get(getProductsUrl, {
+        params: {
           numberOfItems: initialProductLoadNumber,
           currentProductNumber: currentProductNumber,
         },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       console.log("HomeScreen: fetchProductData Status:", getProducts.status);
       if (getProducts.status === 200) {
         const data = await getProducts.data;
@@ -82,18 +80,16 @@ export const HomeScreen = memo(function HomeScreen() {
     setIsLoadingMore(true);
     try {
       console.log("HomeScreen.loadMore: getProductsUrl:", getProductsUrl);
-      const loadMoreProducts = await axios.post(
-        getProductsUrl,
-        {
+      const loadMoreProducts = await axios.get(getProductsUrl, {
+        params: {
           numberOfItems: loadMoreProductNumber,
           currentProductNumber: currentProductNumber + loadMoreProductNumber,
         },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       if (loadMoreProducts.status === 200) {
         const loadMoreProductsData = await loadMoreProducts.data;
         setCurrentProductNumber((prev) => prev + loadMoreProductNumber);
@@ -198,11 +194,18 @@ export const HomeScreen = memo(function HomeScreen() {
       {isLoadingMore && (
         <Text style={{ textAlign: "center", height: 30 }}>Loading...</Text>
       )}
-      {process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev" && (<>
-      <Pressable onPress={()=>{
-        setCurrentProductNumber(0);
-        fetchProductData();
-      }}><Text>devtool refresh all</Text></Pressable></>)}
+      {process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev" && (
+        <>
+          <Pressable
+            onPress={() => {
+              setCurrentProductNumber(0);
+              fetchProductData();
+            }}
+          >
+            <Text>devtool refresh all</Text>
+          </Pressable>
+        </>
+      )}
     </View>
   );
 });

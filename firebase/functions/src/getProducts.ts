@@ -4,8 +4,9 @@ import { db } from "./index";
 const getProducts = functions.https.onRequest(async (req, res) => {
   try {
     // fix this up
-    console.log("getProducts req.body: ", req.body);
-    const { numberOfItems, currentProductNumber } = req.body;
+    console.log("getProducts req.query: ", req.query);
+    const numberOfItems = parseInt(req.query.numberOfItems as string, 10);
+    const currentProductNumber = parseInt(req.query.currentProductNumber as string, 10);
     const productsSnapshot = await db
       .collection("products")
       .orderBy("productName")

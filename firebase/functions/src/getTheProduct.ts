@@ -3,15 +3,15 @@ import { db } from "./index";
 
 const getTheProduct = functions.https.onRequest(async (req, res) => {
   try {
-    console.log("getTheProduct: req.body: ", req.body);
-    const { productId } = req.body;
+    console.log("getTheProduct: req.body: ", req.query);
+    const { productId } = req.query;
 
     if (!productId) {
       res.status(400).send("getTheProduct: productId is required");
       return;
     }
 
-    const productRef = db.collection("products").doc(productId);
+    const productRef = db.collection("products").doc(productId as string);
     const productDoc = await productRef.get();
 
     if (!productDoc.exists) {
