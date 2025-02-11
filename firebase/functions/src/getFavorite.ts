@@ -1,6 +1,7 @@
 import * as functions from "firebase-functions";
 import { db } from "./index";
 import * as admin from "firebase-admin";
+import { FieldPath } from "firebase-admin/firestore";
 
 const getFavorite = functions.https.onRequest(async (req, res) => {
   try {
@@ -28,33 +29,46 @@ const getFavorite = functions.https.onRequest(async (req, res) => {
       return;
     }
 
-    const usersRef = db.collection("users").where("email", "==", email);
-    console.log("getFavorite: usersRef", usersRef);
-    const usersQuerySnapshot = await usersRef.get();
-    console.log("getFavorite: usersQuerySnapshot", usersQuerySnapshot);
-    const usersDoc = usersQuerySnapshot.docs[0];
-    console.log("getFavorite: usersDoc:", usersDoc);
-    const usersDocData = usersDoc.data();
-    const favoriteItemsArray = usersDocData.favoriteItemsArray;
-    console.log("getFavorite: favoriteItemsArray:", favoriteItemsArray);
+    const usersQuerySnapshot = await db
+      .collection("users")
+      .where("email", "==", email)
+      .limit(1)
+      .get();
 
-    if (favoriteItemsArray) {
-      console.log(
-        "getFavorite: favoriteItemsArray.length:",
-        favoriteItemsArray.length
-      );
-      const productsSnapshot = await db
-        .collection("products")
-        .where("id", "in", favoriteItemsArray)
-        .get();
-      const favoriteProducts = productsSnapshot.docs.map((doc) => doc.data());
-      console.log("getFavorite: favoriteProducts", favoriteProducts);
-
-      console.log(
-        "getFavorite: favoriteItemsArray's data Found, sending now.."
-      );
-      res.status(200).json({ favoriteProducts: favoriteProducts });
+    if (usersQuerySnapshot.empty) {
+      console.warn("getFavorite: User not found", { email });
+      res.status(404).json({ error: "User not found" });
+      return;
     }
+
+    const userDoc = usersQuerySnapshot.docs[0];
+    const favoriteItemsArray = userDoc.data()?.favoriteItemsArray || [];
+    console.log("getFavorite: favoriteItemsArray:", favoriteItemsArray);
+    console.log(
+      "getFavorite: favoriteItemsArray.length:",
+      favoriteItemsArray.length
+    );
+
+    if (favoriteItemsArray.length === 0) {
+      console.log("getFavorite: No favorite items found", { email });
+      res.status(200).json({ favoriteProducts: [] });
+      return;
+    }
+
+    const productsSnapshot = await db
+      .collection("products")
+      .where(FieldPath.documentId(), "in", favoriteItemsArray)
+      .get();
+
+    const favoriteProducts = productsSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    console.log("getFavorite: favoriteProducts", favoriteProducts);
+
+    console.log("getFavorite: favoriteItemsArray's data Found, sending now..");
+    res.status(200).json({ favoriteProducts: favoriteProducts });
   } catch (error) {
     console.error("getFavorite: internal errors: ", error);
     res
