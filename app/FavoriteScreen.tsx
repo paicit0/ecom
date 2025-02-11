@@ -1,20 +1,15 @@
 import { useEffect, useState } from "react";
-import {
-  Pressable,
-  Text,
-  StyleSheet,
-  View,
-  ActivityIndicator,
-  ScrollView,
-  Animated,
-} from "react-native";
-import { useFavorite } from "./store/store";
+import { Pressable, Text, StyleSheet, View, ScrollView } from "react-native";
+import { Product, useFavorite } from "./store/store";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 import { getAuth } from "firebase/auth";
 import * as SecureStore from "expo-secure-store";
 import { Link } from "expo-router";
 import AnimatedLoadingIndicator from "../components/AnimatedLoadingIndicator";
+import { FlashList } from "@shopify/flash-list";
+import { useGetFavorite } from "../hooks/fetch/useGetFavorite";
+import { useUpdateFavorite } from "../hooks/fetch/useUpdateFavorite";
 
 function FavoriteScreen() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -26,14 +21,22 @@ function FavoriteScreen() {
   const auth = getAuth();
   const userAuth = auth.currentUser;
 
-  if (!userAuth) {
-    console.log("FavoriteScreen: no userAuth");
-    return;
-  }
-  console.log("FavoriteScreen: userAuth.uid: ", userAuth.uid);
-  const updateFavorite = async () => {
-    setLoading(true);
+  const {
+    data: favorites,
+    isPending,
+    isError,
+    error,
+    refetch,
+  } = useGetFavorite(userAuth?.email as string);
 
+  const handleUpdateFavorite = async () => {
+    if (!userAuth) {
+      console.log("FavoriteScreen: no userAuth");
+      return;
+    }
+    console.log("FavoriteScreen: userAuth.uid: ", userAuth.uid);
+
+    setLoading(true);
     try {
       if (!userAuth.email || !favoriteItemsArray.length) {
         return;
@@ -54,7 +57,7 @@ function FavoriteScreen() {
         `FavoriteScreen: Payload to updateFavorite:Email:${userAuth.email} Array:`,
         favoriteItemsArray
       );
-      const update = await axios.post(
+      const updateFavoriteFromItemsArray = await axios.post(
         updateFavoriteUrl,
         { email: userAuth.email, favoriteItemsArray: favoriteItemsArray },
         {
@@ -64,19 +67,33 @@ function FavoriteScreen() {
           },
         }
       );
-      console.log("FavoriteScreen:update.status", update.status);
+      console.log(
+        "FavoriteScreen: update.status",
+        updateFavoriteFromItemsArray.status
+      );
+      if (updateFavoriteFromItemsArray.status === 201) {
+        return true;
+      }
     } catch (error) {
-      console.error("FavoriteScreen:update failed:", error);
+      console.error("FavoriteScreen: updateFavorite internal errors:", error);
+      return false;
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    updateFavorite();
-  }, []);
+    refetch();
 
-  if (!favoriteItemsArray.length) {
+    console.log("HEY", favorites);
+    // handleUpdateFavorite();
+  }, [favoriteItemsArray]);
+
+  const render = () => {
+    return <></>
+  }
+
+  if (!favorites) {
     return (
       <View
         style={{
@@ -90,13 +107,14 @@ function FavoriteScreen() {
       </View>
     );
   }
-
-  if (loading) {
-    return (
-      <View style={{ marginTop: 60 }}>
-        <AnimatedLoadingIndicator loading={loading} />
-      </View>
-    );
+  if (isPending) {
+    setTimeout(() => {
+      return (
+        <View style={{ marginTop: 60 }}>
+          <AnimatedLoadingIndicator loading={loading} />
+        </View>
+      );
+    }, 250);
   }
 
   return (
@@ -104,17 +122,19 @@ function FavoriteScreen() {
       <ScrollView>
         <View style={{ height: 60 }}></View>
         <View>
-          <Link href="../(tabs)/HomeScreen">
+          <Link href="../(tabs)/ProfileScreen">
             <Ionicons name="arrow-back-outline" size={20}></Ionicons>
           </Link>
           <Text style={{ textAlign: "center" }}>Your Favorite</Text>
         </View>
+
         <View style={styles.favoriteItemsArrayContainer}>
-          {favoriteItemsArray.map((item, index) => (
+          {favorites.favoriteProducts.map((product: Product, index: number) => (
             <View key={index} style={{}}>
-              <Text>{item}</Text>
-              {/* <Text>{item.productName}</Text> */}
-              <Pressable onPress={() => deleteFromFavorite(index.toString())}>
+              <Text>{product.productName}</Text>
+              <Text>{product.productDescription}</Text>
+              <Text>{product.productImageUrl[0]}</Text>
+              <Pressable onPress={() => deleteFromFavorite(product.toString())}>
                 <Ionicons name="close-sharp" size={20} color="#666" />
               </Pressable>
             </View>
