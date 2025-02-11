@@ -35,9 +35,9 @@ if (
   process.env.EXPO_PUBLIC_AUTH_EMULATOR
 ) {
   connectAuthEmulator(auth, process.env.EXPO_PUBLIC_AUTH_EMULATOR);
-  console.log("Connected to Firebase Auth Emulator");
+  console.log("firebaseAuth: Connected to Firebase Auth Emulator");
   connectFirestoreEmulator(db, "10.0.2.2", 8080);
-  console.log("Connected to Firebase Firestore Emulator");
+  console.log("firebaseAuth: Connected to Firebase Firestore Emulator");
 }
 
 type userSessionType = {
@@ -111,7 +111,10 @@ export const useUserSession = create<userSessionType>()(
             },
           });
 
-          return { success: true, message: "useUserSession.login: Login successful." };
+          return {
+            success: true,
+            message: "useUserSession.login: Login successful.",
+          };
         } catch (error) {
           console.error("useUserSession.login: Login failed:", error);
           return { success: false, message: `useUserSession.login: ${error}` };
@@ -125,10 +128,13 @@ export const useUserSession = create<userSessionType>()(
           console.log("useUserSession.logout: Setting userInfo to default");
           set({ userInfo: { email: "", role: null, favorite: [], cart: [] } });
           await auth.signOut();
-          return { success: true, message: "useUserSession.logout: Logout successful." };
+          return {
+            success: true,
+            message: "useUserSession.logout: Logout successful.",
+          };
         } catch (error) {
           console.error("useUserSession.logout: Logout failed:", error);
-          return { success: true, message: `useUserSession.logout: ${error}` };;
+          return { success: true, message: `useUserSession.logout: ${error}` };
         }
       },
       getUserInfo: async (email) => {
