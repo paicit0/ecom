@@ -110,6 +110,10 @@ export const HomeScreen = memo(function HomeScreen() {
     );
   }, [products]);
 
+  useEffect(()=>{
+    fetchProductData();
+  },[])
+
   // useEffect(() => {
   //   console.log("isLoading: ", isLoading);
   // }, [isLoading]);
