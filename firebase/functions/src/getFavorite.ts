@@ -31,7 +31,7 @@ const getFavorite = functions.https.onRequest(async (req, res) => {
 
     const usersQuerySnapshot = await db
       .collection("users")
-      .where("email", "==", email)
+      .where("userEmail", "==", email)
       .limit(1)
       .get();
 
@@ -42,7 +42,13 @@ const getFavorite = functions.https.onRequest(async (req, res) => {
     }
 
     const userDoc = usersQuerySnapshot.docs[0];
-    const favoriteItemsArray = userDoc.data()?.favoriteItemsArray || [];
+    if (!userDoc.exists) {
+      console.warn("getFavorite: User's data not found", { email });
+      res.status(404).json({ error: "getFavorite: User's data not found" });
+      return;
+    }
+
+    const favoriteItemsArray = userDoc.data().favoriteItemsArray;
     console.log("getFavorite: favoriteItemsArray:", favoriteItemsArray);
     console.log(
       "getFavorite: favoriteItemsArray.length:",
