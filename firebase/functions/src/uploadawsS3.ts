@@ -108,7 +108,7 @@ const uploadawsS3 = functions.https.onRequest(async (req, res) => {
       }
     }
     console.log("Urls Array", resImageUrlArray, resThumbnailUrlArray);
-    res.status(200).json({ resImageUrlArray, resThumbnailUrlArray });
+    res.status(201).json({ resImageUrlArray, resThumbnailUrlArray });
     return;
   } catch (error) {
     console.error("uploadawsS3: Error generating upload URL:", error);

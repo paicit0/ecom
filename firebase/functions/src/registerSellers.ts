@@ -24,7 +24,7 @@ const registerSellers = functions.https.onRequest(async (req, res) => {
       return;
     }
 
-    const userRef = db.collection("users").where("email", "==", email);
+    const userRef = db.collection("users").where("userEmail", "==", email);
     const getUser = await userRef.get();
 
     if (getUser.empty) {
@@ -33,8 +33,8 @@ const registerSellers = functions.https.onRequest(async (req, res) => {
       return;
     } else {
       const userDocRef = getUser.docs[0].ref;
-      await userDocRef.update({ role: "seller" });
-      res.status(200).json({ message: "Success 200: Role changed to seller" });
+      await userDocRef.update({ userRole: "seller" });
+      res.status(200).json({ message: "Success 200: userRole changed to seller" });
     }
   } catch (error) {
     console.error(error);

@@ -52,7 +52,7 @@ const updateCart = functions.https.onRequest(async (req, res) => {
       "updateCart: in collection 'users', finding a document with 'email'=",
       email
     );
-    const usersRef = db.collection("users").where("email", "==", email);
+    const usersRef = db.collection("users").where("userEmail", "==", email);
     console.log("updateCart: usersRef:", usersRef);
     const usersQuerySnapshot = await usersRef.get();
     console.log("updateCart: usersQuerySnapshot:", usersQuerySnapshot);

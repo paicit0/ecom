@@ -5,18 +5,17 @@ import { Timestamp } from "firebase-admin/firestore";
 const registerUsers = functions.https.onRequest(async (req, res) => {
   try {
     console.log("registerUsers: Connected.");
-    const { uid, email } = await req.body;
+    const { email } = await req.body;
     console.log("registerUsers: req.body", req.body);
     const usersCollectionEmail = db.collection("users").doc(email);
     const docGet = await usersCollectionEmail.get();
 
     const user = {
-      id: uid,
-      email: email,
-      pictureURL: "",
-      timestamp: Timestamp.now(),
-      role: "normalUser",
-      balance: 0,
+      userEmail: email,
+      userPictureURL: "",
+      userTimestamp: Timestamp.now(),
+      userRole: "normalUser",
+      userBalance: 0,
       cartItemsArray: [],
       favoriteItemsArray: [],
     };
@@ -32,11 +31,15 @@ const registerUsers = functions.https.onRequest(async (req, res) => {
       return;
     } else {
       const addUser = await db.collection("users").add(user);
-      const addUserGet = await addUser.get();
-      console.log("registerUsers: User registered successfully! DocumentID: ", addUserGet.id);
+      console.log(
+        "registerUsers: User registered successfully! DocumentID: ",
+        addUser.id
+      );
+      const userWithId = { ...user, userId: addUser.id };
+      await db.collection("users").doc(addUser.id).set(userWithId);
       res.status(201).json({
-        message: "registerUsers: User registered successfully! DocumentID: ",
-        id: addUserGet.id,
+        message: "registerUsers: User registered successfully!",
+        userId: addUser.id,
       });
     }
   } catch (error) {
