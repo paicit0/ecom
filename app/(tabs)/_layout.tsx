@@ -43,7 +43,7 @@ export default function TabsLayout() {
               <Ionicons name="add-circle" size={size} color={color} />
             ),
             tabBarButton:
-              userInfoFromStore.role === "seller" ? undefined : () => null,
+              userInfoFromStore.userRole === "seller" ? undefined : () => null,
           }}
         />
       </Tabs>

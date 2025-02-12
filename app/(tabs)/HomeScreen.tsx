@@ -8,6 +8,7 @@ import { FlashList } from "@shopify/flash-list";
 import EmptySearchBar from "../../components/EmptySearchBar";
 import { useProductStore } from "../store/store";
 import axios from "axios";
+import { getAuth } from "firebase/auth";
 
 export const HomeScreen = memo(function HomeScreen() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -19,6 +20,7 @@ export const HomeScreen = memo(function HomeScreen() {
   const loadMoreProductNumber = 20;
   const setProducts = useProductStore((state) => state.setProducts);
   const products = useProductStore((state) => state.products);
+  const auth = getAuth();
 
   const getProductsUrl =
     process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
@@ -110,67 +112,63 @@ export const HomeScreen = memo(function HomeScreen() {
     );
   }, [products]);
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchProductData();
-  },[])
+  }, []);
 
   // useEffect(() => {
   //   console.log("isLoading: ", isLoading);
   // }, [isLoading]);
 
+  if (isLoading) {
+    return (
+      <View style={styles.renderStyle}>
+        <View style={styles.itemContainer}>
+          <View style={styles.imageItem}></View>
+          <Text numberOfLines={2} ellipsizeMode="tail" style={styles.itemTitle}>
+            .....
+          </Text>
+          <View style={styles.priceStockContainer}>
+            <Text style={styles.itemPrice}>$...</Text>
+            <Text style={styles.itemStock}>Stock: ...</Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
   const render = ({ item }: { item: Product }) => {
-    if (isLoading) {
-      return (
-        <View style={styles.renderStyle}>
-          <View style={styles.itemContainer}>
-            <View style={styles.imageItem}></View>
+    return (
+      <View style={styles.renderStyle}>
+        <Link
+          href={{
+            pathname: "/ItemScreen/[id]",
+            params: { id: item.productId },
+          }}
+          asChild
+        >
+          <Pressable style={styles.itemContainer}>
+            <Image
+              style={styles.imageItem}
+              source={{ uri: item.productThumbnailUrl[0] }}
+              contentFit="cover"
+              transition={200}
+            />
             <Text
               numberOfLines={2}
               ellipsizeMode="tail"
               style={styles.itemTitle}
             >
-              .....
+              {item.productName}
             </Text>
             <View style={styles.priceStockContainer}>
-              <Text style={styles.itemPrice}>$...</Text>
-              <Text style={styles.itemStock}>Stock: ...</Text>
+              <Text style={styles.itemPrice}>${item.productPrice}</Text>
+              <Text style={styles.itemStock}>Stock: {item.productStock}</Text>
             </View>
-          </View>
-        </View>
-      );
-    } else {
-      return (
-        <View style={styles.renderStyle}>
-          <Link
-            href={{
-              pathname: "/ItemScreen/[id]",
-              params: { id: item.id },
-            }}
-            asChild
-          >
-            <Pressable style={styles.itemContainer}>
-              <Image
-                style={styles.imageItem}
-                source={{ uri: item.productThumbnailUrl[0] }}
-                contentFit="cover"
-                transition={200}
-              />
-              <Text
-                numberOfLines={2}
-                ellipsizeMode="tail"
-                style={styles.itemTitle}
-              >
-                {item.productName}
-              </Text>
-              <View style={styles.priceStockContainer}>
-                <Text style={styles.itemPrice}>${item.productPrice}</Text>
-                <Text style={styles.itemStock}>Stock: {item.productStock}</Text>
-              </View>
-            </Pressable>
-          </Link>
-        </View>
-      );
-    }
+          </Pressable>
+        </Link>
+      </View>
+    );
   };
 
   return (
@@ -180,7 +178,7 @@ export const HomeScreen = memo(function HomeScreen() {
       <FlashList
         data={products}
         renderItem={render}
-        keyExtractor={(item, index) => `${item.id}-${index}`}
+        keyExtractor={(item) => item.productId}
         contentContainerStyle={styles.verticalListContainer}
         numColumns={2}
         showsVerticalScrollIndicator={false}

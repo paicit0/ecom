@@ -56,14 +56,14 @@ export const useCart = create<useCartArray>((set) => ({
 }));
 
 export type Product = {
-  id: string;
+  productId: string;
   productName: string;
   productDescription: string;
   productCategory: string;
   productPrice: number;
   productImageUrl: string[];
   productThumbnailUrl: string[];
-  productStock: number | string;
+  productStock: number;
   productOwner: string;
 };
 type ProductStore = {

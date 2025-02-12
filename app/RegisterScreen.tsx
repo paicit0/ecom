@@ -58,7 +58,7 @@ function RegisterScreen() {
         )
           .then((userCredential) => {
             uid = userCredential.user.uid;
-            console.log("createUserWithEmailAndPassword successful.");
+            console.log("RegisterScreen: createUserWithEmailAndPassword successful.");
             return true;
           })
           .catch((error) => {
@@ -67,11 +67,11 @@ function RegisterScreen() {
             console.error(errorMessage);
             return false;
           });
-        console.log("RegisterScreen: payload:", uid, email);
+        console.log("RegisterScreen: payload:", email);
         if (registerFirebaseAuth) {
           const registerUser = await axios.post(
             registerUsersUrl,
-            { uid: uid, email: email },
+            { email: email },
             {
               headers: {
                 "Content-Type": "application/json",

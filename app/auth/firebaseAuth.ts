@@ -43,10 +43,10 @@ if (
 type userSessionType = {
   userIsSignedIn: boolean;
   userInfo: {
-    email: string | null;
-    role?: string | null;
-    favorite?: [] | null;
-    cart?: [] | null;
+    userEmail: string | null;
+    userRole?: string | null;
+    favoriteItemsArray?: [] | null;
+    cartItemsArray?: [] | null;
   };
   login: (
     email: string,
@@ -72,7 +72,7 @@ const SecureStorage: StateStorage = {
 export const useUserSession = create<userSessionType>()(
   persist(
     (set) => ({
-      userInfo: { email: "", role: "", favorite: [], cart: [] },
+      userInfo: { userEmail: "", userRole: "", favoriteItemsArray: [], cartItemsArray: [] },
       userIsSignedIn: false,
       login: async (email, password) => {
         console.log("useUserSession.login: in firebaseAuth!");
@@ -90,8 +90,8 @@ export const useUserSession = create<userSessionType>()(
           //   "useUserSession.login: Login User credential:",
           //   userCredential
           // );
-          const userRef = collection(db, "users");
-          const emailQuery = query(userRef, where("email", "==", email));
+          const usersRef = collection(db, "users");
+          const emailQuery = query(usersRef, where("userEmail", "==", email));
           const querySnapshot = await getDocs(emailQuery);
           if (querySnapshot.empty) {
             throw new Error(
@@ -104,10 +104,10 @@ export const useUserSession = create<userSessionType>()(
           set({ userIsSignedIn: true });
           set({
             userInfo: {
-              email: email,
-              role: userData.role,
-              favorite: userData.favorite,
-              cart: userData.cart,
+              userEmail: email,
+              userRole: userData.userRole,
+              favoriteItemsArray: userData.favoriteItemsArray,
+              cartItemsArray: userData.cartItemsArray,
             },
           });
 
@@ -126,7 +126,7 @@ export const useUserSession = create<userSessionType>()(
           console.log("useUserSession.logout: Setting userIsSignedIn to false");
           set({ userIsSignedIn: false });
           console.log("useUserSession.logout: Setting userInfo to default");
-          set({ userInfo: { email: "", role: null, favorite: [], cart: [] } });
+          set({ userInfo: { userEmail: "", userRole: null, favoriteItemsArray: [], cartItemsArray: [] } });
           await auth.signOut();
           return {
             success: true,
@@ -140,19 +140,20 @@ export const useUserSession = create<userSessionType>()(
       getUserInfo: async (email) => {
         try {
           const userRef = collection(db, "users");
-          const emailQuery = query(userRef, where("email", "==", email));
+          const emailQuery = query(userRef, where("userEmail", "==", email));
           const querySnapshot = await getDocs(emailQuery);
           if (querySnapshot.empty) {
             throw new Error("No user found with this email.");
           }
+          console.log(querySnapshot);
 
           const userData = querySnapshot.docs[0].data();
           set((state) => ({
             userInfo: {
               ...state.userInfo,
-              role: userData.role,
-              favorite: userData.favorite,
-              cart: userData.cart,
+              userRole: userData.userRole,
+              favoriteItemsArray: userData.favoriteItemsArray,
+              cartItemsArray: userData.cartItemsArray,
             },
           }));
         } catch (error) {
