@@ -58,15 +58,20 @@ const createProduct = functions.https.onRequest(async (req, res) => {
       productThumbnailUrl: productThumbnailUrl,
       productStock: productStock,
       productOwner: productOwner,
-      soldNumber: 0,
-      Timestamp: Timestamp.now(),
+      productSoldNumber: 0,
+      productTimestamp: Timestamp.now(),
     };
-    const productsCollection = db.collection("products");
-    const createOneProduct = await productsCollection.add(product);
+    const createOneProduct = await db.collection("products").add(product);
     console.log(
       "createProduct: Product submitted successfully! Product ID:" +
         createOneProduct.id
     );
+    const productsWithId = { ...product, productId: createOneProduct.id };
+    await db
+      .collection("products")
+      .doc(createOneProduct.id)
+      .set(productsWithId);
+
     res.status(201).json({
       error:
         "createProduct: Product submitted sucessfully! " + createOneProduct.id,
