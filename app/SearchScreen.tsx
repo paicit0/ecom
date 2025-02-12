@@ -80,7 +80,7 @@ function SearchScreen() {
         <FlashList
           data={filteredItems}
           renderItem={render}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.productId}
           numColumns={1}
           showsVerticalScrollIndicator={false}
           estimatedItemSize={200}

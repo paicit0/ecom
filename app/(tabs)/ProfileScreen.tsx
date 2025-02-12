@@ -56,11 +56,11 @@ function ProfileScreen() {
     try {
       console.log(
         "ProfileScreen: Trying to registerSellers with: ",
-        userInfoFromStore.email
+        userInfoFromStore.userEmail
       );
       const registerSeller = await axios.post(
         registerSellersUrl,
-        { email: userInfoFromStore.email },
+        { email: userInfoFromStore.userEmail },
         {
           headers: {
             Authorization: `Bearer ${idToken}`,
@@ -73,7 +73,7 @@ function ProfileScreen() {
         registerSeller.status
       );
       if (registerSeller.status === 200) {
-        getUserInfo(userInfoFromStore.email);
+        getUserInfo(userInfoFromStore.userEmail);
       }
     } catch (error) {
       console.error("ProfileScreen: ", error);
@@ -107,14 +107,14 @@ function ProfileScreen() {
       {error && <Text style={styles.errorText}>{error}</Text>}
       {userIsSignedIn ? (
         <>
-          <Text style={styles.text}>Welcome, {userInfoFromStore.email}</Text>
+          <Text style={styles.text}>Welcome, {userInfoFromStore.userEmail}</Text>
           <Link href={"/FavoriteScreen"} style={styles.link}>
             <Text style={styles.link}>Favorites</Text>
           </Link>
           <Pressable onPress={handleLogout} style={styles.button}>
             <Text style={styles.buttonText}>Logout!</Text>
           </Pressable>
-          {userInfoFromStore.role !== "seller" && (
+          {userInfoFromStore.userRole !== "seller" && (
             <Pressable onPress={handleSellerRegister} style={styles.button}>
               <Text style={styles.buttonText}>Become a seller!</Text>
             </Pressable>
@@ -130,9 +130,9 @@ function ProfileScreen() {
           </Link>
         </>
       )}
-      {/* <Pressable onPress={() => console.log(userInfoFromStore)} style={styles.button}>
+      <Pressable onPress={() => console.log(userInfoFromStore)} style={styles.button}>
         <Text style={styles.buttonText}>Get user status</Text>
-      </Pressable> */}
+      </Pressable>
     </View>
   );
 }
