@@ -20,17 +20,8 @@ const getTheProduct = functions.https.onRequest(async (req, res) => {
         .json({ error: "getTheProduct: No product found with the given ID" });
       return;
     }
-
     const productData = productDoc.data();
-    if (productData) {
-      productData.Timestamp = productData.Timestamp.toDate().toISOString();
-      delete productData.Timestamp;
-      res.status(200).json(productData);
-    } else {
-      res
-        .status(500)
-        .json({ error: "getTheProduct: Failed to retrieve product data" });
-    }
+    res.status(200).json(productData);
   } catch (error) {
     console.log("getTheProduct error: ", error);
     res.status(500).json({ error: "getTheProduct: Internal server error" });
