@@ -44,8 +44,11 @@ export { getTheProduct };
 import { updateCart } from "./updateCart";
 export { updateCart };
 
-import { updateFavorite } from "./updateFavorite";
-export { updateFavorite };
+import { addFavorite } from "./addFavorite";
+export { addFavorite };
+
+import { deleteFavorite } from "./deleteFavorite";
+export { deleteFavorite };
 
 import { getFavorite } from "./getFavorite";
 export { getFavorite };
