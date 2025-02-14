@@ -6,7 +6,10 @@ const getProducts = functions.https.onRequest(async (req, res) => {
     // fix this up
     console.log("getProducts req.query: ", req.query);
     const numberOfItems = parseInt(req.query.numberOfItems as string, 10);
-    const currentProductNumber = parseInt(req.query.currentProductNumber as string, 10);
+    const currentProductNumber = parseInt(
+      req.query.currentProductNumber as string,
+      10
+    );
     const productsSnapshot = await db
       .collection("products")
       .orderBy("productName")
@@ -18,6 +21,7 @@ const getProducts = functions.https.onRequest(async (req, res) => {
       id: doc.id,
       ...doc.data(),
     }));
+    console.log("getProducts: productsData.length: ", productsData.length);
 
     res.status(200).json({ productsData });
   } catch (error) {
