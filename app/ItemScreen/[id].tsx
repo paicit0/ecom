@@ -19,7 +19,6 @@ import AnimatedLoadingIndicator from "../../components/AnimatedLoadingIndicator"
 import { useAddFavorite } from "../../hooks/fetch/useAddFavorite";
 import { useDeleteFavorite } from "../../hooks/fetch/useDeleteFavorite";
 import { getAuth } from "firebase/auth";
-import { useGetFavorite } from "../../hooks/fetch/useGetFavorite";
 
 const ItemScreen = memo(function ItemScreen() {
   const [product, setProduct] = useState<Product>();
@@ -47,7 +46,6 @@ const ItemScreen = memo(function ItemScreen() {
 
   const addFavoriteMutation = useAddFavorite();
   const deleteFavoriteMutation = useDeleteFavorite();
-  const getFavoriteQuery = useGetFavorite({ userEmail });
 
   useEffect(() => {
     const getTheProduct = async () => {
