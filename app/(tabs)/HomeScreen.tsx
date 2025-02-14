@@ -6,9 +6,9 @@ import { Product } from "../store/store";
 import { Link } from "expo-router";
 import { FlashList } from "@shopify/flash-list";
 import EmptySearchBar from "../../components/EmptySearchBar";
-import { useProductStore } from "../store/store";
 import axios from "axios";
 import { getAuth } from "firebase/auth";
+import { useGetProducts } from "../../hooks/fetch/useGetProducts";
 
 export const HomeScreen = memo(function HomeScreen() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -16,11 +16,13 @@ export const HomeScreen = memo(function HomeScreen() {
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [category, setCategory] = useState<string>("");
   const [currentProductNumber, setCurrentProductNumber] = useState<number>(0);
-  const initialProductLoadNumber = 50;
+  const numberOfItems = 50;
   const loadMoreProductNumber = 20;
-  const setProducts = useProductStore((state) => state.setProducts);
-  const products = useProductStore((state) => state.products);
-  const auth = getAuth();
+
+  const getProductsQuery = useGetProducts({
+    numberOfItems,
+    currentProductNumber,
+  });
 
   const getProductsUrl =
     process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
@@ -31,50 +33,6 @@ export const HomeScreen = memo(function HomeScreen() {
     console.log("HomeScreen: url not bussin");
     return;
   }
-
-  const fetchProductData = async () => {
-    try {
-      console.log(
-        "HomeScreen: fetchProductData with: Load:",
-        initialProductLoadNumber,
-        "HomeScreen: Skip:",
-        currentProductNumber
-      );
-      console.log(
-        "HomeScreen.fetchProductData: getProductsUrl:",
-        getProductsUrl
-      );
-      const getProducts = await axios.get(getProductsUrl, {
-        params: {
-          numberOfItems: initialProductLoadNumber,
-          currentProductNumber: currentProductNumber,
-        },
-
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      console.log("HomeScreen: fetchProductData Status:", getProducts.status);
-      if (getProducts.status === 200) {
-        const data = await getProducts.data;
-        // console.log("Homescreen: data:", data);
-        setProducts(data.productsData);
-        const imagesToPreload = data.productsData.map(
-          (product: Product) => product.productThumbnailUrl
-        );
-        await Promise.all(
-          imagesToPreload.map((image: string) => Image.prefetch(image))
-        );
-        setIsRefreshing(false);
-      }
-    } catch (error) {
-      console.log("HomeScreen: fetchProductData Error:", error);
-      return;
-    } finally {
-      setIsLoading(false);
-      setIsRefreshing(false);
-    }
-  };
 
   const loadMore = async () => {
     console.log("HomeScreen: loadMore triggered.");
@@ -95,7 +53,7 @@ export const HomeScreen = memo(function HomeScreen() {
       if (loadMoreProducts.status === 200) {
         const loadMoreProductsData = await loadMoreProducts.data;
         setCurrentProductNumber((prev) => prev + loadMoreProductNumber);
-        setProducts([...products, ...loadMoreProductsData.productsData]);
+        // setProducts([...products, ...loadMoreProductsData.productsData]);
         setIsLoadingMore(false);
       }
     } catch (error) {
@@ -106,21 +64,10 @@ export const HomeScreen = memo(function HomeScreen() {
   };
 
   useEffect(() => {
-    console.log(
-      "HomeScreen: useProductStore.products.length:",
-      products.length
-    );
-  }, [products]);
-
-  useEffect(() => {
-    fetchProductData();
+    getProductsQuery.refetch();
   }, []);
 
-  // useEffect(() => {
-  //   console.log("isLoading: ", isLoading);
-  // }, [isLoading]);
-
-  if (isLoading) {
+  if (getProductsQuery.isLoading) {
     return (
       <View style={styles.renderStyle}>
         <View style={styles.itemContainer}>
@@ -176,7 +123,7 @@ export const HomeScreen = memo(function HomeScreen() {
       <View style={{ height: 45 }} />
       <EmptySearchBar placeholder="Search..." />
       <FlashList
-        data={products}
+        data={getProductsQuery.data.productsData}
         renderItem={render}
         keyExtractor={(item) => item.productId}
         contentContainerStyle={styles.verticalListContainer}
@@ -185,11 +132,11 @@ export const HomeScreen = memo(function HomeScreen() {
         estimatedItemSize={190}
         horizontal={false}
         ListEmptyComponent={() => (
-          <Pressable onPress={fetchProductData}>
+          <Pressable onPress={() => getProductsQuery.refetch()}>
             <Text>Press to refresh (Placeholder)</Text>
           </Pressable>
         )}
-        extraData={[isLoading, products]} // re renders if isLoading/ products change
+        extraData={[isLoading, getProductsQuery.data.productsData]} // re renders if isLoading/ products change
         onEndReachedThreshold={0.5}
         // onEndReached={loadMore}
       />
@@ -201,7 +148,7 @@ export const HomeScreen = memo(function HomeScreen() {
           <Pressable
             onPress={() => {
               setCurrentProductNumber(0);
-              fetchProductData();
+              () => getProductsQuery.refetch();
             }}
           >
             <Text>devtool refresh all</Text>
