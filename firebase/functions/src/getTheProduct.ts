@@ -4,10 +4,12 @@ import { db } from "./index";
 const getTheProduct = functions.https.onRequest(async (req, res) => {
   try {
     console.log("getTheProduct: req.body: ", req.query);
-    const { productId } = req.query;
+    const { userEmail, productId } = req.query;
 
-    if (!productId) {
-      res.status(400).send("getTheProduct: productId is required");
+    if (!userEmail || !productId) {
+      res
+        .status(400)
+        .send({ error: "getTheProduct: userEmail/productId is required" });
       return;
     }
 
@@ -20,10 +22,23 @@ const getTheProduct = functions.https.onRequest(async (req, res) => {
         .json({ error: "getTheProduct: No product found with the given ID" });
       return;
     }
+
+    const userRef = db.collection("users").where("userEmail", "==", userEmail);
+    const userDoc = await userRef.get();
     const productData = productDoc.data();
-    res.status(200).json(productData);
+
+    if (
+      userDoc.docs.length > 0 &&
+      userDoc.docs[0].data().favoriteItemsArray.includes(productId)
+    ) {
+      console.log("getTheProduct: isFavorite:true");
+      res.status(200).json({ ...productData, isFavorite: true });
+    } else {
+      console.log("getTheProduct: isFavorite:false");
+      res.status(200).json({ ...productData, isFavorite: false });
+    }
   } catch (error) {
-    console.log("getTheProduct error: ", error);
+    console.error("getTheProduct error: ", error);
     res.status(500).json({ error: "getTheProduct: Internal server error" });
   }
 });
