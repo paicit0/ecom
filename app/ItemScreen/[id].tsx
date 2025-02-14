@@ -1,3 +1,4 @@
+// ItemScreen/[id].tsx
 import { memo, useEffect, useState } from "react";
 import {
   View,
@@ -11,101 +12,92 @@ import { Ionicons } from "@expo/vector-icons";
 import { useCart, useFavorite } from "../store/store";
 import { Link, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { Product } from "../store/store";
 import { FlashList } from "@shopify/flash-list";
 import AnimatedLoadingIndicator from "../../components/AnimatedLoadingIndicator";
+import { useAddFavorite } from "../../hooks/fetch/useAddFavorite";
+import { useDeleteFavorite } from "../../hooks/fetch/useDeleteFavorite";
+import { getAuth } from "firebase/auth";
+import { useGetFavorite } from "../../hooks/fetch/useGetFavorite";
 
 const ItemScreen = memo(function ItemScreen() {
   const [product, setProduct] = useState<Product>();
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [isFavorited, setIsFavorited] = useState<boolean>(false);
 
-  const { id }: { id: string } = useLocalSearchParams();
+  const { id: productId }: { id: string } = useLocalSearchParams();
 
   const cart = useCart((state) => state.cartItemsArray);
   const addToCart = useCart((state) => state.addToCart);
 
-  const addToFavorite = useFavorite((state) => state.addToFavorite);
-  const deleteFromFavorite = useFavorite((state) => state.deleteFromFavorite);
-  const favoriteItemsArray = useFavorite((state) => state.favoriteItemsArray);
+  const auth = getAuth();
 
-  const itemIsFavorited = (id: string) => favoriteItemsArray.includes(id);
+  if (!auth.currentUser) {
+    console.error("ItemScreen/[id]: no auth.currentUser");
+    return;
+  }
+
+  const userEmail = auth.currentUser.email;
+
+  if (!userEmail) {
+    console.error("ItemScreen/[id]: no userEmail");
+    return;
+  }
+
+  const addFavoriteMutation = useAddFavorite();
+  const deleteFavoriteMutation = useDeleteFavorite();
+  const getFavoriteQuery = useGetFavorite({ userEmail });
 
   useEffect(() => {
     const getTheProduct = async () => {
       try {
+        setLoading(true);
         const getTheProductUrl =
           process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
             ? process.env.EXPO_PUBLIC_getTheProduct_emulator
             : process.env.EXPO_PUBLIC_getTheProduct_prod;
         if (!getTheProductUrl) {
-          console.log("ItemScreen/[id]: url not bussing!");
+          console.error("ItemScreen/[id]: url not bussing!");
           return;
         }
         console.log("ItemScreen/[id]: getTheProductUrl:", getTheProductUrl);
         const getTheProduct = await axios.get(getTheProductUrl, {
-          params: { productId: id },
+          params: { userEmail: userEmail, productId: productId },
           headers: {
             "Content-Type": "application/json",
           },
         });
 
         const getTheProductData = await getTheProduct.data;
-        console.log("getTheProduct", getTheProductData);
+        console.log("getTheProduct:", getTheProductData);
+        console.log("getTheProduct isFavorite:", getTheProductData.isFavorite);
+
+        if (getTheProductData.isFavorite === true) {
+          setIsFavorited(true);
+        } else {
+          setIsFavorited(false);
+        }
 
         if (getTheProductData) {
           setProduct(getTheProductData);
         }
       } catch (error) {
-        console.log("ItemScreen/[id].getTheProduct:", error);
+        console.error("ItemScreen/[id].getTheProduct:", error);
       } finally {
         setLoading(false);
       }
     };
-    
+
     getTheProduct();
-    console.log("getTheProduct: Product State:", product);
   }, []);
 
-  // useEffect(() => {
-  //   const updateCart = async () => {
-  //     try {
-  //       const updateUserUrl =
-  //         process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
-  //           ? process.env.EXPO_PUBLIC_updateUser_emulator
-  //           : process.env.EXPO_PUBLIC_updateUser_prod;
-  //       if (!updateUserUrl) {
-  //         console.log("ItemScreen/[id]: url not bussing!");
-  //         return;
-  //       }
-  //       console.log("ItemScreen/[id]: updateUserUrl:", updateUserUrl);
-  //       const update = await axios.post(
-  //         updateUserUrl,
-  //         { email: userEmail, cart: cartItems },
-  //         {
-  //           headers: {
-  //             "Content-Type": "application/json",
-  //           },
-  //         }
-  //       );
-  //       console.log(update.status);
-  //     } catch (error) {
-  //       console.log("ItemScreen/[id].updateCart: update failed: ", error);
-  //     }
-  //   };
-  //   updateCart();
-  // }, [cartItems]);
-
-  // useEffect(() => {
-  //   console.log("Going to Screen itemId :", id);
-  // }, []);
-
-  const render = ({ item }: { item: string }) => {
+  const render = ({ item }: { item: Product }) => {
     return (
       <View>
         <Image
           style={styles.imageItem}
-          source={{ uri: item }}
+          source={{ uri: item.productThumbnailUrl[0] }}
           contentFit="cover"
           transition={200}
         />
@@ -124,7 +116,12 @@ const ItemScreen = memo(function ItemScreen() {
   if (!product) {
     return (
       <View
-        style={{ flex: 1, alignContent: "center", justifyContent: "center" }}
+        style={{
+          flex: 1,
+          alignContent: "center",
+          justifyContent: "center",
+          alignSelf: "center",
+        }}
       >
         <Text>No Product Found... It may have been deleted.</Text>
       </View>
@@ -140,9 +137,9 @@ const ItemScreen = memo(function ItemScreen() {
           </Link>
           <View style={styles.FlashListStyle}>
             <FlashList
-              data={product.productThumbnailUrl}
+              data={[product]}
               renderItem={render}
-              keyExtractor={(item) => item}
+              keyExtractor={(item) => item.productId}
               showsVerticalScrollIndicator={false}
               estimatedItemSize={200}
               snapToAlignment="start"
@@ -165,10 +162,24 @@ const ItemScreen = memo(function ItemScreen() {
               <View style={styles.productStock}>
                 <Text>Stock: {product.productStock}</Text>
               </View>
-              {itemIsFavorited(id) ? (
+              {isFavorited ? (
                 <Pressable
                   onPress={() => {
-                    deleteFromFavorite(id);
+                    deleteFavoriteMutation.mutate(
+                      { userEmail: userEmail, productId: productId },
+                      {
+                        onSuccess: () => {
+                          console.log(
+                            "ItemScreen/[id]/: deleteFavorite success"
+                          ),
+                            setIsFavorited(false);
+                        },
+                        onError: () => {
+                          console.log("ItemScreen/[id]/: error"),
+                            setIsFavorited(true);
+                        },
+                      }
+                    );
                   }}
                 >
                   <View style={styles.favoriteButton}>
@@ -178,7 +189,21 @@ const ItemScreen = memo(function ItemScreen() {
               ) : (
                 <Pressable
                   onPress={() => {
-                    addToFavorite(id);
+                    addFavoriteMutation.mutate(
+                      { userEmail: userEmail, productId: productId },
+                      {
+                        onSuccess: () => {
+                          console.log(
+                            "ItemScreen/[id]/: addFavorite success"
+                          ),
+                            setIsFavorited(true);
+                        },
+                        onError: () => {
+                          console.log("ItemScreen/[id]/: error"),
+                            setIsFavorited(false);
+                        },
+                      }
+                    );
                   }}
                 >
                   <View style={styles.favoriteButton}>
@@ -203,7 +228,7 @@ const ItemScreen = memo(function ItemScreen() {
       <View style={styles.ItemFooter}>
         <Pressable
           onPress={() => {
-            addToCart(id);
+            addToCart(productId);
           }}
           style={styles.FooterCart}
         >
