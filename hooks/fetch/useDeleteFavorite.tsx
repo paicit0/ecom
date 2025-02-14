@@ -1,31 +1,31 @@
-// useAddFavorite.tsx
+// useDeleteFavorite.tsx
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import { useMutation } from "@tanstack/react-query";
 
-type fetchAddFavoriteType = {
+type fetchDeleteFavoriteType = {
   userEmail: string;
   productId: string;
 };
 
-const fetchAddFavorite = async ({
+const fetchDeleteFavorite = async ({
   userEmail,
   productId,
-}: fetchAddFavoriteType) => {
+}: fetchDeleteFavoriteType) => {
   try {
     if (!userEmail) throw new Error("User userEmail is required");
 
     const idToken = await SecureStore.getItemAsync("authToken");
-    const addFavoriteUrl =
+    const deleteFavoriteUrl =
       process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
-        ? process.env.EXPO_PUBLIC_addFavorite_emulator
-        : process.env.EXPO_PUBLIC_addFavorite_prod;
+        ? process.env.EXPO_PUBLIC_deleteFavorite_emulator
+        : process.env.EXPO_PUBLIC_deleteFavorite_prod;
 
-    if (!addFavoriteUrl) throw new Error("addFavoriteUrl not found");
-    console.log("useAddFavorite: payload:", userEmail, productId);
+    if (!deleteFavoriteUrl) throw new Error("deleteFavoriteUrl not found");
+    console.log("useDeleteFavorite: payload:", userEmail, productId);
 
     const { data } = await axios.post(
-      addFavoriteUrl,
+      deleteFavoriteUrl,
       { userEmail, productId },
       {
         headers: {
@@ -36,14 +36,14 @@ const fetchAddFavorite = async ({
     );
     return data;
   } catch (error) {
-    console.error("useAddFavorite: ", error);
+    console.error("usedeleteFavorite: ", error);
     throw error;
   }
 };
 
-export const useAddFavorite = () => {
+export const useDeleteFavorite = () => {
   return useMutation({
-    mutationFn: ({ userEmail, productId }: fetchAddFavoriteType) =>
-      fetchAddFavorite({ userEmail, productId }),
+    mutationFn: ({ userEmail, productId }: fetchDeleteFavoriteType) =>
+      fetchDeleteFavorite({ userEmail, productId }),
   });
 };
