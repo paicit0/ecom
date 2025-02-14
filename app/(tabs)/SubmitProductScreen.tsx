@@ -38,8 +38,7 @@ function SubmitProductScreen() {
     setImageBase64s([]);
     setImageUris([]);
     setContentType("");
-
-  }
+  };
 
   const handleFilePicking = async () => {
     console.log("SubmitProductScreen: handleFilePicking");
@@ -99,7 +98,7 @@ function SubmitProductScreen() {
       console.log("SubmitProduct.handleSubmit: error getting idToken:", error);
       return;
     }
-    
+
     const uploadawsS3Url =
       process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
         ? process.env.EXPO_PUBLIC_uploadawsS3_emulator
@@ -125,7 +124,10 @@ function SubmitProductScreen() {
           },
         }
       );
-      console.log(getImagesURLs.status);
+      console.log(
+        "SubmitProductScreen: getImagesURLS.status:",
+        getImagesURLs.status
+      );
       console.log(
         "SubmitProductScreen: payload:",
         imageBase64s.length,
@@ -158,7 +160,7 @@ function SubmitProductScreen() {
               productImageUrl: response.resImageUrlArray,
               productThumbnailUrl: response.resThumbnailUrlArray,
               productStock: productStock,
-              productOwner: userInfo.email,
+              productOwner: userInfo.userEmail,
             },
             {
               headers: {
@@ -263,16 +265,6 @@ function SubmitProductScreen() {
           </>
         )}
       </View>
-
-      {/* {imageName.length > 0 && <></>} */}
-
-      {/* <Text style={{ flexDirection: "row", alignItems: "center" }}>
-        {imageName.map((image, index) => (
-          <View key={index}>
-            <Text key={index}>{imageName[index]}</Text>
-          </View>
-        ))}
-      </Text> */}
       <TextInput
         style={styles.input}
         placeholder="Name..."
@@ -322,7 +314,9 @@ function SubmitProductScreen() {
       <Pressable onPress={handleSubmit} style={styles.submitButton}>
         <Text style={styles.submitButtonText}>Submit a product!</Text>
       </Pressable>
-      <Pressable onPress={clearAllFields}><Text>Clear All</Text></Pressable>
+      <Pressable onPress={clearAllFields}>
+        <Text>Clear All</Text>
+      </Pressable>
     </View>
   );
 }
