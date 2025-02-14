@@ -7,24 +7,35 @@ import { Link } from "expo-router";
 import { StyleSheet } from "react-native";
 import { Product } from "./store/store";
 import { Ionicons } from "@expo/vector-icons";
+import { useGetProducts } from "../hooks/fetch/useGetProducts";
 
 function SearchScreen() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [filteredItems, setFilteredItems] = useState<Product[]>([]);
-  const product = useProductStore((state) => state.products);
-  // console.log("product: ", product);
+  const getProductsQuery = useGetProducts({
+    numberOfItems: 20,
+    currentProductNumber: 0,
+  });
 
   useEffect(() => {
-    const getSearchItems = setTimeout(() => {
-      const filterItem = product.filter((item) =>
-        item.productName.toLowerCase().startsWith(searchQuery.toLowerCase())
-      );
-      if (!searchQuery) {
-        setFilteredItems([]);
-      } else {
-        setFilteredItems(filterItem);
-      }
-    }, 1000);
+    getProductsQuery.refetch();
+    console.log("SearchScreen: getProductsQuery.data", getProductsQuery.data);
+  }, []);
+
+  useEffect(() => {
+    if (getProductsQuery.data) {
+      setTimeout(() => {
+        const filterItem = getProductsQuery.data.productsData.filter(
+          (item: Product) =>
+            item.productName.toLowerCase().startsWith(searchQuery.toLowerCase())
+        );
+        if (!searchQuery) {
+          setFilteredItems([]);
+        } else {
+          setFilteredItems(filterItem);
+        }
+      }, 1000);
+    }
   }, [searchQuery]);
 
   // useEffect(() => {}, []);
@@ -43,7 +54,7 @@ function SearchScreen() {
       <Link
         href={{
           pathname: "/ItemScreen/[id]",
-          params: { id: item.id },
+          params: { id: item.productId },
         }}
       >
         <Text>
@@ -59,8 +70,12 @@ function SearchScreen() {
     <View style={styles.mainContainer}>
       <View style={{ height: 45 }}></View>
       <View style={styles.searchBarContainer}>
-        <Link href="../(tabs)/HomeScreen"  asChild>
-          <Ionicons name="arrow-back-outline" style={{ paddingRight: 10 }} size={20}></Ionicons>
+        <Link href="../(tabs)/HomeScreen" asChild>
+          <Ionicons
+            name="arrow-back-outline"
+            style={{ paddingRight: 10 }}
+            size={20}
+          ></Ionicons>
         </Link>
         <View style={styles.input}>
           <TextInput
