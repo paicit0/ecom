@@ -4,6 +4,7 @@ import {
   connectAuthEmulator,
   initializeAuth,
   onAuthStateChanged,
+  onIdTokenChanged,
   signInWithEmailAndPassword,
   User,
 } from "firebase/auth";
@@ -170,11 +171,11 @@ export const useUserSession = create<userSessionType>()(
     }
   )
 );
-async function saveToken(user: User | null) {
+export async function saveToken(user: User | null) {
   try {
     if (user) {
       console.log("firebaseAuth.saveToken: Attempting to get ID token...");
-      const token = await user.getIdToken(true);
+      const token = await user.getIdToken();
       console.log("firebaseAuth.saveToken: Generating a tokenID: ", token);
       await SecureStore.setItemAsync("authToken", token);
     } else {
@@ -185,10 +186,15 @@ async function saveToken(user: User | null) {
   }
 }
 
-onAuthStateChanged(auth, (user) => {
+onIdTokenChanged(auth, async (user) => {
+  console.log("firebaseAuth: onIdTokenChanged triggered:", user?.email);
+  await saveToken(user);
+});
+
+onAuthStateChanged(auth, async (user) => {
   console.log(
-    "firebaseAuth.saveToken: onAuthStateChanged triggered:",
+    "firebaseAuth: onAuthStateChanged triggered:",
     user?.email
   );
-  saveToken(user);
+  await saveToken(user);
 });
