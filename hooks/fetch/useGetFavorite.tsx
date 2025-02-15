@@ -2,12 +2,13 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
+import { Product } from "../../app/store/store";
 
 type fetchFavoritesType = {
   userEmail: string;
 };
 
-const fetchFavorites = async ({ userEmail }: fetchFavoritesType) => {
+const fetchFavorites = async ({ userEmail }: fetchFavoritesType): Promise<Product[]> => {
   try {
     if (!userEmail) throw new Error("User email is required");
 
@@ -29,7 +30,7 @@ const fetchFavorites = async ({ userEmail }: fetchFavoritesType) => {
       },
     });
 
-    return data;
+    return data.favoriteProducts;
   } catch (error) {
     console.error("useGetFavorite: ", error);
     throw error;

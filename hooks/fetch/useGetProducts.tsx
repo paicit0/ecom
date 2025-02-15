@@ -1,6 +1,7 @@
 // useGetFavorite.tsx
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { Product } from "../../app/store/store";
 
 type fetchGetProductsType = {
   numberOfItems: number;
@@ -10,20 +11,20 @@ type fetchGetProductsType = {
 const fetchGetProducts = async ({
   numberOfItems,
   currentProductNumber,
-}: fetchGetProductsType) => {
+}: fetchGetProductsType): Promise<Product[]> => {
   try {
-    const getProducts =
+    const getProductsUrl =
       process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
         ? process.env.EXPO_PUBLIC_getProducts_emulator
         : process.env.EXPO_PUBLIC_getProducts_prod;
 
-    if (!getProducts) throw new Error("API URL not found");
+    if (!getProductsUrl) throw new Error("API URL not found");
     console.log(
       "useGetProducts: payload:",
       numberOfItems,
       currentProductNumber
     );
-    const { data } = await axios.get(getProducts, {
+    const { data } = await axios.get(getProductsUrl, {
       params: {
         numberOfItems: numberOfItems,
         currentProductNumber: currentProductNumber,
@@ -32,7 +33,7 @@ const fetchGetProducts = async ({
         "Content-Type": "application/json",
       },
     });
-    return data;
+    return data.productsData;
   } catch (error) {
     console.error("useGetProducts: ", error);
     throw error;
