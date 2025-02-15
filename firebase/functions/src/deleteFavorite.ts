@@ -43,7 +43,7 @@ const deleteFavorite = functions.https.onRequest(async (req, res) => {
 
     const usersSnapshot = await db
       .collection("users")
-      .where("useruserEmail", "==", userEmail)
+      .where("userEmail", "==", userEmail)
       .get();
 
     console.log("deleteFavorite: usersSnapshot:", usersSnapshot);
