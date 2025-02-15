@@ -23,7 +23,7 @@ const getProducts = functions.https.onRequest(async (req, res) => {
     }));
     console.log("getProducts: productsData.length: ", productsData.length);
 
-    res.status(200).json({ productsData });
+    res.status(200).json({ productsData: productsData });
   } catch (error) {
     console.log("getProducts error: ", error);
     res.status(400);
