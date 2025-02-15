@@ -21,16 +21,32 @@ function FavoriteScreen() {
   const auth = getAuth();
   const userAuth = auth.currentUser;
   if (!userAuth) {
-    console.error("No user auth found");
-    return;
-  }
-  const userEmail = userAuth.email;
-  if (!userEmail || !userAuth) {
-    console.error("No user email found");
-    return;
+    console.error("FavoriteScreen: no auth.currentUser");
+    return (
+      <View
+        style={{
+          flex: 1,
+          flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Text>Please </Text>
+        <Link href="/LoginScreen" asChild>
+          <Pressable style={{}}>
+            <Text style={{ color: "blue" }}>Login</Text>
+          </Pressable>
+        </Link>
+      </View>
+    );
   }
 
-  const getFavoriteQuery = useGetFavorite({ userEmail });
+  const userEmail = userAuth.email;
+  if (!userEmail || !userAuth.email) {
+    console.error("No user email found");
+  }
+
+  const getFavoriteQuery = useGetFavorite({ userEmail: userEmail! });
   const deleteFavoriteMutation = useDeleteFavorite();
 
   useEffect(() => {
@@ -61,7 +77,7 @@ function FavoriteScreen() {
     return <></>;
   }
 
-  if (getFavoriteQuery.data.favoriteProducts.length === 0) {
+  if (getFavoriteQuery.data.length === 0) {
     return (
       <View
         style={{
@@ -98,42 +114,44 @@ function FavoriteScreen() {
         </View>
 
         <View style={styles.favoriteItemsArrayContainer}>
-          {getFavoriteQuery.data.favoriteProducts.map(
-            (product: Product, index: number) => (
-              <View key={index} style={{}}>
-                <Link
-                  href={{
-                    pathname: "/ItemScreen/[id]",
-                    params: { id: product.productId },
-                  }}
-                  asChild
-                >
-                  <Pressable>
-                    <Image
-                      style={{ height: 150, width: 150 }}
-                      source={{ uri: product.productThumbnailUrl[0] }}
-                    />
-                    <Text>{product.productName}</Text>
-                    <Text>{product.productDescription}</Text>
-                    <Text>{product.productThumbnailUrl[0]}</Text>
-                  </Pressable>
-                </Link>
+          {getFavoriteQuery.data.map((product: Product, index: number) => (
+            <View key={index} style={{}}>
+              <Link
+                href={{
+                  pathname: "/ItemScreen/[id]",
+                  params: { id: product.productId },
+                }}
+                asChild
+              >
+                <Pressable>
+                  <Image
+                    style={{ height: 150, width: 150 }}
+                    source={{ uri: product.productThumbnailUrl[0] }}
+                  />
+                  <Text>{product.productName}</Text>
+                  <Text>{product.productDescription}</Text>
+                  <Text>{product.productThumbnailUrl[0]}</Text>
+                </Pressable>
+              </Link>
 
-                <Pressable
-                  onPress={() => {
+              <Pressable
+                onPress={() => {
+                  if (userEmail) {
                     deleteFavoriteMutation.mutate({
                       userEmail: userEmail,
                       productId: product.productId,
                     });
-                  }}
-                >
-                  <Ionicons name="close-sharp" size={20} color="#666" />
-                </Pressable>
-              </View>
-            )
-          )}
+                  } else {
+                    console.error("User email is null");
+                  }
+                }}
+              >
+                <Ionicons name="close-sharp" size={20} color="#666" />
+              </Pressable>
+            </View>
+          ))}
         </View>
-        {getFavoriteQuery.data.favoriteProducts.length > 0 && (
+        {getFavoriteQuery.data.length > 0 && (
           <Pressable onPress={() => console.log("delete all placeholder")}>
             <Text>Delete All</Text>
           </Pressable>
