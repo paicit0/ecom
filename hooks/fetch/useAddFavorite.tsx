@@ -8,10 +8,21 @@ type fetchAddFavoriteType = {
   productId: string;
 };
 
+type fetchAddFavoriteResponseSuccess = {
+  message: string;
+}
+type fetchAddFavoriteResponseFailed = {
+  error: string;
+}
+
+type fetchAddFavoriteResponseType = 
+  | fetchAddFavoriteResponseSuccess 
+  | fetchAddFavoriteResponseFailed 
+
 const fetchAddFavorite = async ({
   userEmail,
   productId,
-}: fetchAddFavoriteType) => {
+}: fetchAddFavoriteType): Promise<fetchAddFavoriteResponseType> => {
   try {
     if (!userEmail) throw new Error("User userEmail is required");
 

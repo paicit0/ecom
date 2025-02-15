@@ -8,10 +8,21 @@ type fetchDeleteFavoriteType = {
   productId: string;
 };
 
+type fetchDeleteFavoriteResponseSuccess = {
+  message: string;
+}
+type fetchDeleteFavoriteResponseFailed = {
+  error: string;
+}
+
+type fetchDeleteFavoriteResponseType = 
+  | fetchDeleteFavoriteResponseSuccess 
+  | fetchDeleteFavoriteResponseFailed 
+
 const fetchDeleteFavorite = async ({
   userEmail,
   productId,
-}: fetchDeleteFavoriteType) => {
+}: fetchDeleteFavoriteType): Promise<fetchDeleteFavoriteResponseType> => {
   try {
     if (!userEmail) throw new Error("User userEmail is required");
 
