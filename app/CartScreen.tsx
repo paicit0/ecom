@@ -21,7 +21,7 @@ export const CartScreen = memo(() => {
   const userAuth = auth.currentUser;
 
   if (!auth.currentUser) {
-    console.error("ItemScreen/[id]: no auth.currentUser");
+    console.error("CartScreen: no auth.currentUser");
     return (
       <View
         style={{
