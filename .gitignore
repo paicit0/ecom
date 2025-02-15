@@ -39,3 +39,4 @@ app/auth/firebaseConfig.ts
 .gitignore
 WhatToDo.txt
 firebase/functions/firebase-export-1738757470996xStQ3N/
+app.json
