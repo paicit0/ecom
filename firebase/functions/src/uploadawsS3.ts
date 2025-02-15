@@ -1,4 +1,4 @@
-// uploadawsS3.ts
+// uploadAwsS3.ts
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import sharp from "sharp";
 import * as functions from "firebase-functions";
@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import * as admin from "firebase-admin";
 require("firebase-functions/logger/compat"); // enables console.log()
 
-console.log("uploadawsS3 reached");
+console.log("uploadAwsS3 reached");
 
 const REGION = process.env.AWS_REGION;
 const BUCKET_NAME = process.env.AWS_BUCKET_NAME;
@@ -22,7 +22,7 @@ const s3Client = new S3Client({
 });
 
 const uploadToS3 = async (buffer: Buffer, key: string, contentType: string) => {
-  console.log("uploadawsS3.ts.uploadToS3");
+  console.log("uploadAwsS3.ts.uploadToS3");
   try {
     const command = new PutObjectCommand({
       Bucket: BUCKET_NAME,
@@ -40,7 +40,7 @@ const uploadToS3 = async (buffer: Buffer, key: string, contentType: string) => {
 };
 
 const createThumbnail = async (imageBuffer: Buffer) => {
-  console.log("uploadawsS3.createThumbnail");
+  console.log("uploadAwsS3.createThumbnail");
   try {
     return await sharp(imageBuffer).resize({ width: 150 }).toBuffer();
   } catch (error) {
@@ -49,39 +49,39 @@ const createThumbnail = async (imageBuffer: Buffer) => {
   }
 };
 
-const uploadawsS3 = functions.https.onRequest(async (req, res) => {
-  console.log("uploadawsS3.uploadawsS3 function reached");
+const uploadAwsS3 = functions.https.onRequest(async (req, res) => {
+  console.log("uploadAwsS3.uploadAwsS3 function reached");
   try {
     const uniqueName = uuidv4();
     const authHeader = req.headers.authorization;
     const { imageBase64, contentType } = req.body;
-    console.log("uploadawsS3 received headers:", authHeader);
+    console.log("uploadAwsS3 received headers:", authHeader);
     if (!authHeader || !authHeader.toLowerCase().startsWith("bearer")) {
-      console.log("uploadawsS3: no/invalid auth in headers!");
-      res.status(401).json({ error: "uploadawsS3: no auth in headers!!" });
+      console.log("uploadAwsS3: no/invalid auth in headers!");
+      res.status(401).json({ error: "uploadAwsS3: no auth in headers!!" });
       return;
     }
     const idToken = authHeader.replace(/^Bearer\s+/i, "").trim();
     try {
       const decodedToken = await admin.auth().verifyIdToken(idToken);
       if (!decodedToken) {
-        res.status(401).json({ error: "uploadawsS3: No auth token." });
+        res.status(401).json({ error: "uploadAwsS3: No auth token." });
         return;
       }
     } catch (error) {
       console.log(error);
-      res.status(401).json({ error: `uploadawsS3: Unauthorized! ${error}` });
+      res.status(401).json({ error: `uploadAwsS3: Unauthorized! ${error}` });
       return;
     }
 
     if (!Array.isArray(imageBase64)) {
-      res.status(400).json({ error: "uploadawsS3: imageBase64 must be an array" });
+      res.status(400).json({ error: "uploadAwsS3: imageBase64 must be an array" });
       return;
     }
 
     const validContentTypes = ["image/jpeg", "image/png", "image/gif"];
     if (!validContentTypes.includes(contentType)) {
-      res.status(400).json({ error: "uploadawsS3: Invalid content type" });
+      res.status(400).json({ error: "uploadAwsS3: Invalid content type" });
       return;
     }
 
@@ -111,9 +111,9 @@ const uploadawsS3 = functions.https.onRequest(async (req, res) => {
     res.status(201).json({ resImageUrlArray, resThumbnailUrlArray });
     return;
   } catch (error) {
-    console.error("uploadawsS3: Error generating upload URL:", error);
-    res.status(500).json({ error: "uploadawsS3: Internal server error" });
+    console.error("uploadAwsS3: Error generating upload URL:", error);
+    res.status(500).json({ error: "uploadAwsS3: Internal server error" });
   }
 });
 
-export { uploadawsS3 };
+export { uploadAwsS3 as uploadAwsS3 };
