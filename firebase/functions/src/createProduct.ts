@@ -73,7 +73,7 @@ const createProduct = functions.https.onRequest(async (req, res) => {
       .set(productsWithId);
 
     res.status(201).json({
-      error:
+      message:
         "createProduct: Product submitted sucessfully! " + createOneProduct.id,
     });
     return;
