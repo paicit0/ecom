@@ -1,3 +1,4 @@
+// ProfileScreen.tsx
 import { Link, useRouter } from "expo-router";
 import {
   View,

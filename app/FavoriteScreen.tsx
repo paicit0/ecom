@@ -1,3 +1,4 @@
+// FavoriteScreen.tsx
 import { useEffect, useState } from "react";
 import {
   Pressable,

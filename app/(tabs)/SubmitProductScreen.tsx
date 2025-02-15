@@ -4,12 +4,12 @@ import { View, Text, TextInput, Pressable, Image } from "react-native";
 import { StyleSheet } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
-import { useUserSession } from "../auth/firebaseAuth";
 import { Dropdown } from "react-native-element-dropdown";
 import { getAuth } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
-
+import { useUploadAwsS3 } from "../../hooks/fetch/useUploadAwsS3";
+import { useCreateProduct } from "../../hooks/fetch/useCreateProduct";
 global.Buffer = require("buffer").Buffer;
 
 function SubmitProductScreen() {
@@ -20,12 +20,12 @@ function SubmitProductScreen() {
   const [productStock, setProductStock] = useState<number>(NaN);
   const [imageIsSelected, setImageIsSelected] = useState<boolean>(false);
   const [imageNames, setImageNames] = useState<string[]>([]);
-  const [imageBase64s, setImageBase64s] = useState<string[]>([]);
+  const [imageBase64Array, setImageBase64s] = useState<string[]>([]);
   const [imageUris, setImageUris] = useState<string[]>([]);
   const [contentType, setContentType] = useState<string>("");
 
-  const userInfo = useUserSession((state) => state.userInfo);
-  const refreshToken = useUserSession((state) => state.refreshToken);
+  const uploadAwsS3Mutation = useUploadAwsS3();
+  const createProductMutation = useCreateProduct();
 
   const clearAllFields = () => {
     setProductName("");
@@ -55,7 +55,7 @@ function SubmitProductScreen() {
           }
         );
         setImageNames([...imageNames, docRes.assets[0].name]);
-        setImageBase64s([...imageBase64s, fileContent]);
+        setImageBase64s([...imageBase64Array, fileContent]);
         setImageUris([...imageUris, docRes.assets[0].uri]);
         setContentType(docRes.assets[0].mimeType ?? "");
         setImageIsSelected(true);
@@ -66,6 +66,7 @@ function SubmitProductScreen() {
   };
 
   const handleSubmit = async () => {
+    // uploadAwsS3Mutation.mutate({})
     if (
       !productName ||
       !productDescription ||
@@ -79,7 +80,6 @@ function SubmitProductScreen() {
     const auth = getAuth();
     const userAuth = auth.currentUser;
 
-    // refreshToken(userAuth);
     console.log(
       "SubmitProduct.handleSubmit: auth.currentUser: ",
       auth.currentUser
@@ -116,7 +116,7 @@ function SubmitProductScreen() {
       console.log("SubmitProductScreen: uploadawsS3 url:", uploadawsS3Url);
       const getImagesURLs = await axios.post(
         uploadawsS3Url,
-        { imageBase64: imageBase64s, contentType: contentType },
+        { imageBase64: imageBase64Array, contentType: contentType },
         {
           headers: {
             authorization: `Bearer ${idToken}`,
@@ -130,7 +130,7 @@ function SubmitProductScreen() {
       );
       console.log(
         "SubmitProductScreen: payload:",
-        imageBase64s.length,
+        imageBase64Array.length,
         contentType
       );
       const response = await getImagesURLs.data;
@@ -160,7 +160,7 @@ function SubmitProductScreen() {
               productImageUrl: response.resImageUrlArray,
               productThumbnailUrl: response.resThumbnailUrlArray,
               productStock: productStock,
-              productOwner: userInfo.userEmail,
+              productOwner: userAuth.email,
             },
             {
               headers: {

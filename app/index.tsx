@@ -1,5 +1,5 @@
-//eas build --profile development --platform android
-//Index.tsx
+// Index.tsx
+// eas build --profile development --platform android
 import { Redirect } from "expo-router";
 
 function Index() {

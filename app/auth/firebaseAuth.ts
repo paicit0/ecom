@@ -1,4 +1,4 @@
-//firebaseAuth.ts
+// firebaseAuth.ts
 import { initializeApp } from "firebase/app";
 import {
   connectAuthEmulator,

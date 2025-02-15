@@ -1,4 +1,4 @@
-//HomeScreen.tsx
+// HomeScreen.tsx
 import { memo, useEffect, useState } from "react";
 import { StyleSheet, View, Text, Dimensions, Pressable } from "react-native";
 import { Image } from "expo-image";
@@ -34,7 +34,7 @@ export const HomeScreen = memo(function HomeScreen() {
   }
 
   useEffect(() => {
-    console.log(getProductsQuery.data);
+    console.log("HomeScreen: getProductsQuery.data:", getProductsQuery.data);
   }, []);
 
   const loadMore = async () => {
@@ -67,6 +67,7 @@ export const HomeScreen = memo(function HomeScreen() {
   };
 
   if (getProductsQuery.isLoading) {
+    console.log("HomeScreen: getProductsQuery.isLoading", getProductsQuery.isLoading);
     return (
       <View style={styles.renderStyle}>
         <View style={styles.itemContainer}>
@@ -79,6 +80,14 @@ export const HomeScreen = memo(function HomeScreen() {
             <Text style={styles.itemStock}>Stock: ...</Text>
           </View>
         </View>
+      </View>
+    );
+  }
+  if (getProductsQuery.isError) {
+    console.log("HomeScreen: getProductsQuery.isError", getProductsQuery.isError);
+    return (
+      <View style={{}}>
+        <Text>Failed to get products.</Text>
       </View>
     );
   }
@@ -170,7 +179,7 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {},
   header: { width: "100%" },
-  renderStyle: { width: "100%" },
+  renderStyle: { height:"100%", width: "100%" },
   flashListStyle: {
     height: Dimensions.get("window").height,
     width: Dimensions.get("window").width,
