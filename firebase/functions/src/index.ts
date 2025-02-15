@@ -29,8 +29,8 @@ export { registerUsers };
 import { registerSellers } from "./registerSellers";
 export { registerSellers };
 
-import { uploadawsS3 } from "./uploadawsS3";
-export { uploadawsS3 };
+import { uploadAwsS3 } from "./uploadAwsS3";
+export { uploadAwsS3 };
 
 import { createProduct } from "./createProduct";
 export { createProduct };
