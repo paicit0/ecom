@@ -7,7 +7,6 @@ import { Link } from "expo-router";
 import { FlashList } from "@shopify/flash-list";
 import EmptySearchBar from "../../components/EmptySearchBar";
 import axios from "axios";
-import { getAuth } from "firebase/auth";
 import { useGetProducts } from "../../hooks/fetch/useGetProducts";
 
 export const HomeScreen = memo(function HomeScreen() {
@@ -33,6 +32,10 @@ export const HomeScreen = memo(function HomeScreen() {
     console.log("HomeScreen: url not bussin");
     return;
   }
+
+  useEffect(() => {
+    console.log(getProductsQuery.data);
+  }, []);
 
   const loadMore = async () => {
     console.log("HomeScreen: loadMore triggered.");
@@ -63,17 +66,13 @@ export const HomeScreen = memo(function HomeScreen() {
     }
   };
 
-  useEffect(() => {
-    getProductsQuery.refetch();
-  }, []);
-
   if (getProductsQuery.isLoading) {
     return (
       <View style={styles.renderStyle}>
         <View style={styles.itemContainer}>
           <View style={styles.imageItem}></View>
           <Text numberOfLines={2} ellipsizeMode="tail" style={styles.itemTitle}>
-            .....
+            Loading...
           </Text>
           <View style={styles.priceStockContainer}>
             <Text style={styles.itemPrice}>$...</Text>
@@ -123,7 +122,7 @@ export const HomeScreen = memo(function HomeScreen() {
       <View style={{ height: 45 }} />
       <EmptySearchBar placeholder="Search..." />
       <FlashList
-        data={getProductsQuery.data.productsData}
+        data={getProductsQuery.data}
         renderItem={render}
         keyExtractor={(item) => item.productId}
         contentContainerStyle={styles.verticalListContainer}
@@ -136,7 +135,7 @@ export const HomeScreen = memo(function HomeScreen() {
             <Text>Press to refresh (Placeholder)</Text>
           </Pressable>
         )}
-        extraData={[isLoading, getProductsQuery.data.productsData]} // re renders if isLoading/ products change
+        extraData={[isLoading, getProductsQuery.data]} // re renders if isLoading/products change
         onEndReachedThreshold={0.5}
         // onEndReached={loadMore}
       />
@@ -147,6 +146,11 @@ export const HomeScreen = memo(function HomeScreen() {
         <>
           <Pressable
             onPress={() => {
+              console.log("HomeScreen: refresh");
+              console.log(
+                "HomeScreen: getProductsQuery.data",
+                getProductsQuery.data
+              );
               setCurrentProductNumber(0);
               () => getProductsQuery.refetch();
             }}
@@ -166,7 +170,7 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {},
   header: { width: "100%" },
-  renderStyle: {},
+  renderStyle: { width: "100%" },
   flashListStyle: {
     height: Dimensions.get("window").height,
     width: Dimensions.get("window").width,
