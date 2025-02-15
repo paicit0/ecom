@@ -34,7 +34,23 @@ const ItemScreen = memo(function ItemScreen() {
 
   if (!auth.currentUser) {
     console.error("ItemScreen/[id]: no auth.currentUser");
-    return;
+    return (
+      <View
+        style={{
+          flex: 1,
+          flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Text>Please </Text>
+        <Link href="/LoginScreen" asChild>
+          <Pressable style={{}}>
+            <Text style={{ color: "blue" }}>Login</Text>
+          </Pressable>
+        </Link>
+      </View>
+    );
   }
 
   const userEmail = auth.currentUser.email;
@@ -191,9 +207,7 @@ const ItemScreen = memo(function ItemScreen() {
                       { userEmail: userEmail, productId: productId },
                       {
                         onSuccess: () => {
-                          console.log(
-                            "ItemScreen/[id]/: addFavorite success"
-                          ),
+                          console.log("ItemScreen/[id]/: addFavorite success"),
                             setIsFavorited(true);
                         },
                         onError: () => {

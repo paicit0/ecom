@@ -4,7 +4,7 @@ import { View, StyleSheet, Pressable, ScrollView } from "react-native";
 import { Text, Image } from "react-native";
 import { useCart } from "./store/store";
 import { Ionicons } from "@expo/vector-icons";
-import { Link, useRouter } from "expo-router";
+import { Link } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import axios from "axios";
 import { getAuth } from "firebase/auth";
@@ -17,16 +17,29 @@ export const CartScreen = memo(() => {
   const deleteFromCart = useCart((state) => state.deleteFromCart);
   const deleteAllCart = useCart((state) => state.deleteAllCart);
 
-  const router = useRouter();
   const auth = getAuth();
   const userAuth = auth.currentUser;
 
-  useEffect(() => {
-    if (!userAuth) {
-      console.log("CartScreen: no userAuth, redirecting to /LoginScreen");
-      router.replace("/LoginScreen");
-    }
-  }, [userAuth, router]);
+  if (!auth.currentUser) {
+    console.error("ItemScreen/[id]: no auth.currentUser");
+    return (
+      <View
+        style={{
+          flex: 1,
+          flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Text>Please </Text>
+        <Link href="/LoginScreen" asChild>
+          <Pressable style={{}}>
+            <Text style={{ color: "blue" }}>Login</Text>
+          </Pressable>
+        </Link>
+      </View>
+    );
+  }
 
   const updateCart = async () => {
     setLoading(true);
