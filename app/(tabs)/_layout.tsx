@@ -46,6 +46,16 @@ export default function TabsLayout() {
               userInfoFromStore.userRole === "seller" ? undefined : () => null,
           }}
         />
+        <Tabs.Screen
+          name="MapScreen"
+          options={{
+            tabBarLabel: "Map",
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="map" size={size} color={color} />
+            ),
+            href:null
+          }}
+        />
       </Tabs>
     </View>
   );
