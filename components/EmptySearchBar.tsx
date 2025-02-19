@@ -1,16 +1,42 @@
 //EmptySearchScreen.tsx
 import { StyleSheet, View, Text, TextInput, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { memo } from "react";
+import { memo, useEffect, useState } from "react";
 import { Link } from "expo-router";
 import { useCart } from "@/app/store/store";
+import { FadeIn, FadeOut } from 'react-native-reanimated';
 
-type SearchBarProps =  {
-  placeholder: string;
-}
+type SearchBarProps = {
+  placeholderArray: string[];
+  intervalMs: number;
+};
 
-const EmptySearchBar = memo(function SearchBar({placeholder}: SearchBarProps) {
+const EmptySearchBar = memo(function SearchBar({
+  placeholderArray, intervalMs
+}: SearchBarProps) {
+  const [currentPlaceholder, setCurrentPlaceholder] = useState(() =>
+    getRandomPlaceholder(-1)
+  );
   const cart = useCart((state) => state.cartItemsArray);
+
+  function getRandomPlaceholder(excludeIndex: number) {
+    let randomIndex;
+    do {
+      randomIndex = Math.floor(Math.random() * placeholderArray.length);
+    } while (randomIndex === excludeIndex);
+    return { text: placeholderArray[randomIndex], index: randomIndex };
+  }
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setCurrentPlaceholder((prev: { index: number }) =>
+        getRandomPlaceholder(prev.index)
+      );
+    }, intervalMs);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
   return (
     <View style={styles.mainContainer}>
       <View style={styles.searchBarContainer}>
@@ -22,7 +48,7 @@ const EmptySearchBar = memo(function SearchBar({placeholder}: SearchBarProps) {
             style={{ flex: 1, flexDirection: "row", alignItems: "center" }}
           >
             <TextInput
-              placeholder={placeholder}
+              placeholder={currentPlaceholder.text}
               editable={false}
               pointerEvents="none"
               style={styles.input}
@@ -52,9 +78,12 @@ const styles = StyleSheet.create({
     width: "100%",
     padding: 10,
     flexDirection: "row",
+    paddingTop: 45,
+    paddingBottom: 30,
+    backgroundColor: "orange",
   },
   searchBarContainer: {
-    flex:6,
+    flex: 6,
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "white",
@@ -66,13 +95,13 @@ const styles = StyleSheet.create({
   },
   cartContainer: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center'
+    alignItems: "center",
+    justifyContent: "center",
   },
   input: {
     fontSize: 16,
-    color: "black",
-    fontWeight: "200",
+    color: "orange",
+    fontWeight: "600",
   },
   badge: {
     position: "absolute",
