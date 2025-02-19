@@ -19,11 +19,13 @@ function ProfileScreen() {
   const { getUserInfo } = useUserSession();
   const router = useRouter();
 
-  useEffect(() => {
-    if (userIsSignedIn) {
-      setError("");
-    }
-  }, [userIsSignedIn]);
+  const auth = getAuth();
+  const userAuth = auth.currentUser;
+  console.log("ProfileScreen: userAuth: ", userAuth);
+  if (!userAuth) {
+    console.log("ProfileScreen: not logged in");
+    return;
+  }
 
   const handleSellerRegister = async () => {
     if (!userIsSignedIn) {
@@ -31,13 +33,6 @@ function ProfileScreen() {
       return;
     }
 
-    const auth = getAuth();
-    const userAuth = auth.currentUser;
-    console.log("ProfileScreen: userAuth: ", userAuth);
-    if (!userAuth) {
-      console.log("ProfileScreen: not logged in");
-      return;
-    }
     const idToken = await SecureStore.getItemAsync("authToken");
     console.log("ProfileScreen: idToken:", idToken);
 
@@ -105,24 +100,52 @@ function ProfileScreen() {
         {/* <View style={{ height: 35, backgroundColor: "red" }}></View> */}
         {error && <Text style={styles.errorText}>{error}</Text>}
         <View style={styles.topButtonsContainer}>
-          <Ionicons name="settings-outline" size={28} color={"white"} />
-          <Link href={"/CartScreen"} asChild>
-            <Pressable>
-              <Ionicons name="cart-outline" size={28} color={"white"} />
+          {userInfoFromStore.userRole === "seller" && userAuth && (
+            <Pressable
+              style={{
+                flexDirection: "row",
+                backgroundColor: "white",
+                paddingLeft: 10,
+                borderBottomRightRadius: 20,
+                borderTopRightRadius: 20,
+              }}
+              onPress={handleSellerRegister}
+            >
+              <Ionicons
+                name="storefront-outline"
+                size={24}
+                style={{ alignSelf: "center", color: "black" }}
+              />
+              <Text style={{ alignSelf: "center", marginLeft: 5 }}>
+                Become a Seller
+              </Text>
+              <Ionicons
+                style={{ alignSelf: "center" }}
+                name="chevron-forward"
+                size={20}
+              />
             </Pressable>
-          </Link>
-          <Ionicons
-            name="chatbubble-ellipses-outline"
-            size={28}
-            color={"white"}
-          />
+          )}
+          <View style={{ flexDirection: "row", gap: 12 }}>
+            <Ionicons name="settings-outline" size={28} color={"white"} />
+            <Link href={"/CartScreen"} asChild>
+              <Pressable>
+                <Ionicons name="cart-outline" size={28} color={"white"} />
+              </Pressable>
+            </Link>
+            <Ionicons
+              name="chatbubble-ellipses-outline"
+              size={28}
+              color={"white"}
+            />
+          </View>
         </View>
         <>
           <View style={styles.mainHeaderContainer}>
             <View style={styles.usersProfileContainer}>
               {auth.currentUser ? (
                 <>
-                  <View style={{ flexDirection: "row" }}>
+                  <View style={{ flexDirection: "row", paddingLeft: 16 }}>
                     <View style={{ flex: 1, flexDirection: "row" }}>
                       <Ionicons
                         name="happy"
@@ -155,9 +178,9 @@ function ProfileScreen() {
                         onPress={handleLogout}
                         style={{
                           flex: 1,
-                          justifyContent:'center',
+                          justifyContent: "center",
                           backgroundColor: "white",
-                          width:70
+                          width: 70,
                         }}
                       >
                         <Text
@@ -191,7 +214,7 @@ function ProfileScreen() {
                         <Pressable
                           style={{
                             flex: 1,
-                            justifyContent:'center',
+                            justifyContent: "center",
                             backgroundColor: "white",
                           }}
                         >
@@ -210,10 +233,9 @@ function ProfileScreen() {
                         <Pressable
                           style={{
                             flex: 1,
-                            justifyContent:'center',
+                            justifyContent: "center",
                             borderColor: "white",
                             borderWidth: 1,
-                            
                           }}
                         >
                           <Text
@@ -358,7 +380,7 @@ const styles = StyleSheet.create({
   topButtonsContainer: {
     flexDirection: "row",
     alignItems: "flex-start",
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
     width: deviceWidth,
     backgroundColor: "orange",
     gap: 17,
@@ -377,7 +399,7 @@ const styles = StyleSheet.create({
   usersProfileContainer: {
     flex: 1,
     justifyContent: "flex-start",
-    paddingLeft: 15,
+    // paddingLeft: 15,
     // backgroundColor: "blue",
   },
   loginRegisterContainer: {
