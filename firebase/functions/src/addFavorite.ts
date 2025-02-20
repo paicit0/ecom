@@ -61,7 +61,7 @@ const addFavorite = functions.https.onRequest(async (req, res) => {
       favoriteItemsArray: FieldValue.arrayUnion(productId),
     });
     res.status(201).json({
-      message: "addFavorite: Item added to favorites",
+      message: "addFavorite: Item added to favoriteItemsArray",
     });
   } catch (error) {
     console.error("addFavorite: internal error:", error);

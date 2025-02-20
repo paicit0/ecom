@@ -8,9 +8,11 @@ type fetchFavoritesType = {
   userEmail: string;
 };
 
-const fetchFavorites = async ({ userEmail }: fetchFavoritesType): Promise<Product[]> => {
+const fetchFavorites = async ({
+  userEmail,
+}: fetchFavoritesType): Promise<Product[]> => {
   try {
-    if (!userEmail) throw new Error("User email is required");
+    if (!userEmail) throw new Error("userEmail is required");
 
     const idToken = await SecureStore.getItemAsync("authToken");
     const getFavoriteUrl =
