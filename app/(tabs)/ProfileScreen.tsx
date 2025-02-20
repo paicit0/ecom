@@ -23,7 +23,6 @@ function ProfileScreen() {
 
   const auth = getAuth();
   const userAuth = auth.currentUser;
-  console.log("ProfileScreen: userAuth: ", userAuth);
   if (!userAuth) {
     console.log("ProfileScreen: not logged in");
   }
@@ -97,7 +96,6 @@ function ProfileScreen() {
   if (loading) {
     return (
       <View style={{ marginTop: 60 }}>
-        <Text>OK!!?</Text>
         <AnimatedLoadingIndicator loading={loading} />
       </View>
     );
