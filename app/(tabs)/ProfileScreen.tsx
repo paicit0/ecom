@@ -3,13 +3,15 @@ import { Link, useRouter } from "expo-router";
 import { View, Text, Pressable, Dimensions, ScrollView } from "react-native";
 import { StyleSheet } from "react-native";
 // @ts-ignore
-import { auth, useUserSession } from "../auth/firebaseAuth";
+import { useUserSession } from "../auth/firebaseAuth";
 import { useState, useEffect } from "react";
 import { getAuth } from "firebase/auth";
 import * as SecureStore from "expo-secure-store";
 import axios from "axios";
 import AnimatedLoadingIndicator from "../../components/AnimatedLoadingIndicator";
 import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { TouchableOpacity } from "react-native";
 function ProfileScreen() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -24,8 +26,11 @@ function ProfileScreen() {
   console.log("ProfileScreen: userAuth: ", userAuth);
   if (!userAuth) {
     console.log("ProfileScreen: not logged in");
-    return;
   }
+
+  useEffect(() => {
+    console.log("ProfileScreen: loading:", loading);
+  }, []);
 
   const handleSellerRegister = async () => {
     if (!userIsSignedIn) {
@@ -75,9 +80,12 @@ function ProfileScreen() {
   const handleLogout = async () => {
     setLoading(true);
     try {
-      const tryLogout = await logout();
-      if (tryLogout.success) {
-        router.replace("../(tabs)/HomeScreen");
+      const { success, message } = await logout();
+      if (success) {
+        setLoading(false);
+        router.replace("/(tabs)/HomeScreen");
+      } else {
+        console.error("ProfileScreen: handleLogout Error:", message);
       }
     } catch (error) {
       console.error("ProfileScreen: handleLogout Error:", error);
@@ -89,133 +97,98 @@ function ProfileScreen() {
   if (loading) {
     return (
       <View style={{ marginTop: 60 }}>
+        <Text>OK!!?</Text>
         <AnimatedLoadingIndicator loading={loading} />
       </View>
     );
   }
 
   return (
-    <View style={styles.mainContainer}>
-      <ScrollView style={{ height: deviceHeight, flex: 1 }}>
-        {/* <View style={{ height: 35, backgroundColor: "red" }}></View> */}
-        {error && <Text style={styles.errorText}>{error}</Text>}
-        <View style={styles.topButtonsContainer}>
-          {userInfoFromStore.userRole === "seller" && userAuth && (
-            <Pressable
-              style={{
-                flexDirection: "row",
-                backgroundColor: "white",
-                paddingLeft: 10,
-                borderBottomRightRadius: 20,
-                borderTopRightRadius: 20,
-              }}
-              onPress={handleSellerRegister}
-            >
+    <>
+      <SafeAreaView style={styles.mainContainer}>
+        <ScrollView style={{ flex: 1, backgroundColor: "white" }}>
+          <View style={styles.topButtonsContainer}>
+            <View style={{ justifyContent: "flex-start" }}>
+              {userInfoFromStore.userRole !== "seller" && userAuth && (
+                <Pressable
+                  style={{
+                    flexDirection: "row",
+                    backgroundColor: "white",
+                    borderBottomRightRadius: 20,
+                    borderTopRightRadius: 20,
+                  }}
+                  onPress={handleSellerRegister}
+                >
+                  <Ionicons
+                    name="storefront-outline"
+                    size={24}
+                    style={{ alignSelf: "center", color: "black" }}
+                  />
+                  <Text style={{ alignSelf: "center", marginLeft: 5 }}>
+                    Become a Seller
+                  </Text>
+                  <Ionicons
+                    style={{ alignSelf: "center" }}
+                    name="chevron-forward"
+                    size={20}
+                  />
+                </Pressable>
+              )}
+            </View>
+            <View style={{ flexDirection: "row", gap: 12, marginRight: 16 }}>
+              <Ionicons name="settings-outline" size={28} color={"white"} />
+              <Link href={"/CartScreen"} asChild>
+                <Pressable>
+                  <Ionicons name="cart-outline" size={28} color={"white"} />
+                </Pressable>
+              </Link>
               <Ionicons
-                name="storefront-outline"
-                size={24}
-                style={{ alignSelf: "center", color: "black" }}
+                name="chatbubble-ellipses-outline"
+                size={28}
+                color={"white"}
               />
-              <Text style={{ alignSelf: "center", marginLeft: 5 }}>
-                Become a Seller
-              </Text>
-              <Ionicons
-                style={{ alignSelf: "center" }}
-                name="chevron-forward"
-                size={20}
-              />
-            </Pressable>
-          )}
-          <View style={{ flexDirection: "row", gap: 12 }}>
-            <Ionicons name="settings-outline" size={28} color={"white"} />
-            <Link href={"/CartScreen"} asChild>
-              <Pressable>
-                <Ionicons name="cart-outline" size={28} color={"white"} />
-              </Pressable>
-            </Link>
-            <Ionicons
-              name="chatbubble-ellipses-outline"
-              size={28}
-              color={"white"}
-            />
+            </View>
           </View>
-        </View>
-        <>
-          <View style={styles.mainHeaderContainer}>
-            <View style={styles.usersProfileContainer}>
-              {auth.currentUser ? (
-                <>
-                  <View style={{ flexDirection: "row", paddingLeft: 16 }}>
-                    <View style={{ flex: 1, flexDirection: "row" }}>
-                      <Ionicons
-                        name="happy"
-                        size={50}
-                        style={{ color: "white" }}
-                      />
-                      <View
-                        style={{
-                          flexDirection: "column",
-                          marginLeft: 10,
-                          justifyContent: "center",
-                        }}
-                      >
-                        <Text>Piyapat</Text>
-                        <View style={{ flexDirection: "row", gap: 10 }}>
-                          <Text>50 Followers</Text>
-                          <Text>50 Following</Text>
-                        </View>
-                      </View>
-                    </View>
-                    <View
-                      style={{
-                        flex: 0.4,
-                        height: 30,
-                        justifyContent: "flex-end",
-                        alignSelf: "center",
-                      }}
-                    >
-                      <Pressable
-                        onPress={handleLogout}
-                        style={{
-                          flex: 1,
-                          justifyContent: "center",
-                          backgroundColor: "white",
-                          width: 70,
-                        }}
-                      >
-                        <Text
+          <>
+            <View style={styles.mainHeaderContainer}>
+              <View style={styles.usersProfileContainer}>
+                {auth.currentUser ? (
+                  <>
+                    <View style={{ flexDirection: "row", paddingLeft: 16 }}>
+                      <View style={{ flex: 1, flexDirection: "row" }}>
+                        <Ionicons
+                          name="happy"
+                          size={50}
+                          style={{ color: "white" }}
+                        />
+                        <View
                           style={{
-                            color: "orange",
-                            fontSize: 16,
-                            textAlign: "center",
+                            flexDirection: "column",
+                            marginLeft: 10,
+                            justifyContent: "center",
                           }}
                         >
-                          Logout
-                        </Text>
-                      </Pressable>
-                    </View>
-                  </View>
-                </>
-              ) : (
-                <>
-                  <View
-                    style={{
-                      justifyContent: "space-between",
-                      flexDirection: "row",
-                    }}
-                  >
-                    <Ionicons
-                      name="sad"
-                      size={50}
-                      style={{ color: "white", flex: 1 }}
-                    />
-                    <View style={styles.loginRegisterContainer}>
-                      <Link href="/LoginScreen" asChild>
+                          <Text>Piyapat</Text>
+                          <View style={{ flexDirection: "row", gap: 10 }}>
+                            <Text>50 Followers</Text>
+                            <Text>50 Following</Text>
+                          </View>
+                        </View>
+                      </View>
+                      <View
+                        style={{
+                          flex: 1,
+                          alignItems: "flex-end",
+                          alignSelf: "center",
+                          marginRight: 16,
+                        }}
+                      >
                         <Pressable
+                          onPress={handleLogout}
                           style={{
-                            flex: 1,
                             justifyContent: "center",
                             backgroundColor: "white",
+                            padding: 5,
                           }}
                         >
                           <Text
@@ -225,74 +198,130 @@ function ProfileScreen() {
                               textAlign: "center",
                             }}
                           >
-                            Login
+                            Logout
                           </Text>
                         </Pressable>
-                      </Link>
-                      <Link href="/RegisterScreen" asChild>
-                        <Pressable
-                          style={{
-                            flex: 1,
-                            justifyContent: "center",
-                            borderColor: "white",
-                            borderWidth: 1,
-                          }}
-                        >
-                          <Text
+                      </View>
+                    </View>
+                  </>
+                ) : (
+                  <>
+                    <View
+                      style={{
+                        justifyContent: "space-between",
+                        flexDirection: "row",
+                      }}
+                    >
+                      <Ionicons
+                        name="sad"
+                        size={50}
+                        style={{ color: "white", flex: 1 }}
+                      />
+                      <View style={styles.loginRegisterContainer}>
+                        <Link href="/LoginScreen" asChild>
+                          <Pressable
                             style={{
-                              color: "white",
-                              fontSize: 16,
-                              textAlign: "center",
-                              // flex: 1,
+                              flex: 1,
+                              justifyContent: "center",
+                              backgroundColor: "white",
                             }}
                           >
-                            Register
-                          </Text>
-                        </Pressable>
-                      </Link>
+                            <Text
+                              style={{
+                                color: "orange",
+                                fontSize: 16,
+                                textAlign: "center",
+                              }}
+                            >
+                              Login
+                            </Text>
+                          </Pressable>
+                        </Link>
+                        <Link href="/RegisterScreen" asChild>
+                          <Pressable
+                            style={{
+                              flex: 1,
+                              justifyContent: "center",
+                              borderColor: "white",
+                              borderWidth: 1,
+                            }}
+                          >
+                            <Text
+                              style={{
+                                color: "white",
+                                fontSize: 16,
+                                textAlign: "center",
+                                // flex: 1,
+                              }}
+                            >
+                              Register
+                            </Text>
+                          </Pressable>
+                        </Link>
+                      </View>
                     </View>
-                  </View>
-                </>
-              )}
-            </View>
-          </View>
-          <Link href="/PurchaseHistoryScreen" asChild>
-            <Pressable style={styles.purchaseHistoryContainer}>
-              <Text
-                style={{
-                  flex: 1.49,
-                  fontSize: 16,
-                  fontWeight: "600",
-                }}
-              >
-                Your Purchases
-              </Text>
-              <View style={{ flexDirection: "row", flex: 1 }}>
-                <Text>View Purchase History</Text>
-                <Ionicons name="chevron-forward" size={20} />
+                  </>
+                )}
               </View>
-            </Pressable>
-          </Link>
-          <View style={styles.purchaseButtonWithTextBelowContainer}>
-            <View style={styles.purchaseButtonWithTextBelow}>
-              <Ionicons name="wallet-outline" size={32} />
-              <Text>To Pay</Text>
             </View>
-            <View style={styles.purchaseButtonWithTextBelow}>
-              <Ionicons name="file-tray-outline" size={32} />
-              <Text>To Deliver</Text>
+            <Link href="/PurchaseHistoryScreen" asChild>
+              <Pressable style={styles.purchaseHistoryContainer}>
+                <Text
+                  style={{
+                    flex: 1.49,
+                    fontSize: 16,
+                    fontWeight: "600",
+                  }}
+                >
+                  Your Purchases
+                </Text>
+                <View style={{ flexDirection: "row", flex: 1 }}>
+                  <Text>View Purchase History</Text>
+                  <Ionicons name="chevron-forward" size={20} />
+                </View>
+              </Pressable>
+            </Link>
+            <View style={styles.purchaseButtonWithTextBelowContainer}>
+              <View style={styles.purchaseButtonWithTextBelow}>
+                <Ionicons name="wallet-outline" size={32} />
+                <Text>To Pay</Text>
+              </View>
+              <View style={styles.purchaseButtonWithTextBelow}>
+                <Ionicons name="file-tray-outline" size={32} />
+                <Text>To Deliver</Text>
+              </View>
+              <View style={styles.purchaseButtonWithTextBelow}>
+                <Ionicons name="rocket-outline" size={32} />
+                <Text>To Receive</Text>
+              </View>
+              <View style={styles.purchaseButtonWithTextBelow}>
+                <Ionicons name="star-outline" size={32} />
+                <Text>Rating</Text>
+              </View>
             </View>
-            <View style={styles.purchaseButtonWithTextBelow}>
-              <Ionicons name="rocket-outline" size={32} />
-              <Text>To Receive</Text>
-            </View>
-            <View style={styles.purchaseButtonWithTextBelow}>
-              <Ionicons name="star-outline" size={32} />
-              <Text>Rating</Text>
-            </View>
-          </View>
-          <View>
-            <Link href={"/FavoriteScreen"} asChild>
+            <View>
+              <Link href={"/FavoriteScreen"} asChild>
+                <Pressable
+                  style={{
+                    width: deviceWidth,
+                    flexDirection: "row",
+                    alignContent: "flex-start",
+                    alignItems: "center",
+                    paddingLeft: 15,
+                    paddingTop: 15,
+                    paddingBottom: 15,
+                    gap: 8,
+                    borderColor: "grey",
+                    borderTopWidth: 0.5,
+                    borderBottomWidth: 0.5,
+                    backgroundColor: "white",
+                  }}
+                >
+                  <Ionicons name="heart" size={26} />
+                  <Text>Your Favorites</Text>
+                </Pressable>
+              </Link>
+
               <Pressable
                 style={{
                   width: deviceWidth,
@@ -309,59 +338,39 @@ function ProfileScreen() {
                   backgroundColor: "white",
                 }}
               >
-                <Ionicons name="heart" size={26} />
-                <Text>Your Favorites</Text>
+                <Ionicons name="fast-food-outline" size={26} />
+                <Text>GoFood</Text>
               </Pressable>
-            </Link>
-
-            <Pressable
-              style={{
-                width: deviceWidth,
-                flexDirection: "row",
-                alignContent: "flex-start",
-                alignItems: "center",
-                paddingLeft: 15,
-                paddingTop: 15,
-                paddingBottom: 15,
-                gap: 8,
-                borderColor: "grey",
-                borderTopWidth: 0.5,
-                borderBottomWidth: 0.5,
-                backgroundColor: "white",
-              }}
-            >
-              <Ionicons name="fast-food-outline" size={26} />
-              <Text>GoFood</Text>
-            </Pressable>
-            <Pressable
-              style={{
-                width: deviceWidth,
-                flexDirection: "row",
-                alignContent: "flex-start",
-                alignItems: "center",
-                paddingLeft: 15,
-                paddingTop: 15,
-                paddingBottom: 15,
-                gap: 8,
-                borderColor: "#DEDFE4",
-                borderTopWidth: 0.5,
-                borderBottomWidth: 7,
-                backgroundColor: "white",
-              }}
-            >
-              <Ionicons name="phone-portrait-outline" size={26} />
-              <Text>Go-Service / Go-Voucher</Text>
-            </Pressable>
-          </View>
-        </>
-        <Pressable
-          onPress={() => console.log(userInfoFromStore)}
-          style={styles.button}
-        >
-          <Text style={styles.buttonText}>Get user status</Text>
-        </Pressable>
-      </ScrollView>
-    </View>
+              <Pressable
+                style={{
+                  width: deviceWidth,
+                  flexDirection: "row",
+                  alignContent: "flex-start",
+                  alignItems: "center",
+                  paddingLeft: 15,
+                  paddingTop: 15,
+                  paddingBottom: 15,
+                  gap: 8,
+                  borderColor: "#DEDFE4",
+                  borderTopWidth: 0.5,
+                  borderBottomWidth: 7,
+                  backgroundColor: "white",
+                }}
+              >
+                <Ionicons name="phone-portrait-outline" size={26} />
+                <Text>Go-Service / Go-Voucher</Text>
+              </Pressable>
+            </View>
+          </>
+          <Pressable
+            onPress={() => console.log(userInfoFromStore)}
+            style={styles.button}
+          >
+            <Text style={styles.buttonText}>Get user status</Text>
+          </Pressable>
+        </ScrollView>
+      </SafeAreaView>
+    </>
   );
 }
 
@@ -370,22 +379,13 @@ const deviceWidth = Dimensions.get("window").width;
 
 const styles = StyleSheet.create({
   mainContainer: {
-    height: deviceHeight,
-    width: deviceWidth,
     flex: 1,
-    justifyContent: "flex-start",
-    alignItems: "center",
-    // backgroundColor: "orange",
+    backgroundColor: "orange",
   },
   topButtonsContainer: {
     flexDirection: "row",
-    alignItems: "flex-start",
     justifyContent: "space-between",
-    width: deviceWidth,
     backgroundColor: "orange",
-    gap: 17,
-    paddingTop: 65,
-    paddingRight: 15,
   },
   mainHeaderContainer: {
     flexDirection: "row",
