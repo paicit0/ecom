@@ -1,6 +1,14 @@
 // HomeScreen.tsx
 import { memo, useEffect, useState } from "react";
-import { StyleSheet, View, Text, Dimensions, Pressable } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  Dimensions,
+  Pressable,
+  ScrollView,
+  FlatList,
+} from "react-native";
 import { Image } from "expo-image";
 import { Product } from "../store/store";
 import { Link } from "expo-router";
@@ -8,10 +16,10 @@ import { FlashList } from "@shopify/flash-list";
 import EmptySearchBar from "../../components/EmptySearchBar";
 import axios from "axios";
 import { useGetProducts } from "../../hooks/fetch/useGetProducts";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
 
 export const HomeScreen = memo(function HomeScreen() {
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [category, setCategory] = useState<string>("");
   const [currentProductNumber, setCurrentProductNumber] = useState<number>(0);
@@ -39,7 +47,6 @@ export const HomeScreen = memo(function HomeScreen() {
 
   const loadMore = async () => {
     console.log("HomeScreen: loadMore triggered.");
-    if (isLoading || isRefreshing) return;
     setIsLoadingMore(true);
     try {
       console.log("HomeScreen.loadMore: getProductsUrl:", getProductsUrl);
@@ -67,34 +74,39 @@ export const HomeScreen = memo(function HomeScreen() {
   };
 
   if (getProductsQuery.isLoading) {
-    console.log("HomeScreen: getProductsQuery.isLoading", getProductsQuery.isLoading);
+    console.log(
+      "HomeScreen: getProductsQuery.isLoading",
+      getProductsQuery.isLoading
+    );
     return (
-      <View style={styles.renderStyle}>
-        <View style={styles.itemContainer}>
-          <View style={styles.imageItem}></View>
-          <Text numberOfLines={2} ellipsizeMode="tail" style={styles.itemTitle}>
-            Loading...
-          </Text>
-          <View style={styles.priceStockContainer}>
-            <Text style={styles.itemPrice}>$...</Text>
-            <Text style={styles.itemStock}>Stock: ...</Text>
-          </View>
-        </View>
-      </View>
+      <SafeAreaView
+        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+      >
+        <Text>Loading...</Text>
+      </SafeAreaView>
     );
   }
+
   if (getProductsQuery.isError) {
-    console.log("HomeScreen: getProductsQuery.isError", getProductsQuery.isError);
+    console.log(
+      "HomeScreen: getProductsQuery.isError",
+      getProductsQuery.isError
+    );
     return (
-      <View style={{}}>
+      <SafeAreaView
+        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+      >
         <Text>Failed to get products.</Text>
-      </View>
+        <Pressable onPress={() => getProductsQuery.refetch()}>
+          <Text>Try to Reload</Text>
+        </Pressable>
+      </SafeAreaView>
     );
   }
 
   const render = ({ item }: { item: Product }) => {
     return (
-      <View style={styles.renderStyle}>
+      <View style={{}}>
         <Link
           href={{
             pathname: "/ItemScreen/[id]",
@@ -112,13 +124,13 @@ export const HomeScreen = memo(function HomeScreen() {
             <Text
               numberOfLines={2}
               ellipsizeMode="tail"
-              style={styles.itemTitle}
+              style={{ marginLeft: 16 }}
             >
               {item.productName}
             </Text>
             <View style={styles.priceStockContainer}>
-              <Text style={styles.itemPrice}>${item.productPrice}</Text>
-              <Text style={styles.itemStock}>Stock: {item.productStock}</Text>
+              <Text style={{}}>${item.productPrice}</Text>
+              <Text style={{}}>Stock: {item.productStock}</Text>
             </View>
           </Pressable>
         </Link>
@@ -127,104 +139,130 @@ export const HomeScreen = memo(function HomeScreen() {
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <View style={{ height: 45 }} />
-      <EmptySearchBar placeholder="Search..." />
-      <FlashList
-        data={getProductsQuery.data}
-        renderItem={render}
-        keyExtractor={(item) => item.productId}
-        contentContainerStyle={styles.verticalListContainer}
-        numColumns={2}
-        showsVerticalScrollIndicator={false}
-        estimatedItemSize={190}
-        horizontal={false}
-        ListEmptyComponent={() => (
-          <Pressable onPress={() => getProductsQuery.refetch()}>
-            <Text>Press to refresh (Placeholder)</Text>
-          </Pressable>
+    <SafeAreaView style={styles.mainContainer}>
+      <View style={{ flex: 1, backgroundColor: "white" }}>
+        <EmptySearchBar
+          placeholderArray={[
+            "Electric Drill",
+            "Meat",
+            "shovel",
+            "Jars",
+            "Batteries",
+          ]}
+          intervalMs={5000}
+        />
+        <View style={styles.categoryContainer}>
+          <View style={styles.categoryContainerItem}>
+            <Ionicons
+              style={{ alignSelf: "center" }}
+              name="pizza-outline"
+              size={30}
+            />
+            <Text style={{ alignSelf: "center" }}>Food</Text>
+          </View>
+          <View style={styles.categoryContainerItem}>
+            <Ionicons
+              style={{ alignSelf: "center" }}
+              name="hammer-outline"
+              size={30}
+            />
+            <Text style={{ alignSelf: "center" }}>Tools</Text>
+          </View>
+          <View style={styles.categoryContainerItem}>
+            <Ionicons
+              style={{ alignSelf: "center" }}
+              name="power-outline"
+              size={30}
+            />
+            <Text style={{ alignSelf: "center" }}>Electronics</Text>
+          </View>
+        </View>
+        <FlashList
+          data={getProductsQuery.data}
+          renderItem={render}
+          keyExtractor={(item) => item.productId}
+          // contentContainerStyle={styles.verticalListContainer}
+          numColumns={2}
+          showsVerticalScrollIndicator={false}
+          estimatedItemSize={250}
+          horizontal={false}
+          ListEmptyComponent={() => (
+            <Pressable onPress={() => getProductsQuery.refetch()}>
+              <Text>Press to refresh (Placeholder)</Text>
+            </Pressable>
+          )}
+          extraData={[getProductsQuery.isLoading, getProductsQuery.data]} // re renders if isLoading/data change
+          onEndReachedThreshold={0.5}
+          // onEndReached={loadMore}
+        />
+
+        {isLoadingMore && (
+          <Text style={{ textAlign: "center", height: 30 }}>Loading...</Text>
         )}
-        extraData={[isLoading, getProductsQuery.data]} // re renders if isLoading/products change
-        onEndReachedThreshold={0.5}
-        // onEndReached={loadMore}
-      />
-      {isLoadingMore && (
-        <Text style={{ textAlign: "center", height: 30 }}>Loading...</Text>
-      )}
-      {process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev" && (
-        <>
-          <Pressable
-            onPress={() => {
-              console.log("HomeScreen: refresh");
-              console.log(
-                "HomeScreen: getProductsQuery.data",
-                getProductsQuery.data
-              );
-              setCurrentProductNumber(0);
-              () => getProductsQuery.refetch();
-            }}
-          >
-            <Text>devtool refresh all</Text>
-          </Pressable>
-        </>
-      )}
-    </View>
+        {process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev" && (
+          <>
+            <Pressable
+              onPress={() => {
+                console.log("HomeScreen: refresh");
+
+                setCurrentProductNumber(0);
+                getProductsQuery.refetch();
+                console.log(
+                  "HomeScreen: getProductsQuery.data",
+                  getProductsQuery.data
+                );
+              }}
+            >
+              <Text>devtool refresh all</Text>
+            </Pressable>
+          </>
+        )}
+      </View>
+    </SafeAreaView>
   );
 });
-// console.log(Dimensions.get("window").width)
+const deviceHeight = Dimensions.get("window").height;
+const deviceWidth = Dimensions.get("window").width;
 
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
+    backgroundColor: "orange",
   },
-  loadingContainer: {},
-  header: { width: "100%" },
-  renderStyle: { height:"100%", width: "100%" },
-  flashListStyle: {
-    height: Dimensions.get("window").height,
-    width: Dimensions.get("window").width,
+  categoryContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
     padding: 10,
+    gap: 5,
   },
-  title: {
-    fontSize: 18,
-    color: "#333",
-  },
-  verticalListContainer: {
-    // backgroundColor: "black",
-  },
-  horizontalListContainer: {
-    backgroundColor: "cyan",
-  },
-  itemContainer: {
-    flex: 1,
+  categoryContainerItem: {
+    flexDirection: "row",
+    borderColor: "black",
+    borderWidth: 1,
+    borderRadius: 20,
     padding: 5,
-    backgroundColor: "white",
-    width: Dimensions.get("window").width / 2,
   },
-  cardContent: {
-    backgroundColor: "blue",
+
+  itemContainer: {
+    backgroundColor: "white",
+    width: deviceWidth / 2,
+    // marginHorizontal: 6,
   },
   imageItem: {
+    marginHorizontal: 16,
+
     minHeight: 125,
-    minWidth: 125,
+    maxWidth: deviceWidth / 2 - 12,
     // backgroundColor: "green",
   },
   priceStockContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    // width: (Dimensions.get("window").width / 2) - 15,
-  },
-  itemPrice: {},
-  itemStock: {},
-  itemTitle: {},
-  icon: {},
-  input: {
-    color: "#333",
+    marginRight: 16,
+    marginLeft: 16,
+    marginTop: 8,
   },
   badge: {},
-  loadingImagePlaceholder: {
-    backgroundColor: "#E0E0E0",
-  },
 });
 
 export default HomeScreen;
