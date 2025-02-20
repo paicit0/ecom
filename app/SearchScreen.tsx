@@ -7,6 +7,7 @@ import { StyleSheet } from "react-native";
 import { Product } from "./store/store";
 import { Ionicons } from "@expo/vector-icons";
 import { useGetProducts } from "../hooks/fetch/useGetProducts";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 function SearchScreen() {
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -62,8 +63,7 @@ function SearchScreen() {
   };
 
   return (
-    <View style={styles.mainContainer}>
-      <View style={{ height: 45 }}></View>
+    <SafeAreaView style={styles.mainContainer}>
       <View style={styles.searchBarContainer}>
         <Link href="../(tabs)/HomeScreen" asChild>
           <Ionicons
@@ -97,7 +97,7 @@ function SearchScreen() {
           horizontal={false}
         />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
