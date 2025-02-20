@@ -44,14 +44,20 @@ export { getTheProduct };
 import { updateCart } from "./updateCart";
 export { updateCart };
 
+import { getFavorite } from "./getFavorite";
+export { getFavorite };
+
 import { addFavorite } from "./addFavorite";
 export { addFavorite };
 
 import { deleteFavorite } from "./deleteFavorite";
 export { deleteFavorite };
 
-import { getFavorite } from "./getFavorite";
-export { getFavorite };
-
 import { getCart } from "./getCart";
 export { getCart };
+
+import { addCart } from "./addCart";
+export { addCart };
+
+import { deleteCart } from "./deleteCart";
+export { deleteCart };
