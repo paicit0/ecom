@@ -3,8 +3,12 @@ import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useUserSession } from "../auth/firebaseAuth";
 import { View, StyleSheet } from "react-native";
+import { getAuth } from "firebase/auth";
 
 export default function TabsLayout() {
+  const auth = getAuth();
+  const userAuth = auth.currentUser;
+  console.log("(tabs)/_layout: userAuth.email:", userAuth?.email);
   const userInfoFromStore = useUserSession((state) => state.userInfo);
 
   return (
@@ -43,7 +47,9 @@ export default function TabsLayout() {
               <Ionicons name="add-circle" size={size} color={color} />
             ),
             tabBarButton:
-              userInfoFromStore.userRole === "seller" ? undefined : () => null,
+              userInfoFromStore.userRole === "seller" && userAuth
+                ? undefined
+                : () => null,
           }}
         />
         <Tabs.Screen
@@ -53,7 +59,7 @@ export default function TabsLayout() {
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="map" size={size} color={color} />
             ),
-            href:null
+            href: null,
           }}
         />
       </Tabs>
