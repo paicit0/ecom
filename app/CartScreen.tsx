@@ -1,27 +1,29 @@
 // CartScreen.tsx
 import { memo, useEffect, useState } from "react";
-import { View, StyleSheet, Pressable, ScrollView } from "react-native";
-import { Text, Image } from "react-native";
-import { useCart } from "./store/store";
+import {
+  View,
+  StyleSheet,
+  Pressable,
+  ScrollView,
+  Dimensions,
+} from "react-native";
+import { Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
-import * as SecureStore from "expo-secure-store";
-import axios from "axios";
 import { getAuth } from "firebase/auth";
 import AnimatedLoadingIndicator from "../components/AnimatedLoadingIndicator";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useGetCart } from "../hooks/fetch/useGetCart";
+import { useDeleteCart } from "../hooks/fetch/useDeleteCart";
+import { Product } from "./store/store";
+import { Image } from "expo-image";
 
 export const CartScreen = memo(() => {
-  const [loading, setLoading] = useState<boolean>(true);
-
-  const cartItemsArray = useCart((state) => state.cartItemsArray);
-  const deleteFromCart = useCart((state) => state.deleteFromCart);
-  const deleteAllCart = useCart((state) => state.deleteAllCart);
-
   const auth = getAuth();
   const userAuth = auth.currentUser;
 
-  if (!auth.currentUser) {
-    console.error("CartScreen: no auth.currentUser");
+  if (!userAuth) {
+    console.error("CartScreen: no userAuth");
     return (
       <View
         style={{
@@ -40,57 +42,12 @@ export const CartScreen = memo(() => {
       </View>
     );
   }
+  const userEmail = userAuth.email;
 
-  const updateCart = async () => {
-    setLoading(true);
-    if (!userAuth) {
-      console.error("CartScreen: no userAuth found");
-      return;
-    }
-    try {
-      if (!userAuth.email || !cartItemsArray.length) {
-        return;
-      }
-      const idToken = await SecureStore.getItemAsync("authToken");
-      const updateCartUrl =
-        process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
-          ? process.env.EXPO_PUBLIC_updateCart_emulator
-          : process.env.EXPO_PUBLIC_updateCart_prod;
-      if (!updateCartUrl) {
-        console.error("CartScreen: cart not bussin urls");
-        return;
-      }
-      console.log(
-        "CartScreen: Payload to updateCart:",
-        userAuth.email,
-        cartItemsArray
-      );
-      const updateCart = await axios.post(
-        updateCartUrl,
-        {
-          email: userAuth.email,
-          cartItemsArray: cartItemsArray,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      console.log("CartScreen: updateCart.status", updateCart.status);
-    } catch (error) {
-      console.error("CartScreen: update failed: ", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const useGetCartQuery = useGetCart({ userEmail: userEmail as string });
+  const useDeleteCartMutation = useDeleteCart();
 
-  useEffect(() => {
-    if (cartItemsArray.length > 0) {
-      updateCart();
-    }
-  }, [cartItemsArray]);
+  useEffect(() => {}, []);
 
   const handleCartSubmit = () => {
     try {
@@ -99,17 +56,29 @@ export const CartScreen = memo(() => {
     }
   };
 
-  if (loading) {
+  if (useGetCartQuery.isLoading) {
     return (
-      <View style={{ marginTop: 60 }}>
-        <AnimatedLoadingIndicator loading={loading} />
-      </View>
+      <SafeAreaView style={{ marginTop: 60 }}>
+        <AnimatedLoadingIndicator loading={useGetCartQuery.isLoading} />
+      </SafeAreaView>
     );
   }
 
-  if (!cartItemsArray.length) {
+  if (useGetCartQuery.isError) {
+    console.error("CartScreen: useGetCartQuery.isError", useGetCartQuery.error);
     return (
-      <View
+      <SafeAreaView style={{ marginTop: 60 }}>
+        <Text>Failed to get cart items.</Text>
+        <Pressable onPress={() => useGetCartQuery.refetch()}>
+          <Text>Try to Reload</Text>
+        </Pressable>
+      </SafeAreaView>
+    );
+  }
+
+  if (!useGetCartQuery.data || !useGetCartQuery.data.length) {
+    return (
+      <SafeAreaView
         style={{
           flex: 1,
           alignContent: "center",
@@ -118,12 +87,42 @@ export const CartScreen = memo(() => {
         }}
       >
         <Text>There's no item in your cart...</Text>
-      </View>
+      </SafeAreaView>
     );
   }
 
+  const render = ({ item }: { item: Product }) => {
+    return (
+      <View style={styles.renderStyle}>
+        <Link
+          href={{
+            pathname: "/ItemScreen/[id]",
+            params: { id: item.productId },
+          }}
+          asChild
+        >
+          <Pressable style={styles.itemContainer}>
+            <Image
+              style={styles.imageItem}
+              source={{ uri: item.productThumbnailUrl[0] }}
+              contentFit="cover"
+              transition={200}
+            />
+            <Text numberOfLines={2} ellipsizeMode="tail" style={{}}>
+              {item.productName}
+            </Text>
+            <View style={styles.priceStockContainer}>
+              <Text style={{}}>${item.productPrice}</Text>
+              <Text style={{}}>Stock: {item.productStock}</Text>
+            </View>
+          </Pressable>
+        </Link>
+      </View>
+    );
+  };
+
   return (
-    <View style={styles.mainContainer}>
+    <SafeAreaView style={styles.mainContainer}>
       <ScrollView>
         <View style={{ height: 60 }}></View>
         <View>
@@ -133,39 +132,16 @@ export const CartScreen = memo(() => {
           <Text style={{ textAlign: "center" }}>Your Cart</Text>
         </View>
 
-        {cartItemsArray.map((item, index) => (
-          <View style={styles.cartContainer} key={index}>
-            <Text>id {item.id}</Text>
-            <Text>quantity {item.quantity}</Text>
-            {/* <Text>${item.productPrice}</Text>
-            <Image
-              style={styles.imageItem}
-              source={{ uri: item.productThumbnailUrl }}
-            /> */}
-            <Pressable onPress={() => deleteFromCart(item.id)}>
-              <Ionicons
-                name="close-sharp"
-                size={20}
-                color="#666"
-                style={styles.icon}
-              />
-            </Pressable>
-          </View>
-        ))}
-        {cartItemsArray.length > 0 && (
-          <View>
-            <Pressable onPress={deleteAllCart}>
-              <Text>Delete All</Text>
-            </Pressable>
-          </View>
-        )}
         <Pressable onPress={() => handleCartSubmit()}>
           <Text>Checkout</Text>
         </Pressable>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 });
+
+const deviceHeight = Dimensions.get("window").height;
+const deviceWidth = Dimensions.get("window").width;
 
 const styles = StyleSheet.create({
   mainContainer: {
@@ -178,13 +154,25 @@ const styles = StyleSheet.create({
   cartContainer: {
     flex: 1,
   },
-  imageItem: {
-    width: 100,
-    height: 100,
-    resizeMode: "contain",
-  },
   icon: {
     marginRight: 8,
+  },
+  renderStyle: { height: "100%", width: "100%" },
+  itemContainer: {
+    flex: 1,
+    padding: 5,
+    backgroundColor: "white",
+    width: deviceWidth / 2,
+  },
+  imageItem: {
+    minHeight: 125,
+    minWidth: 125,
+    // backgroundColor: "green",
+  },
+  priceStockContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    // width: (Dimensions.get("window").width / 2) - 15,
   },
 });
 
