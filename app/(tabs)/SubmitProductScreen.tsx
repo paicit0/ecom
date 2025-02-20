@@ -10,6 +10,7 @@ import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 import { useUploadAwsS3 } from "../../hooks/fetch/useUploadAwsS3";
 import { useCreateProduct } from "../../hooks/fetch/useCreateProduct";
+import { SafeAreaView } from "react-native-safe-area-context";
 global.Buffer = require("buffer").Buffer;
 
 function SubmitProductScreen() {
@@ -99,23 +100,23 @@ function SubmitProductScreen() {
       return;
     }
 
-    const uploadawsS3Url =
+    const uploadAwsS3Url =
       process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
-        ? process.env.EXPO_PUBLIC_uploadawsS3_emulator
-        : process.env.EXPO_PUBLIC_uploadawsS3_prod;
+        ? process.env.EXPO_PUBLIC_uploadAwsS3_emulator
+        : process.env.EXPO_PUBLIC_uploadAwsS3_prod;
 
     const createProductUrl =
       process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
         ? process.env.EXPO_PUBLIC_createProduct_emulator
         : process.env.EXPO_PUBLIC_createProduct_prod;
-    if (!uploadawsS3Url || !createProductUrl) {
+    if (!uploadAwsS3Url || !createProductUrl) {
       console.log("SubmitProductScreen: urls not bussing!");
       return;
     }
     try {
-      console.log("SubmitProductScreen: uploadawsS3 url:", uploadawsS3Url);
+      console.log("SubmitProductScreen: uploadawsS3 url:", uploadAwsS3Url);
       const getImagesURLs = await axios.post(
-        uploadawsS3Url,
+        uploadAwsS3Url,
         { imageBase64: imageBase64Array, contentType: contentType },
         {
           headers: {
@@ -222,7 +223,7 @@ function SubmitProductScreen() {
   ];
 
   return (
-    <View style={styles.mainContainer}>
+    <SafeAreaView style={styles.mainContainer}>
       <View style={styles.imageContainer}>
         {imageIsSelected ? (
           <>
@@ -317,14 +318,14 @@ function SubmitProductScreen() {
       <Pressable onPress={clearAllFields}>
         <Text>Clear All</Text>
       </Pressable>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    justifyContent: "center",
+    // justifyContent: "center",
     alignItems: "center",
   },
   input: {
