@@ -6,8 +6,9 @@ import {
   StyleSheet,
   View,
   ScrollView,
-  Image,
+  Dimensions,
 } from "react-native";
+import { Image } from "expo-image";
 import { Product } from "./store/store";
 import { Ionicons } from "@expo/vector-icons";
 import { getAuth } from "firebase/auth";
@@ -16,9 +17,10 @@ import AnimatedLoadingIndicator from "../components/AnimatedLoadingIndicator";
 import { FlashList } from "@shopify/flash-list";
 import { useGetFavorite } from "../hooks/fetch/useGetFavorite";
 import { useDeleteFavorite } from "../hooks/fetch/useDeleteFavorite";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 function FavoriteScreen() {
-  const [loading, setLoading] = useState<boolean>(false);
+  const [isLoading, setLoading] = useState<boolean>(false);
   const auth = getAuth();
   const userAuth = auth.currentUser;
   if (!userAuth) {
@@ -34,7 +36,7 @@ function FavoriteScreen() {
       >
         <Text>Please </Text>
         <Link href="/LoginScreen" asChild>
-          <Pressable style={{}}>
+          <Pressable>
             <Text style={{ color: "blue" }}>Login</Text>
           </Pressable>
         </Link>
@@ -47,7 +49,7 @@ function FavoriteScreen() {
     console.error("No user email found");
   }
 
-  const getFavoriteQuery = useGetFavorite({ userEmail: userEmail! });
+  const getFavoriteQuery = useGetFavorite({ userEmail: userEmail as string });
   const deleteFavoriteMutation = useDeleteFavorite();
 
   useEffect(() => {
@@ -62,25 +64,35 @@ function FavoriteScreen() {
     }
   }, []);
 
-  const render = () => {
-    return <></>;
-  };
+  if (getFavoriteQuery.isLoading) {
+    setTimeout(() => {
+      return (
+        <SafeAreaView style={{ marginTop: 60 }}>
+          <AnimatedLoadingIndicator loading={getFavoriteQuery.isLoading} />
+        </SafeAreaView>
+      );
+    }, 250);
+  }
 
   if (getFavoriteQuery.isError) {
     return (
-      <View>
+      <SafeAreaView>
         <Text>Error getting favorite.</Text>
-      </View>
+      </SafeAreaView>
     );
   }
 
   if (!getFavoriteQuery.data) {
-    return <></>;
+    return (
+      <SafeAreaView>
+        <Text>No getFavoriteQuery.data</Text>
+      </SafeAreaView>
+    );
   }
 
   if (getFavoriteQuery.data.length === 0) {
     return (
-      <View
+      <SafeAreaView
         style={{
           flex: 1,
           alignContent: "center",
@@ -89,22 +101,42 @@ function FavoriteScreen() {
         }}
       >
         <Text>No Favorites yet...</Text>
-      </View>
+      </SafeAreaView>
     );
   }
 
-  if (getFavoriteQuery.isLoading) {
-    setTimeout(() => {
-      return (
-        <View style={{ marginTop: 60 }}>
-          <AnimatedLoadingIndicator loading={loading} />
-        </View>
-      );
-    }, 250);
-  }
+  const render = ({ item }: { item: Product }) => {
+    return (
+      <View style={styles.renderStyle}>
+        <Link
+          href={{
+            pathname: "/ItemScreen/[id]",
+            params: { id: item.productId },
+          }}
+          asChild
+        >
+          <Pressable style={styles.itemContainer}>
+            <Image
+              style={styles.imageItem}
+              source={{ uri: item.productThumbnailUrl[0] }}
+              contentFit="cover"
+              transition={200}
+            />
+            <Text numberOfLines={2} ellipsizeMode="tail" style={{}}>
+              {item.productName}
+            </Text>
+            <View style={styles.priceStockContainer}>
+              <Text style={{}}>${item.productPrice}</Text>
+              <Text style={{}}>Stock: {item.productStock}</Text>
+            </View>
+          </Pressable>
+        </Link>
+      </View>
+    );
+  };
 
   return (
-    <View style={styles.mainContainer}>
+    <SafeAreaView style={styles.mainContainer}>
       <ScrollView>
         <View style={{ height: 60 }}></View>
         <View>
@@ -113,54 +145,32 @@ function FavoriteScreen() {
           </Link>
           <Text style={{ textAlign: "center" }}>Your Favorite</Text>
         </View>
+        <FlashList
+          data={getFavoriteQuery.data}
+          renderItem={render}
+          keyExtractor={(item) => item.productId}
+          numColumns={2}
+          showsVerticalScrollIndicator={false}
+          estimatedItemSize={190}
+          horizontal={false}
+          ListEmptyComponent={() => (
+            <Pressable onPress={() => getFavoriteQuery.refetch()}>
+              <Text>Press to refresh (Placeholder)</Text>
+            </Pressable>
+          )}
+          extraData={[isLoading, getFavoriteQuery.data]} // re renders if isLoading/products change
+          onEndReachedThreshold={0.5}
+          // onEndReached={loadMore}
+        />
 
-        <View style={styles.favoriteItemsArrayContainer}>
-          {getFavoriteQuery.data.map((product: Product, index: number) => (
-            <View key={index} style={{}}>
-              <Link
-                href={{
-                  pathname: "/ItemScreen/[id]",
-                  params: { id: product.productId },
-                }}
-                asChild
-              >
-                <Pressable>
-                  <Image
-                    style={{ height: 150, width: 150 }}
-                    source={{ uri: product.productThumbnailUrl[0] }}
-                  />
-                  <Text>{product.productName}</Text>
-                  <Text>{product.productDescription}</Text>
-                  <Text>{product.productThumbnailUrl[0]}</Text>
-                </Pressable>
-              </Link>
-
-              <Pressable
-                onPress={() => {
-                  if (userEmail) {
-                    deleteFavoriteMutation.mutate({
-                      userEmail: userEmail,
-                      productId: product.productId,
-                    });
-                  } else {
-                    console.error("User email is null");
-                  }
-                }}
-              >
-                <Ionicons name="close-sharp" size={20} color="#666" />
-              </Pressable>
-            </View>
-          ))}
-        </View>
-        {getFavoriteQuery.data.length > 0 && (
-          <Pressable onPress={() => console.log("delete all placeholder")}>
-            <Text>Delete All</Text>
-          </Pressable>
-        )}
+        <View style={styles.favoriteItemsArrayContainer}></View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
+
+const deviceHeight = Dimensions.get("window").height;
+const deviceWidth = Dimensions.get("window").width;
 
 const styles = StyleSheet.create({
   mainContainer: {
@@ -172,6 +182,23 @@ const styles = StyleSheet.create({
   },
   favoriteItemsArrayContainer: {
     flex: 1,
+  },
+  renderStyle: { height: "100%", width: "100%" },
+  itemContainer: {
+    flex: 1,
+    padding: 5,
+    backgroundColor: "white",
+    width: deviceWidth / 2,
+  },
+  imageItem: {
+    minHeight: 125,
+    minWidth: 125,
+    // backgroundColor: "green",
+  },
+  priceStockContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    // width: (Dimensions.get("window").width / 2) - 15,
   },
 });
 
