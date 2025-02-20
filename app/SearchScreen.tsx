@@ -1,7 +1,6 @@
-//SearchScreen.tsx
+// SearchScreen.tsx
 import { useEffect, useState } from "react";
 import { View, Text, TextInput, Pressable, Dimensions } from "react-native";
-import { useProductStore } from "./store/store";
 import { FlashList } from "@shopify/flash-list";
 import { Link } from "expo-router";
 import { StyleSheet } from "react-native";
@@ -18,14 +17,10 @@ function SearchScreen() {
   });
 
   useEffect(() => {
-    getProductsQuery.refetch();
     console.log("SearchScreen: getProductsQuery.data", getProductsQuery.data);
-  }, []);
-
-  useEffect(() => {
     if (getProductsQuery.data) {
       setTimeout(() => {
-        const filterItem = getProductsQuery.data.productsData.filter(
+        const filterItem = getProductsQuery.data.filter(
           (item: Product) =>
             item.productName.toLowerCase().startsWith(searchQuery.toLowerCase())
         );
