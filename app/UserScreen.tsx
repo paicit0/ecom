@@ -1,5 +1,6 @@
 // UserScreen.tsx
 import { View, Text, Pressable } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 function UserScreen() {
     const handleGetUsers = () => {
@@ -7,12 +8,12 @@ function UserScreen() {
     }
 
   return (
-    <View>
+    <SafeAreaView>
       <Text>User</Text>
       <Pressable onPress={handleGetUsers}>
         <Text>Press to get Users Infos</Text>
       </Pressable>
-    </View>
+    </SafeAreaView>
   );
 }
 

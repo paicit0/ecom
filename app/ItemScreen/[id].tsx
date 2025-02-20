@@ -9,21 +9,22 @@ import {
   Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useCart, useFavorite } from "../store/store";
 import { Link, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
 import axios, { AxiosError } from "axios";
-import { Product } from "../store/store";
+import { Product, useCart } from "../store/store";
 import { FlashList } from "@shopify/flash-list";
 import AnimatedLoadingIndicator from "../../components/AnimatedLoadingIndicator";
 import { useAddFavorite } from "../../hooks/fetch/useAddFavorite";
 import { useDeleteFavorite } from "../../hooks/fetch/useDeleteFavorite";
 import { getAuth } from "firebase/auth";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const ItemScreen = memo(function ItemScreen() {
   const [product, setProduct] = useState<Product>();
   const [loading, setLoading] = useState<boolean>(false);
   const [isFavorited, setIsFavorited] = useState<boolean>(false);
+  const [imagePage, setImagePage] = useState<number>(1);
 
   const { id: productId }: { id: string } = useLocalSearchParams();
 
@@ -143,7 +144,7 @@ const ItemScreen = memo(function ItemScreen() {
   }
 
   return (
-    <View style={styles.mainContainer}>
+    <SafeAreaView style={styles.mainContainer}>
       <ScrollView accessible={false}>
         <View style={{ flex: 1 }}>
           <Link href="../(tabs)/HomeScreen">
@@ -261,14 +262,14 @@ const ItemScreen = memo(function ItemScreen() {
           <Text style={{ color: "white", alignSelf: "center" }}>Buy Now</Text>
         </Pressable>
       </View>
-    </View>
+    </SafeAreaView>
   );
 });
 
 const styles = StyleSheet.create({
   mainContainer: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
+    flex: 0,
+    backgroundColor: "orange",
   },
   imageItem: {
     minHeight: 150,
