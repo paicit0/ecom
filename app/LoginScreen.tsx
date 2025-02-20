@@ -2,16 +2,17 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
-import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
+import { View, Text, StyleSheet, TextInput, Pressable, Dimensions } from "react-native";
 import { useUserSession } from "./auth/firebaseAuth";
 import AnimatedLoadingIndicator from "../components/AnimatedLoadingIndicator";
 import { Image } from "expo-image";
-import { Svg, G } from "react-native-svg";
-import apuPNG from "../assets/images/apuPNG.png";
+import ApuSVG from "../assets/svgs/ApuSVG.svg";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 function LoginScreen() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -29,16 +30,15 @@ function LoginScreen() {
         return;
       }
       console.log("LoginScreen: Trying to login... ", email);
-      const tryLogin = await login(email, password);
-      console.log("LoginScreen: tryLogin returns:", tryLogin);
-      if (tryLogin.success) {
+      const { success, message } = await login(email, password);
+      console.log("LoginScreen: login:", success);
+      if (success) {
         console.log(
-          "LoginScreen: tryLogin.success redirecting to:../(tabs)/HomeScreen"
+          "LoginScreen: redirecting to:../(tabs)/HomeScreen"
         );
-        router.replace("../(tabs)/HomeScreen");
-        return;
+        router.replace("/(tabs)/HomeScreen");
       } else {
-        console.error("LoginScreen: Login failed");
+        console.error("LoginScreen: Login failed:", message);
       }
     } catch (error) {
       console.error("LoginScreen: Error during login:", error);
@@ -77,55 +77,13 @@ function LoginScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <Image source={apuPNG} style={{ height: 200, width: 200 }} />
-      <Svg
-        width={200}
-        height={200}
-        viewBox="0 0 200 200"
-        style={{ position: "absolute", top: 0, left: 0 }}
-      >
-        <G>
-          <G>
-            <Animated.View
-              style={[
-                {
-                  position: "absolute",
-                  left: 190,
-                  top: 310,
-                  width: 32,
-                  height: 25,
-                  borderRadius: 15,
-                  backgroundColor: "black",
-                },
-                animatedLeftEyeStyle,
-              ]}
-            />
-          </G>
-
-          <G>
-            <Animated.View
-              style={[
-                {
-                  position: "absolute",
-                  left: 260,
-                  top: 315,
-                  width: 30,
-                  height: 25,
-                  borderRadius: 12,
-                  backgroundColor: "black",
-                },
-                animatedRightEyeStyle,
-              ]}
-            />
-          </G>
-        </G>
-      </Svg>
+    <SafeAreaView style={styles.container}>
+      <ApuSVG width={200} height={200} />
       <Pressable onPress={handleEyesPosition}>
         <Text>Big eye</Text>
       </Pressable>
 
-      <Link href="../(tabs)/HomeScreen">
+      <Link href="../(tabs)/ProfileScreen">
         <Ionicons name="arrow-back-outline" size={20}></Ionicons>
       </Link>
       <Text>LoginScreen</Text>
@@ -145,16 +103,18 @@ function LoginScreen() {
       <Pressable onPress={handleLogin}>
         <Text>Login!</Text>
       </Pressable>
-    </View>
+    </SafeAreaView>
   );
 }
+
+const deviceHeight = Dimensions.get("window").height;
+const deviceWidth = Dimensions.get("window").width;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
   },
   input: {
     height: 40,
