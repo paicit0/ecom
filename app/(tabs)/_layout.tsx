@@ -2,7 +2,7 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useUserSession } from "../auth/firebaseAuth";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Dimensions } from "react-native";
 import { getAuth } from "firebase/auth";
 
 export default function TabsLayout() {
@@ -66,15 +66,14 @@ export default function TabsLayout() {
     </View>
   );
 }
+const deviceHeight = Dimensions.get("window").height;
+const deviceWidth = Dimensions.get("window").width;
+console.log(deviceHeight);
 
 const styles = StyleSheet.create({
   tabBar: {
-    position: "absolute",
-    bottom: 20,
-    left: 20,
-    right: 20,
-    height: 60,
-    borderRadius: 25,
+    // fix later. make the icon stay at the top of bar
+    height: deviceHeight * 0.0765,
     backgroundColor: "white",
   },
   tabBarItem: {
