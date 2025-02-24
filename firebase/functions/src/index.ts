@@ -2,10 +2,9 @@
 // firebase emulators:start --import=./firebase-export --export-on-exit=./firebase-export
 // use http://10.0.2.2:5001 for android emulator
 // index.ts
-
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
-import { firebaseConfig } from "../../../app/auth/firebaseConfig";
+import { firebaseConfig } from "./configs/firebaseConfig";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -41,9 +40,6 @@ export { getProducts };
 import { getTheProduct } from "./getTheProduct";
 export { getTheProduct };
 
-import { updateCart } from "./updateCart";
-export { updateCart };
-
 import { getFavorite } from "./getFavorite";
 export { getFavorite };
 
@@ -61,3 +57,6 @@ export { addCart };
 
 import { deleteCart } from "./deleteCart";
 export { deleteCart };
+
+import { stripePayment } from "./stripePayment";
+export { stripePayment };

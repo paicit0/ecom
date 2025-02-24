@@ -75,7 +75,9 @@ const uploadAwsS3 = functions.https.onRequest(async (req, res) => {
     }
 
     if (!Array.isArray(imageBase64)) {
-      res.status(400).json({ error: "uploadAwsS3: imageBase64 must be an array" });
+      res
+        .status(400)
+        .json({ error: "uploadAwsS3: imageBase64 must be an array" });
       return;
     }
 
@@ -116,4 +118,4 @@ const uploadAwsS3 = functions.https.onRequest(async (req, res) => {
   }
 });
 
-export { uploadAwsS3 as uploadAwsS3 };
+export { uploadAwsS3 };

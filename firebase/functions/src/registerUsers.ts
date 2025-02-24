@@ -1,3 +1,4 @@
+// registerUsers.ts
 import * as functions from "firebase-functions";
 import { db } from "./index";
 import { Timestamp } from "firebase-admin/firestore";
