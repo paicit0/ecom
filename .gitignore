@@ -39,3 +39,4 @@ app/auth/firebaseConfig.ts
 .gitignore
 WhatToDo.txt
 db/items.tsx
+firebase/functions/src/configs/firebaseConfig.ts
