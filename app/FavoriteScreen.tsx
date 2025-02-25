@@ -126,7 +126,7 @@ function FavoriteScreen() {
               {item.productName}
             </Text>
             <View style={styles.priceStockContainer}>
-              <Text style={{}}>${item.productPrice}</Text>
+              <Text style={{}}>฿{item.productPrice}</Text>
               <Text style={{}}>Stock: {item.productStock}</Text>
             </View>
           </Pressable>
