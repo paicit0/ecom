@@ -31,7 +31,7 @@ const fetchFavorites = async ({
         "Content-Type": "application/json",
       },
     });
-
+    console.log("useGetFavorite: data.favoriteProducts",data.favoriteProducts)
     return data.favoriteProducts;
   } catch (error) {
     console.error("useGetFavorite: ", error);
