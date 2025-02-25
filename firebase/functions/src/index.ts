@@ -58,5 +58,5 @@ export { addCart };
 import { deleteCart } from "./deleteCart";
 export { deleteCart };
 
-import { stripePayment } from "./stripePayment";
-export { stripePayment };
+import { stripePaymentSheet } from "./stripePaymentSheet";
+export { stripePaymentSheet };
