@@ -12,8 +12,8 @@ function CheckoutScreen() {
   const fetchPaymentSheetParams = async () => {
     const stripePaymentSheetUrl =
       process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
-        ? "http://10.0.2.2:5001/ecom-firestore-11867/us-central1/stripePaymentSheet"
-        : "https://us-central1-ecom-firestore-11867.cloudfunctions.net/stripePaymentSheet";
+        ? process.env.EXPO_PUBLIC_stripePaymentSheet_emulator
+        : process.env.EXPO_PUBLIC_stripePaymentSheet_prod;
     console.log("CheckoutScreen: amount cash in สตางค์:", amount);
     if (!stripePaymentSheetUrl) {
       console.error("CheckoutScreen: urls not good");
