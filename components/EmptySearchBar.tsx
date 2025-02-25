@@ -66,16 +66,10 @@ const EmptySearchBar = memo(function SearchBar({
                 {cart.length > 99 ? "99+" : cart.length}
               </Text>
             )}
-            <View style={{ flexDirection: "row", gap:20 }}>
-              <Ionicons name="cart-outline" size={28} color="white" />
-              <Ionicons
-                name="chatbubble-ellipses-outline"
-                size={28}
-                color="white"
-              />
-            </View>
+            <Ionicons name="cart-outline" size={28} color="white" />
           </Pressable>
         </Link>
+        <Ionicons name="chatbubble-ellipses-outline" size={28} color="white" />
       </View>
     </View>
   );
@@ -100,6 +94,8 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
   },
   cartContainer: {
+    flexDirection: "row",
+    gap: 18,
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
