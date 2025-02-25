@@ -12,11 +12,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { Link, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
 import axios, { AxiosError } from "axios";
-import { Product, useCart } from "../store/store";
+import { Product } from "../store/store";
 import { FlashList } from "@shopify/flash-list";
 import AnimatedLoadingIndicator from "../../components/AnimatedLoadingIndicator";
 import { useAddFavorite } from "../../hooks/fetch/useAddFavorite";
 import { useDeleteFavorite } from "../../hooks/fetch/useDeleteFavorite";
+import { useAddCart } from "../../hooks/fetch/useAddCart";
 import { getAuth } from "firebase/auth";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -27,10 +28,6 @@ const ItemScreen = memo(function ItemScreen() {
   const [imagePage, setImagePage] = useState<number>(1);
 
   const { id: productId }: { id: string } = useLocalSearchParams();
-
-  const cart = useCart((state) => state.cartItemsArray);
-  const addToCart = useCart((state) => state.addToCart);
-
   const auth = getAuth();
 
   if (!auth.currentUser) {
@@ -63,6 +60,8 @@ const ItemScreen = memo(function ItemScreen() {
 
   const addFavoriteMutation = useAddFavorite();
   const deleteFavoriteMutation = useDeleteFavorite();
+
+  const addCartMutation = useAddCart();
 
   useEffect(() => {
     const getTheProduct = async () => {
@@ -171,7 +170,7 @@ const ItemScreen = memo(function ItemScreen() {
             <View style={styles.itemHeader}>
               <View style={styles.productPrice}>
                 <Text style={styles.productPriceText}>
-                  {"$" + product.productPrice}
+                  {"฿" + product.productPrice}
                 </Text>
               </View>
               <View style={styles.productStock}>
@@ -208,11 +207,15 @@ const ItemScreen = memo(function ItemScreen() {
                       { userEmail: userEmail, productId: productId },
                       {
                         onSuccess: () => {
-                          console.log("ItemScreen/[id]/: addFavorite success"),
+                          console.log(
+                            "ItemScreen/[id]/: addFavoriteMutation success"
+                          ),
                             setIsFavorited(true);
                         },
                         onError: () => {
-                          console.log("ItemScreen/[id]/: error"),
+                          console.log(
+                            "ItemScreen/[id]/: addFavoriteMutation error"
+                          ),
                             setIsFavorited(false);
                         },
                       }
@@ -241,15 +244,25 @@ const ItemScreen = memo(function ItemScreen() {
       <View style={styles.ItemFooter}>
         <Pressable
           onPress={() => {
-            addToCart(productId);
+            addCartMutation.mutate(
+              { userEmail: userEmail, productId: productId },
+              {
+                onSuccess: () => {
+                  console.log("ItemScreen/[id]/: addCartMutation success");
+                },
+                onError: () => {
+                  console.log("ItemScreen/[id]/: addCartMutation error");
+                },
+              }
+            );
           }}
-          style={styles.FooterCart}
+          style={styles.addToCartFooter}
         >
-          {cart.length > 0 && (
+          {/* {cart.length > 0 && (
             <Text style={styles.badge}>
               {cart.length > 99 ? "99+" : cart.length}
             </Text>
-          )}
+          )} */}
           <Ionicons
             name="cart-outline"
             size={20}
@@ -258,7 +271,7 @@ const ItemScreen = memo(function ItemScreen() {
           />
           <Text style={{ color: "white" }}>Add to Cart</Text>
         </Pressable>
-        <Pressable style={styles.FooterBuy}>
+        <Pressable style={styles.buyFooter}>
           <Text style={{ color: "white", alignSelf: "center" }}>Buy Now</Text>
         </Pressable>
       </View>
@@ -340,12 +353,12 @@ const styles = StyleSheet.create({
     padding: 12,
     backgroundColor: "black",
   },
-  FooterCart: {
+  addToCartFooter: {
     flexDirection: "column",
     justifyContent: "space-between",
     padding: 8,
   },
-  FooterBuy: {
+  buyFooter: {
     flexDirection: "row",
     justifyContent: "space-between",
     padding: 8,
