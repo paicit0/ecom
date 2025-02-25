@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { getAuth } from "firebase/auth";
 import AnimatedLoadingIndicator from "../components/AnimatedLoadingIndicator";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,10 +17,12 @@ import { useGetCart } from "../hooks/fetch/useGetCart";
 import { useDeleteCart } from "../hooks/fetch/useDeleteCart";
 import { Product } from "./store/store";
 import { Image } from "expo-image";
+import { FlashList } from "@shopify/flash-list";
 
 export const CartScreen = memo(() => {
   const auth = getAuth();
   const userAuth = auth.currentUser;
+  const router = useRouter();
 
   if (!userAuth) {
     console.error("CartScreen: no userAuth");
@@ -44,8 +46,8 @@ export const CartScreen = memo(() => {
   }
   const userEmail = userAuth.email;
 
-  const useGetCartQuery = useGetCart({ userEmail: userEmail as string });
-  const useDeleteCartMutation = useDeleteCart();
+  const getCartQuery = useGetCart({ userEmail: userEmail as string });
+  const deleteCartMutation = useDeleteCart();
 
   useEffect(() => {}, []);
 
@@ -56,27 +58,27 @@ export const CartScreen = memo(() => {
     }
   };
 
-  if (useGetCartQuery.isLoading) {
+  if (getCartQuery.isLoading) {
     return (
       <SafeAreaView style={{ marginTop: 60 }}>
-        <AnimatedLoadingIndicator loading={useGetCartQuery.isLoading} />
+        <AnimatedLoadingIndicator loading={getCartQuery.isLoading} />
       </SafeAreaView>
     );
   }
 
-  if (useGetCartQuery.isError) {
-    console.error("CartScreen: useGetCartQuery.isError", useGetCartQuery.error);
+  if (getCartQuery.isError) {
+    console.error("CartScreen: useGetCartQuery.isError", getCartQuery.error);
     return (
       <SafeAreaView style={{ marginTop: 60 }}>
         <Text>Failed to get cart items.</Text>
-        <Pressable onPress={() => useGetCartQuery.refetch()}>
+        <Pressable onPress={() => getCartQuery.refetch()}>
           <Text>Try to Reload</Text>
         </Pressable>
       </SafeAreaView>
     );
   }
 
-  if (!useGetCartQuery.data || !useGetCartQuery.data.length) {
+  if (!getCartQuery.data || !getCartQuery.data.length) {
     return (
       <SafeAreaView
         style={{
@@ -92,6 +94,7 @@ export const CartScreen = memo(() => {
   }
 
   const render = ({ item }: { item: Product }) => {
+    const productPriceToBaht = item.productPrice * 100;
     return (
       <View style={styles.renderStyle}>
         <Link
@@ -112,9 +115,20 @@ export const CartScreen = memo(() => {
               {item.productName}
             </Text>
             <View style={styles.priceStockContainer}>
-              <Text style={{}}>${item.productPrice}</Text>
+              <Text style={{}}>฿{item.productPrice}</Text>
               <Text style={{}}>Stock: {item.productStock}</Text>
             </View>
+          </Pressable>
+        </Link>
+        <Link
+          href={{
+            pathname: "/CheckoutScreen",
+            params: { amount: productPriceToBaht.toString() }, 
+          }}
+          asChild
+        >
+          <Pressable onPress={() => handleCartSubmit()}>
+            <Text>Checkout</Text>
           </Pressable>
         </Link>
       </View>
@@ -123,19 +137,29 @@ export const CartScreen = memo(() => {
 
   return (
     <SafeAreaView style={styles.mainContainer}>
-      <ScrollView>
-        <View style={{ height: 60 }}></View>
-        <View>
-          <Link href="../(tabs)/HomeScreen">
-            <Ionicons name="arrow-back-outline" size={20}></Ionicons>
-          </Link>
-          <Text style={{ textAlign: "center" }}>Your Cart</Text>
-        </View>
-
-        <Pressable onPress={() => handleCartSubmit()}>
-          <Text>Checkout</Text>
-        </Pressable>
-      </ScrollView>
+      <View style={{ height: 60 }}></View>
+      <View>
+        <Link href="../(tabs)/HomeScreen">
+          <Ionicons name="arrow-back-outline" size={20}></Ionicons>
+        </Link>
+      </View>
+      <FlashList
+        data={getCartQuery.data}
+        renderItem={render}
+        keyExtractor={(item) => item.productId}
+        numColumns={1}
+        showsVerticalScrollIndicator={false}
+        estimatedItemSize={190}
+        horizontal={false}
+        ListEmptyComponent={() => (
+          <Pressable onPress={() => getCartQuery.refetch()}>
+            <Text>Press to refresh (Placeholder)</Text>
+          </Pressable>
+        )}
+        extraData={[getCartQuery.data]} // re renders if isLoading/products change
+        onEndReachedThreshold={0.5}
+        // onEndReached={loadMore}
+      />
     </SafeAreaView>
   );
 });
@@ -146,16 +170,6 @@ const deviceWidth = Dimensions.get("window").width;
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    flexDirection: "column",
-    alignContent: "center",
-    justifyContent: "center",
-    alignSelf: "center",
-  },
-  cartContainer: {
-    flex: 1,
-  },
-  icon: {
-    marginRight: 8,
   },
   renderStyle: { height: "100%", width: "100%" },
   itemContainer: {
