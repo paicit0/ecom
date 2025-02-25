@@ -24,6 +24,7 @@ function SubmitProductScreen() {
   const [imageBase64Array, setImageBase64s] = useState<string[]>([]);
   const [imageUris, setImageUris] = useState<string[]>([]);
   const [contentType, setContentType] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const uploadAwsS3Mutation = useUploadAwsS3();
   const createProductMutation = useCreateProduct();
@@ -67,6 +68,7 @@ function SubmitProductScreen() {
   };
 
   const handleSubmit = async () => {
+    setLoading(true);
     // uploadAwsS3Mutation.mutate({})
     if (
       !productName ||
@@ -75,7 +77,9 @@ function SubmitProductScreen() {
       !productStock ||
       !productCategory
     ) {
+      setLoading(false);
       console.log("SubmitProduct.handleSubmit: missing field(s).");
+      return;
     }
 
     const auth = getAuth();
@@ -88,6 +92,7 @@ function SubmitProductScreen() {
     // console.log("SubmitProduct.handleSubmit: refreshing firebase token");
     if (!userAuth) {
       console.log("SubmitProduct.handleSubmit: not logged in");
+      setLoading(false);
       return;
     }
 
@@ -97,6 +102,7 @@ function SubmitProductScreen() {
       console.log("SubmitProduct.handleSubmit: new idToken:", idToken);
     } catch (error) {
       console.log("SubmitProduct.handleSubmit: error getting idToken:", error);
+      setLoading(false);
       return;
     }
 
@@ -214,6 +220,7 @@ function SubmitProductScreen() {
         console.log("SubmitProductScreen.getImagesURL:", error);
       }
     }
+    setLoading(false);
   };
 
   const DropdownCategories = [
@@ -312,7 +319,7 @@ function SubmitProductScreen() {
         valueField="value"
       />
 
-      <Pressable onPress={handleSubmit} style={styles.submitButton}>
+      <Pressable onPress={handleSubmit} disabled={loading} style={styles.submitButton}>
         <Text style={styles.submitButtonText}>Submit a product!</Text>
       </Pressable>
       <Pressable onPress={clearAllFields}>
