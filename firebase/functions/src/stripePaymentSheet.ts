@@ -16,9 +16,9 @@ app.use(cors({ origin: true }));
 
 app.post("/payment-sheet", async (req, res) => {
   try {
-    const { amount } = req.body;
+    const { amount, userEmail } = req.body;
     console.log("stripePaymentSheet: req.body", req.body);
-    const customer = await stripe.customers.create();
+    const customer = await stripe.customers.create({ email: userEmail });
     console.log("stripePaymentSheet: customer", customer);
 
     const ephemeralKey = await stripe.ephemeralKeys.create(
