@@ -3,11 +3,19 @@ import { Pressable, View, Text, StyleSheet } from "react-native";
 import { useEffect, useState } from "react";
 import { useStripe } from "@stripe/stripe-react-native";
 import { useLocalSearchParams } from "expo-router";
+import { getAuth } from "firebase/auth";
+import axios from "axios";
 
 function CheckoutScreen() {
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const { amount } = useLocalSearchParams();
   const [loading, setLoading] = useState(false);
+  const auth = getAuth();
+  const userEmail = auth.currentUser?.email;
+
+  useEffect(() => {
+    initializePaymentSheet();
+  }, []);
 
   const fetchPaymentSheetParams = async () => {
     const stripePaymentSheetUrl =
@@ -19,14 +27,21 @@ function CheckoutScreen() {
       console.error("CheckoutScreen: urls not good");
     }
 
-    const response = await fetch(`${stripePaymentSheetUrl}/payment-sheet`, {
-      method: "POST",
-      body: JSON.stringify({ amount: amount }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const { paymentIntent, ephemeralKey, customer } = await response.json();
+    const fetchPaymentSheet = await axios.post(
+      `${stripePaymentSheetUrl}/payment-sheet`,
+      { amount: amount, userEmail: userEmail },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log(
+      "CheckoutScreen: fetchPaymentSheet.status:",
+      fetchPaymentSheet.status
+    );
+    const { paymentIntent, ephemeralKey, customer } =
+      await fetchPaymentSheet.data;
     console.log("CheckoutScreen: PaymentIntent:", paymentIntent);
     console.log("CheckoutScreen: CustomerId:", customer);
 
@@ -73,10 +88,6 @@ function CheckoutScreen() {
     }
   };
 
-  useEffect(() => {
-    initializePaymentSheet();
-  }, []);
-
   if (loading)
     return (
       <View style={{ flex: 1, justifyContent: "center", alignSelf: "center" }}>
@@ -84,6 +95,7 @@ function CheckoutScreen() {
       </View>
     );
 
+  const amountInBaht = parseInt(amount as string) / 100;
   return (
     <>
       <Pressable
@@ -93,6 +105,7 @@ function CheckoutScreen() {
           openPaymentSheet();
         }}
       >
+        <Text>Price: ฿{amountInBaht}</Text>
         <Text>PRESS HERE TO OPEN PAYMENT SHEET</Text>
       </Pressable>
     </>
