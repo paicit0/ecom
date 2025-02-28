@@ -68,7 +68,7 @@ export default function TabsLayout() {
 }
 const deviceHeight = Dimensions.get("window").height;
 const deviceWidth = Dimensions.get("window").width;
-console.log(deviceHeight);
+// console.log(deviceHeight);
 
 const styles = StyleSheet.create({
   tabBar: {
