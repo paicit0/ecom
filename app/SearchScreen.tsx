@@ -82,9 +82,9 @@ function SearchScreen() {
           ></TextInput>
         </View>
         <Pressable onPress={() => setSearchQuery("")} style={{ padding: 10 }}>
-          <Ionicons name="close-circle-outline" size={25}></Ionicons>
+          <Ionicons name="close-circle-outline" size={24}></Ionicons>
         </Pressable>
-        <Ionicons name="search" size={30} color="#666" style={{}} />
+        <Ionicons name="search" size={24} color="#666" style={{}} />
       </View>
       <View style={styles.flashListStyle}>
         <FlashList
