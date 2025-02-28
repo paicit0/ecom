@@ -116,18 +116,129 @@ export const HomeScreen = memo(function HomeScreen() {
     );
   }
 
+  const belowSearchBar = () => {
+    return (
+      <>
+        <View style={{ backgroundColor: "orange", height: 30 }}></View>
+        <View style={styles.scannerContainer}>
+          <View
+            style={{
+              justifyContent: "center",
+              borderColor: "grey",
+              borderRightWidth: 0.5,
+              paddingRight: 6,
+            }}
+          >
+            <Ionicons
+              name="barcode-outline"
+              size={30}
+              color={"gray"}
+            ></Ionicons>
+          </View>
+          <View style={{ flexDirection: "row", gap: 30 }}>
+            <View
+              style={{
+                borderColor: "grey",
+                borderRightWidth: 0.5,
+                justifyContent: "center",
+                paddingRight: 6,
+              }}
+            >
+              <View style={{ flexDirection: "row" }}>
+                <Ionicons
+                  name="card-outline"
+                  size={24}
+                  color={"red"}
+                ></Ionicons>
+                <Text style={{ alignSelf: "center", marginLeft: 2 }}>
+                  ฿0.00
+                </Text>
+              </View>
+              <Text style={{ alignSelf: "flex-start" }}>abcd</Text>
+            </View>
+            <View
+              style={{
+                borderColor: "grey",
+                borderRightWidth: 0.5,
+                justifyContent: "center",
+                paddingRight: 6,
+              }}
+            >
+              <View style={{ flexDirection: "row" }}>
+                <Ionicons
+                  name="heart-circle-outline"
+                  size={24}
+                  color={"orange"}
+                ></Ionicons>
+                <Text style={{ alignSelf: "center", marginLeft: 2 }}>0.00</Text>
+              </View>
+              <Text style={{ alignSelf: "flex-start" }}>Coin</Text>
+            </View>
+            <View>
+              <View style={{ flexDirection: "row", justifyContent: "center" }}>
+                <Ionicons
+                  name="gift-outline"
+                  size={24}
+                  color={"blue"}
+                ></Ionicons>
+                <Text style={{ alignSelf: "center", marginLeft: 2 }}>0.00</Text>
+              </View>
+              <Text style={{ alignSelf: "flex-start" }}>Coupons</Text>
+            </View>
+          </View>
+          <View
+            style={{
+              justifyContent: "center",
+              borderColor: "grey",
+              borderLeftWidth: 0.5,
+              paddingLeft: 6,
+            }}
+          >
+            <Ionicons name="logo-bitcoin" size={30} color={"orange"}></Ionicons>
+          </View>
+        </View>
+        <View style={styles.categoryContainer}>
+          <Pressable onPress={() => handleCategorySelect("food")}>
+            <View style={styles.categoryContainerItem}>
+              <Ionicons
+                style={styles.categoryItemIcon}
+                name="pizza"
+                color={"orange"}
+                size={30}
+              />
+              <Text style={{ alignSelf: "center" }}>Food</Text>
+            </View>
+          </Pressable>
+          <Pressable onPress={() => handleCategorySelect("tool")}>
+            <View style={styles.categoryContainerItem}>
+              <Ionicons
+                style={styles.categoryItemIcon}
+                name="hammer"
+                color={"black"}
+                size={30}
+              />
+              <Text style={{ alignSelf: "center" }}>Tools</Text>
+            </View>
+          </Pressable>
+          <Pressable onPress={() => handleCategorySelect("electronic")}>
+            <View style={styles.categoryContainerItem}>
+              <Ionicons
+                style={styles.categoryItemIcon}
+                name="power-outline"
+                color={"blue"}
+                size={30}
+              />
+              <Text style={{ alignSelf: "center" }}>Electronics</Text>
+            </View>
+          </Pressable>
+        </View>
+      </>
+    );
+  };
+
   const render = ({ item }: { item: Product }) => {
     return (
-      <View
-        style={{
-          borderRadius: 5,
-          borderWidth: 1,
-          borderColor: "#ddd",
-          backgroundColor: "#fff",
-          elevation: 3,
-          overflow: "hidden",
-        }}
-      >
+      <View style={styles.productItemsContainer}>
         <Link
           href={{
             pathname: "/ItemScreen/[id]",
@@ -137,10 +248,7 @@ export const HomeScreen = memo(function HomeScreen() {
         >
           <Pressable style={styles.itemContainer}>
             <Image
-              style={[
-                styles.imageItem,
-                { borderTopLeftRadius: 10, borderTopRightRadius: 10 },
-              ]}
+              style={styles.imageItem}
               source={{ uri: item.productThumbnailUrl[0] }}
               contentFit="cover"
               transition={200}
@@ -177,110 +285,19 @@ export const HomeScreen = memo(function HomeScreen() {
   return (
     <SafeAreaView style={styles.mainContainer}>
       <View style={{ flex: 1, backgroundColor: "#F5F5F5" }}>
-        <EmptySearchBar
-          placeholderArray={[
-            "Electric Drill",
-            "Meat",
-            "shovel",
-            "Jars",
-            "Batteries",
-          ]}
-          intervalMs={5000}
-        />
-        <View style={{ backgroundColor: "orange", height: 30 }}></View>
-        <View style={styles.scannerContainer}>
-          <View
-            style={{
-              justifyContent: "center",
-              borderColor: "grey",
-              borderRightWidth: 0.5,
-              paddingRight: 6,
-            }}
-          >
-            <Ionicons name="barcode-outline" size={30}></Ionicons>
-          </View>
-          <View style={{ flexDirection: "row", gap: 30 }}>
-            <View
-              style={{
-                borderColor: "grey",
-                borderRightWidth: 0.5,
-                justifyContent: "center",
-                paddingRight: 6,
-              }}
-            >
-              <View style={{ flexDirection: "row" }}>
-                <Ionicons name="card-outline" size={24}></Ionicons>
-                <Text style={{ alignSelf: "center", marginLeft: 2 }}>
-                  ฿0.00
-                </Text>
-              </View>
-              <Text style={{ alignSelf: "flex-start" }}>abcd</Text>
-            </View>
-            <View
-              style={{
-                borderColor: "grey",
-                borderRightWidth: 0.5,
-                justifyContent: "center",
-                paddingRight: 6,
-              }}
-            >
-              <View style={{ flexDirection: "row" }}>
-                <Ionicons name="heart-circle-outline" size={24}></Ionicons>
-                <Text style={{ alignSelf: "center", marginLeft: 2 }}>0.00</Text>
-              </View>
-              <Text style={{ alignSelf: "flex-start" }}>Coin</Text>
-            </View>
-            <View>
-              <View style={{ flexDirection: "row", justifyContent: "center" }}>
-                <Ionicons name="gift-outline" size={24}></Ionicons>
-                <Text style={{ alignSelf: "center", marginLeft: 2 }}>0.00</Text>
-              </View>
-              <Text style={{ alignSelf: "flex-start" }}>Coupons</Text>
-            </View>
-          </View>
-          <View
-            style={{
-              justifyContent: "center",
-              borderColor: "grey",
-              borderLeftWidth: 0.5,
-              paddingLeft: 6,
-            }}
-          >
-            <Ionicons name="logo-bitcoin" size={30}></Ionicons>
-          </View>
+        <View style={{ backgroundColor: "transparent" }}>
+          <EmptySearchBar
+            placeholderArray={[
+              "Electric Drill",
+              "Meat",
+              "shovel",
+              "Jars",
+              "Batteries",
+            ]}
+            intervalMs={5000}
+          />
         </View>
-        <View style={styles.categoryContainer}>
-          <Pressable onPress={() => handleCategorySelect("food")}>
-            <View style={styles.categoryContainerItem}>
-              <Ionicons
-                style={styles.categoryItemIcon}
-                name="pizza-outline"
-                size={30}
-              />
-              <Text style={{ alignSelf: "center" }}>Food</Text>
-            </View>
-          </Pressable>
-          <Pressable onPress={() => handleCategorySelect("tool")}>
-            <View style={styles.categoryContainerItem}>
-              <Ionicons
-                style={styles.categoryItemIcon}
-                name="hammer-outline"
-                size={30}
-              />
-              <Text style={{ alignSelf: "center" }}>Tools</Text>
-            </View>
-          </Pressable>
-          <Pressable onPress={() => handleCategorySelect("electronic")}>
-            <View style={styles.categoryContainerItem}>
-              <Ionicons
-                style={styles.categoryItemIcon}
-                name="power-outline"
-                size={30}
-              />
-              <Text style={{ alignSelf: "center" }}>Electronics</Text>
-            </View>
-          </Pressable>
-        </View>
+
         <FlashList
           data={getProductsQuery.data}
           renderItem={render}
@@ -290,6 +307,7 @@ export const HomeScreen = memo(function HomeScreen() {
           showsVerticalScrollIndicator={false}
           estimatedItemSize={250}
           horizontal={false}
+          ListHeaderComponent={belowSearchBar}
           ListEmptyComponent={() => (
             <Pressable onPress={() => getProductsQuery.refetch()}>
               <Text>Press to refresh (Placeholder)</Text>
@@ -342,31 +360,36 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     padding: 10,
     gap: 5,
-    marginTop: -35,
+    marginTop: -30,
+    marginBottom: 10,
   },
   categoryContainer: {
     marginHorizontal: 8,
-    marginVertical: 8,
+    marginBottom: 10,
     backgroundColor: "white",
     borderWidth: 0.5,
     borderRadius: 8,
     flexDirection: "row",
-    justifyContent: "flex-start",
+    justifyContent: "center",
     padding: 10,
-    gap: 5,
+    gap: 40,
   },
   categoryContainerItem: {
-    // flexDirection: "row",
     borderColor: "black",
-    // borderWidth: 1,
     borderRadius: 20,
-    // padding: 5,
   },
   categoryItemIcon: {
     alignSelf: "center",
-    borderWidth: 1,
+    borderWidth: 0.5,
     borderRadius: 10,
     padding: 5,
+  },
+  productItemsContainer: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    backgroundColor: "#fff",
+    elevation: 3,
+    overflow: "hidden",
   },
   itemContainer: {
     backgroundColor: "white",
@@ -375,6 +398,7 @@ const styles = StyleSheet.create({
   },
   imageItem: {
     marginHorizontal: 16,
+    marginTop:16,
     minHeight: 125,
     maxWidth: deviceWidth / 2 - 12,
     // backgroundColor: "green",
