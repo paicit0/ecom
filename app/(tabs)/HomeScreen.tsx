@@ -7,7 +7,6 @@ import {
   Dimensions,
   Pressable,
   ScrollView,
-  FlatList,
 } from "react-native";
 import { Image } from "expo-image";
 import { Product } from "../store/store";
@@ -21,7 +20,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 export const HomeScreen = memo(function HomeScreen() {
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
-  const [category, setCategory] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [currentProductNumber, setCurrentProductNumber] = useState<number>(0);
   const numberOfItems = 50;
   const loadMoreProductNumber = 20;
@@ -44,6 +43,19 @@ export const HomeScreen = memo(function HomeScreen() {
   useEffect(() => {
     console.log("HomeScreen: getProductsQuery.data:", getProductsQuery.data);
   }, []);
+
+  useEffect(() => {
+    setCurrentProductNumber(0);
+    getProductsQuery.refetch();
+  }, [selectedCategory]);
+
+  const handleCategorySelect = (category: string) => {
+    if (selectedCategory === category) {
+      setSelectedCategory("");
+    } else {
+      setSelectedCategory(category);
+    }
+  };
 
   const loadMore = async () => {
     console.log("HomeScreen: loadMore triggered.");
@@ -106,7 +118,16 @@ export const HomeScreen = memo(function HomeScreen() {
 
   const render = ({ item }: { item: Product }) => {
     return (
-      <View style={{}}>
+      <View
+        style={{
+          borderRadius: 5,
+          borderWidth: 1,
+          borderColor: "#ddd",
+          backgroundColor: "#fff",
+          elevation: 3,
+          overflow: "hidden",
+        }}
+      >
         <Link
           href={{
             pathname: "/ItemScreen/[id]",
@@ -116,21 +137,36 @@ export const HomeScreen = memo(function HomeScreen() {
         >
           <Pressable style={styles.itemContainer}>
             <Image
-              style={styles.imageItem}
+              style={[
+                styles.imageItem,
+                { borderTopLeftRadius: 10, borderTopRightRadius: 10 },
+              ]}
               source={{ uri: item.productThumbnailUrl[0] }}
               contentFit="cover"
               transition={200}
             />
-            <Text
-              numberOfLines={2}
-              ellipsizeMode="tail"
-              style={{ marginLeft: 16 }}
-            >
-              {item.productName}
-            </Text>
-            <View style={styles.priceStockContainer}>
-              <Text style={{}}>${item.productPrice}</Text>
-              <Text style={{}}>Stock: {item.productStock}</Text>
+            <View style={{ padding: 10 }}>
+              <Text
+                numberOfLines={2}
+                ellipsizeMode="tail"
+                style={{ fontSize: 16, fontWeight: "bold", color: "#333" }}
+              >
+                {item.productName}
+              </Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  marginTop: 5,
+                }}
+              >
+                <Text style={{ fontSize: 14, color: "#333" }}>
+                  ฿{item.productPrice}
+                </Text>
+                <Text style={{ fontSize: 14, color: "#888" }}>
+                  Stock: {item.productStock}
+                </Text>
+              </View>
             </View>
           </Pressable>
         </Link>
@@ -140,7 +176,7 @@ export const HomeScreen = memo(function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.mainContainer}>
-      <View style={{ flex: 1, backgroundColor: "white" }}>
+      <View style={{ flex: 1, backgroundColor: "#F5F5F5" }}>
         <EmptySearchBar
           placeholderArray={[
             "Electric Drill",
@@ -151,31 +187,99 @@ export const HomeScreen = memo(function HomeScreen() {
           ]}
           intervalMs={5000}
         />
+        <View style={{ backgroundColor: "orange", height: 30 }}></View>
+        <View style={styles.scannerContainer}>
+          <View
+            style={{
+              justifyContent: "center",
+              borderColor: "grey",
+              borderRightWidth: 0.5,
+              paddingRight: 6,
+            }}
+          >
+            <Ionicons name="barcode-outline" size={30}></Ionicons>
+          </View>
+          <View style={{ flexDirection: "row", gap: 30 }}>
+            <View
+              style={{
+                borderColor: "grey",
+                borderRightWidth: 0.5,
+                justifyContent: "center",
+                paddingRight: 6,
+              }}
+            >
+              <View style={{ flexDirection: "row" }}>
+                <Ionicons name="card-outline" size={24}></Ionicons>
+                <Text style={{ alignSelf: "center", marginLeft: 2 }}>
+                  ฿0.00
+                </Text>
+              </View>
+              <Text style={{ alignSelf: "flex-start" }}>abcd</Text>
+            </View>
+            <View
+              style={{
+                borderColor: "grey",
+                borderRightWidth: 0.5,
+                justifyContent: "center",
+                paddingRight: 6,
+              }}
+            >
+              <View style={{ flexDirection: "row" }}>
+                <Ionicons name="heart-circle-outline" size={24}></Ionicons>
+                <Text style={{ alignSelf: "center", marginLeft: 2 }}>0.00</Text>
+              </View>
+              <Text style={{ alignSelf: "flex-start" }}>Coin</Text>
+            </View>
+            <View>
+              <View style={{ flexDirection: "row", justifyContent: "center" }}>
+                <Ionicons name="gift-outline" size={24}></Ionicons>
+                <Text style={{ alignSelf: "center", marginLeft: 2 }}>0.00</Text>
+              </View>
+              <Text style={{ alignSelf: "flex-start" }}>Coupons</Text>
+            </View>
+          </View>
+          <View
+            style={{
+              justifyContent: "center",
+              borderColor: "grey",
+              borderLeftWidth: 0.5,
+              paddingLeft: 6,
+            }}
+          >
+            <Ionicons name="logo-bitcoin" size={30}></Ionicons>
+          </View>
+        </View>
         <View style={styles.categoryContainer}>
-          <View style={styles.categoryContainerItem}>
-            <Ionicons
-              style={{ alignSelf: "center" }}
-              name="pizza-outline"
-              size={30}
-            />
-            <Text style={{ alignSelf: "center" }}>Food</Text>
-          </View>
-          <View style={styles.categoryContainerItem}>
-            <Ionicons
-              style={{ alignSelf: "center" }}
-              name="hammer-outline"
-              size={30}
-            />
-            <Text style={{ alignSelf: "center" }}>Tools</Text>
-          </View>
-          <View style={styles.categoryContainerItem}>
-            <Ionicons
-              style={{ alignSelf: "center" }}
-              name="power-outline"
-              size={30}
-            />
-            <Text style={{ alignSelf: "center" }}>Electronics</Text>
-          </View>
+          <Pressable onPress={() => handleCategorySelect("food")}>
+            <View style={styles.categoryContainerItem}>
+              <Ionicons
+                style={styles.categoryItemIcon}
+                name="pizza-outline"
+                size={30}
+              />
+              <Text style={{ alignSelf: "center" }}>Food</Text>
+            </View>
+          </Pressable>
+          <Pressable onPress={() => handleCategorySelect("tool")}>
+            <View style={styles.categoryContainerItem}>
+              <Ionicons
+                style={styles.categoryItemIcon}
+                name="hammer-outline"
+                size={30}
+              />
+              <Text style={{ alignSelf: "center" }}>Tools</Text>
+            </View>
+          </Pressable>
+          <Pressable onPress={() => handleCategorySelect("electronic")}>
+            <View style={styles.categoryContainerItem}>
+              <Ionicons
+                style={styles.categoryItemIcon}
+                name="power-outline"
+                size={30}
+              />
+              <Text style={{ alignSelf: "center" }}>Electronics</Text>
+            </View>
+          </Pressable>
         </View>
         <FlashList
           data={getProductsQuery.data}
@@ -229,20 +333,41 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "orange",
   },
-  categoryContainer: {
+  scannerContainer: {
+    marginHorizontal: 8,
+    backgroundColor: "white",
+    borderWidth: 0.5,
+    borderRadius: 8,
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "space-between",
+    padding: 10,
+    gap: 5,
+    marginTop: -35,
+  },
+  categoryContainer: {
+    marginHorizontal: 8,
+    marginVertical: 8,
+    backgroundColor: "white",
+    borderWidth: 0.5,
+    borderRadius: 8,
+    flexDirection: "row",
+    justifyContent: "flex-start",
     padding: 10,
     gap: 5,
   },
   categoryContainerItem: {
-    flexDirection: "row",
+    // flexDirection: "row",
     borderColor: "black",
-    borderWidth: 1,
+    // borderWidth: 1,
     borderRadius: 20,
+    // padding: 5,
+  },
+  categoryItemIcon: {
+    alignSelf: "center",
+    borderWidth: 1,
+    borderRadius: 10,
     padding: 5,
   },
-
   itemContainer: {
     backgroundColor: "white",
     width: deviceWidth / 2,
@@ -250,7 +375,6 @@ const styles = StyleSheet.create({
   },
   imageItem: {
     marginHorizontal: 16,
-
     minHeight: 125,
     maxWidth: deviceWidth / 2 - 12,
     // backgroundColor: "green",
