@@ -30,8 +30,20 @@ export default function RootLayout() {
         urlScheme="your-url-scheme"
       >
         <View style={styles.container}>
-          <Stack screenOptions={{ headerShown: false }}>
+          <Stack 
+            screenOptions={{ 
+              headerShown: false,
+            }}
+          >
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen 
+              name="ItemScreen/[id]" 
+              options={{ 
+                gestureEnabled: true,
+                gestureDirection: 'horizontal',
+                animation: 'slide_from_right',
+              }} 
+            />
           </Stack>
         </View>
       </StripeProvider>
