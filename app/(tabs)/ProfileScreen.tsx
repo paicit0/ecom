@@ -315,7 +315,7 @@ function ProfileScreen() {
                     backgroundColor: "white",
                   }}
                 >
-                  <Ionicons name="heart" size={26} />
+                  <Ionicons name="heart" size={26} color={"red"}/>
                   <Text>Your Favorites</Text>
                 </Pressable>
               </Link>
