@@ -65,6 +65,7 @@ export type Product = {
   productThumbnailUrl: string[];
   productStock: number;
   productOwner: string;
+  productCartQuantity?: number;
 };
 type ProductStore = {
   products: Product[];
@@ -94,7 +95,10 @@ export const useFavorite = create<useFavoriteArray>((set, get) => ({
       }
       const updatedFavoriteItems = [...state.favoriteItemsArray, itemId];
       console.log("store.useFavorite: Adding to Favorite: " + itemId);
-      console.log("store.useFavorite: Current FavoriteItems", updatedFavoriteItems);
+      console.log(
+        "store.useFavorite: Current FavoriteItems",
+        updatedFavoriteItems
+      );
       return { favoriteItemsArray: updatedFavoriteItems };
     }),
   deleteFromFavorite: (itemId) =>
@@ -103,7 +107,10 @@ export const useFavorite = create<useFavoriteArray>((set, get) => ({
         (item) => item !== itemId
       );
       console.log("store.useFavorite: Removing from favorite: " + itemId);
-      console.log("store.useFavorite: Current FavoriteItems", updatedFavoriteItems);
+      console.log(
+        "store.useFavorite: Current FavoriteItems",
+        updatedFavoriteItems
+      );
       return {
         favoriteItemsArray: updatedFavoriteItems,
       };
