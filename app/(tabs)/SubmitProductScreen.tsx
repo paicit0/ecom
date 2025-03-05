@@ -78,7 +78,20 @@ function SubmitProductScreen() {
       !productCategory
     ) {
       setLoading(false);
-      console.log("SubmitProduct.handleSubmit: missing field(s).");
+      console.log("SubmitProductScreen.handleSubmit: missing field(s).");
+      return;
+    }
+
+    if (productPrice < 10) {
+      console.log(
+        "SubmitProductScreen.handleSubmit: price should be > 10 baht"
+      );
+      return;
+    }
+    if (productStock > 0) {
+      console.log(
+        "SubmitProductScreen.handleSubmit: stock should be > 0 items"
+      );
       return;
     }
 
@@ -231,32 +244,45 @@ function SubmitProductScreen() {
 
   return (
     <SafeAreaView style={styles.mainContainer}>
+      <View style={{}}>
+        <Text style={{ fontSize: 18 }}>Submit Your Product</Text>
+      </View>
       <View style={styles.imageContainer}>
-        {imageIsSelected ? (
+        {imageUris.length > 0 ? (
           <>
-            {imageUris.map((uri, index) => (
-              <View key={index} style={{ flexDirection: "column" }}>
-                <Text>Image No. {index + 1}</Text>
-                <Image
-                  style={{ height: 200, width: 200 }}
-                  source={{ uri: uri }}
-                />
-                <Pressable
-                  onPress={() => {
-                    if (imageUris.length === 0) {
-                      setImageIsSelected(false);
-                    }
-                    setImageUris(imageUris.filter((img) => img !== uri));
+            <View style={{flexDirection: "row", gap:10}}>
+              {imageUris.map((uri, index) => (
+                <View
+                  key={index}
+                  style={{
+                    
+                    alignItems: "center",
+                    gap: 5,
                   }}
                 >
-                  <Ionicons name="close-sharp" size={20} color="red" />
-                </Pressable>
-              </View>
-            ))}
-            {imageNames.length < 3 && imageNames ? (
+                  <Text>Image No. {index + 1}</Text>
+                  <Image
+                    style={{ height: 100, width: 100 }}
+                    source={{ uri: uri }}
+                  />
+                  <Pressable
+                    onPress={() => {
+                      if (imageUris.length === 0) {
+                        setImageIsSelected(false);
+                      }
+                      setImageUris(imageUris.filter((img) => img !== uri));
+                    }}
+                  >
+                    <Ionicons name="close-sharp" size={24} color="red" />
+                  </Pressable>
+                </View>
+              ))}
+            </View>
+            {imageUris.length < 3 ? (
               <>
                 <Pressable onPress={handleFilePicking}>
-                  <Ionicons name="add-outline" size={20} />
+                  {/* <Text>Add more pictures...</Text> */}
+                  <Ionicons name="add" size={30} />
                 </Pressable>
               </>
             ) : null}
@@ -267,28 +293,30 @@ function SubmitProductScreen() {
               onPress={handleFilePicking}
               style={styles.imageInputButton}
             >
-              <View style={{ height: 200, width: 200 }}></View>
+              <View
+                style={{ height: 200, width: 200, backgroundColor: "white" }}
+              ></View>
               <Text style={styles.imageInputButtonText}>Browse</Text>
             </Pressable>
           </>
         )}
       </View>
       <TextInput
-        style={styles.input}
+        style={styles.inputField}
         placeholder="Name..."
         value={productName}
         onChangeText={setProductName}
         autoCapitalize="none"
       />
       <TextInput
-        style={styles.input}
+        style={styles.inputField}
         placeholder="Description..."
         value={productDescription}
         onChangeText={setProductDescription}
         autoCapitalize="none"
       />
       <TextInput
-        style={styles.input}
+        style={styles.inputField}
         keyboardType="numeric"
         placeholder="Price..."
         value={isNaN(productPrice) ? "" : productPrice.toString()}
@@ -298,7 +326,7 @@ function SubmitProductScreen() {
         autoCapitalize="none"
       />
       <TextInput
-        style={styles.input}
+        style={styles.inputField}
         keyboardType="numeric"
         placeholder="Stock..."
         value={isNaN(productStock) ? "" : productStock.toString()}
@@ -313,13 +341,17 @@ function SubmitProductScreen() {
         onChange={(item) => {
           setProductCategory(item.value);
         }}
-        placeholder="Select Category"
+        placeholder="   Select Category"
         value={productCategory}
         labelField="label"
         valueField="value"
       />
 
-      <Pressable onPress={handleSubmit} disabled={loading} style={styles.submitButton}>
+      <Pressable
+        onPress={handleSubmit}
+        disabled={loading}
+        style={styles.submitButton}
+      >
         <Text style={styles.submitButtonText}>Submit a product!</Text>
       </Pressable>
       <Pressable onPress={clearAllFields}>
@@ -335,25 +367,24 @@ const styles = StyleSheet.create({
     // justifyContent: "center",
     alignItems: "center",
   },
-  input: {
+  inputField: {
     height: 40,
-    borderColor: "gray",
-    borderWidth: 0.8,
+    // borderColor: "gray",
+    borderWidth: 1,
     borderRadius: 12.5,
-    marginVertical: 10,
+    marginVertical: 4,
     paddingHorizontal: 10,
     width: 300,
   },
   imageContainer: {
     flexDirection: "row",
+    margin: 10,
   },
   dropdown: {
-    margin: 16,
-    height: 50,
+    height: 40,
     width: 300,
     borderWidth: 0.8,
     borderRadius: 12.5,
-    alignItems: "center",
   },
   imageInputButton: {
     backgroundColor: "grey",
@@ -362,7 +393,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",
-    marginVertical: 10,
+    marginVertical: 5,
     shadowColor: "#ff4757",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
