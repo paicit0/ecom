@@ -114,13 +114,13 @@ const ItemScreen = memo(function ItemScreen() {
 
   const handlePrevImage = () => {};
 
-  // if (loading) {
-  //   return (
-  //     <View style={{ marginTop: 60 }}>
-  //       <AnimatedLoadingIndicator loading={loading} />
-  //     </View>
-  //   );
-  // }
+  if (loading) {
+    return (
+      <View style={{ marginTop: 60 }}>
+        <AnimatedLoadingIndicator loading={loading} />
+      </View>
+    );
+  }
 
   if (!product) {
     return (
@@ -143,7 +143,7 @@ const ItemScreen = memo(function ItemScreen() {
         {/* <View style={{ flex: 1 }}> */}
         <Link href="../(tabs)/HomeScreen" asChild>
           <Pressable style={styles.backButton}>
-            <Ionicons name="arrow-back-outline" size={20} color={"white"}></Ionicons>
+            <Ionicons name="arrow-back-outline" size={24} color={"white"}></Ionicons>
           </Pressable>
         </Link>
 
@@ -248,7 +248,7 @@ const ItemScreen = memo(function ItemScreen() {
               backgroundColor: "white",
             }}
           >
-            <Text>ส่งฟรี</Text>
+            <Text>Delivery Options:</Text>
           </View>
         </View>
         {/* </View> */}
@@ -305,14 +305,14 @@ const styles = StyleSheet.create({
     // backgroundColor: "orange",
   },
   backButton: {
-    marginBottom: -20,
+    marginBottom: -30,
     zIndex: 1,
     marginLeft: 10,
     borderWidth:2,
     width:30,
     borderRadius:90,
-    // backgroundColor:"white",
-    opacity:50
+    backgroundColor:"black",
+    opacity:20
   },
   imageItem: {
     flexDirection: "row",
