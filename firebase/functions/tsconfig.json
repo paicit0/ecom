@@ -10,11 +10,12 @@
     "sourceMap": true,
     "strict": true,
     "target": "es2017",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "typeRoots": ["node_modules/@types"] 
   },
   "compileOnSave": true,
   "include": [
     "src"
   ],
-  "extends": "expo/tsconfig.base"
+  // "extends": "expo/tsconfig.base" // makes npm run build not work for some reasons
 }
