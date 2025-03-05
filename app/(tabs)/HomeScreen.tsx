@@ -23,6 +23,7 @@ export const HomeScreen = memo(function HomeScreen() {
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [currentProductNumber, setCurrentProductNumber] = useState<number>(0);
+  const [filteredProduct, setFilteredProduct] = useState<Product[]>();
   const { userInfo } = useUserSession();
   const numberOfItems = 50;
   const loadMoreProductNumber = 20;
@@ -43,12 +44,18 @@ export const HomeScreen = memo(function HomeScreen() {
   }
 
   useEffect(() => {
+    setFilteredProduct(getProductsQuery.data);
     console.log("HomeScreen: getProductsQuery.data:", getProductsQuery.data);
   }, []);
 
   useEffect(() => {
     setCurrentProductNumber(0);
     getProductsQuery.refetch();
+    if (!getProductsQuery.data){
+      return;
+    }
+    const filterProduct = getProductsQuery.data.filter((item:Product)=>item.productCategory === selectedCategory)
+    setFilteredProduct(filterProduct);
   }, [selectedCategory]);
 
   const handleCategorySelect = (category: string) => {
@@ -77,7 +84,7 @@ export const HomeScreen = memo(function HomeScreen() {
       if (loadMoreProducts.status === 200) {
         const loadMoreProductsData = await loadMoreProducts.data;
         setCurrentProductNumber((prev) => prev + loadMoreProductNumber);
-        // setProducts([...products, ...loadMoreProductsData.productsData]);
+        // setFilteredProduct([filteredProduct, ...loadMoreProductsData.productsData]);
         setIsLoadingMore(false);
       }
     } catch (error) {
@@ -200,6 +207,17 @@ export const HomeScreen = memo(function HomeScreen() {
           </View>
         </View>
         <View style={styles.categoryContainer}>
+          <Pressable onPress={() => setSelectedCategory("")}>
+            <View style={styles.categoryContainerItem}>
+              <Ionicons
+                style={styles.categoryItemIcon}
+                name="apps"
+                color={"black"}
+                size={30}
+              />
+              <Text style={{ alignSelf: "center" }}>All</Text>
+            </View>
+          </Pressable>
           <Pressable onPress={() => handleCategorySelect("food")}>
             <View style={styles.categoryContainerItem}>
               <Ionicons
@@ -216,7 +234,7 @@ export const HomeScreen = memo(function HomeScreen() {
               <Ionicons
                 style={styles.categoryItemIcon}
                 name="hammer"
-                color={"black"}
+                color={"grey"}
                 size={30}
               />
               <Text style={{ alignSelf: "center" }}>Tools</Text>
@@ -301,7 +319,7 @@ export const HomeScreen = memo(function HomeScreen() {
         </View>
 
         <FlashList
-          data={getProductsQuery.data}
+          data={filteredProduct?.length ?? 0 > 0 ? filteredProduct : getProductsQuery.data}
           renderItem={render}
           keyExtractor={(item) => item.productId}
           // contentContainerStyle={styles.verticalListContainer}
@@ -316,7 +334,7 @@ export const HomeScreen = memo(function HomeScreen() {
             </Pressable>
           )}
           extraData={[getProductsQuery.isLoading, getProductsQuery.data]} // re renders if isLoading/data change
-          onEndReachedThreshold={0.5}
+          // onEndReachedThreshold={0.5}
           // onEndReached={loadMore}
         />
 
@@ -372,9 +390,9 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderRadius: 8,
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     padding: 10,
-    gap: 40,
+    gap: 10,
   },
   categoryContainerItem: {
     borderColor: "black",
