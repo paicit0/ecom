@@ -1,5 +1,5 @@
-// Index.tsx
 // eas build --profile development --platform android
+// Index.tsx
 import { Redirect } from "expo-router";
 
 function Index() {
@@ -15,7 +15,7 @@ function Index() {
     console.debug = function no_console() {};
   }
 
-  return <Redirect href="../(tabs)/HomeScreen" />;
+  return <Redirect href="/(tabs)/HomeScreen" />;
 }
 
 export default Index;
