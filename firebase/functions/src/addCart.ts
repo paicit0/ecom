@@ -1,7 +1,6 @@
 // addCart.ts
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import { FieldValue } from "firebase-admin/firestore";
 import { db } from "./index";
 
 const addCart = functions.https.onRequest(async (req, res) => {
@@ -12,7 +11,7 @@ const addCart = functions.https.onRequest(async (req, res) => {
   console.log("addCart: req.headers.authorization:", authHeader);
 
   if (!userEmail || !productId) {
-    res.status(401).json({
+    res.status(400).json({
       error: "addCart: no/invalid userEmail or productId in body.",
     });
     return;
@@ -56,10 +55,37 @@ const addCart = functions.https.onRequest(async (req, res) => {
       res.status(404).json({ error: "addCart: User data not found." });
       return;
     }
-    console.log("addCart: userDoc updating.");
-    await userDoc.ref.update({
-      cartItemsArray: FieldValue.arrayUnion(productId),
-    });
+    console.log("addCart: userDoc", userDoc);
+
+    const userData = userDoc.data() || {};
+
+    const cartItemsArray: { productId: string; productQuantity: number }[] =
+      Array.isArray(userData.cartItemsArray) ? userData.cartItemsArray : [];
+
+    console.log("addCart: cartItemsArray:", cartItemsArray);
+
+    const updatedCartItems = [...cartItemsArray];
+
+    const existingItemIndex = updatedCartItems.findIndex(
+      (item) => item.productId === productId
+    );
+
+    if (existingItemIndex !== -1) {
+      console.log("addCart: Incrementing existing product quantity!");
+      updatedCartItems[existingItemIndex] = {
+        ...updatedCartItems[existingItemIndex],
+        productQuantity:
+          updatedCartItems[existingItemIndex].productQuantity + 1,
+      };
+    } else {
+      console.log("addCart: Adding new product to cart");
+      updatedCartItems.push({
+        productId,
+        productQuantity: 1,
+      });
+    }
+
+    await userDoc.ref.update({ cartItemsArray: updatedCartItems });
     res.status(201).json({
       message: "addCart: Item added to cartItemsArray",
     });
