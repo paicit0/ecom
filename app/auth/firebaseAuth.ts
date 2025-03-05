@@ -73,7 +73,12 @@ const SecureStorage: StateStorage = {
 export const useUserSession = create<userSessionType>()(
   persist(
     (set) => ({
-      userInfo: { userEmail: "", userRole: "", favoriteItemsArray: [], cartItemsArray: [] },
+      userInfo: {
+        userEmail: "",
+        userRole: "",
+        favoriteItemsArray: [],
+        cartItemsArray: [],
+      },
       userIsSignedIn: false,
       login: async (email, password) => {
         console.log("useUserSession.login: in firebaseAuth!");
@@ -127,7 +132,14 @@ export const useUserSession = create<userSessionType>()(
           console.log("useUserSession.logout: Setting userIsSignedIn to false");
           set({ userIsSignedIn: false });
           console.log("useUserSession.logout: Setting userInfo to default");
-          set({ userInfo: { userEmail: "", userRole: null, favoriteItemsArray: [], cartItemsArray: [] } });
+          set({
+            userInfo: {
+              userEmail: "",
+              userRole: null,
+              favoriteItemsArray: [],
+              cartItemsArray: [],
+            },
+          });
           await auth.signOut();
           return {
             success: true,
@@ -176,7 +188,11 @@ export async function saveToken(user: User | null) {
     if (user) {
       console.log("firebaseAuth.saveToken: Attempting to get ID token...");
       const token = await user.getIdToken();
-      console.log("firebaseAuth.saveToken: Generating a tokenID: ", token);
+      console.log("firebaseAuth.saveToken: Generating a tokenID:", token);
+      console.log(
+        "firebaseAuth.saveToken: auth.currentUser",
+        auth.currentUser
+      );
       await SecureStore.setItemAsync("authToken", token);
     } else {
       await SecureStore.deleteItemAsync("authToken");
@@ -192,9 +208,6 @@ onIdTokenChanged(auth, async (user) => {
 });
 
 onAuthStateChanged(auth, async (user) => {
-  console.log(
-    "firebaseAuth: onAuthStateChanged triggered:",
-    user?.email
-  );
+  console.log("firebaseAuth: onAuthStateChanged triggered:", user?.email);
   await saveToken(user);
 });
