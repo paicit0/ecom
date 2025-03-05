@@ -52,7 +52,7 @@ export const useGetProducts = ({
         numberOfItems,
         currentProductNumber,
       }),
-    staleTime: 0.5 * 60 * 1000,
+    staleTime: 0.5 * 60 * 1000, // ms
     refetchOnWindowFocus: true,
   });
 };
