@@ -20,6 +20,7 @@ import { Image } from "expo-image";
 import { FlashList } from "@shopify/flash-list";
 
 export const CartScreen = memo(() => {
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const auth = getAuth();
   const userAuth = auth.currentUser;
   const router = useRouter();
@@ -50,7 +51,7 @@ export const CartScreen = memo(() => {
   const deleteCartMutation = useDeleteCart();
 
   useEffect(() => {
-    console.log("CartScreen: Cart array Length:",getCartQuery.data?.length);
+    console.log("CartScreen: Cart array Length:", getCartQuery.data?.length);
   }, []);
 
   const handleCartSubmit = () => {
@@ -71,7 +72,9 @@ export const CartScreen = memo(() => {
   if (getCartQuery.isError) {
     console.error("CartScreen: useGetCartQuery.isError", getCartQuery.error);
     return (
-      <SafeAreaView style={{ marginTop: 60 }}>
+      <SafeAreaView
+        style={{ flex: 1, justifyContent: "center", alignSelf: "center" }}
+      >
         <Text>Failed to get cart items.</Text>
         <Pressable onPress={() => getCartQuery.refetch()}>
           <Text>Try to Reload</Text>
@@ -91,6 +94,9 @@ export const CartScreen = memo(() => {
         }}
       >
         <Text>There's no item in your cart...</Text>
+        <Pressable onPress={() => getCartQuery.refetch()}>
+          <Text>Reload</Text>
+        </Pressable>
       </SafeAreaView>
     );
   }
@@ -118,18 +124,37 @@ export const CartScreen = memo(() => {
             </Text>
             <View style={styles.priceStockContainer}>
               <Text style={{}}>฿{item.productPrice}</Text>
-              <Text style={{}}>Stock: {item.productStock}</Text>
+              <View style={{ flexDirection: "row", gap: 5 }}>
+                <Ionicons
+                  name="remove-outline"
+                  size={16}
+                  style={{ borderWidth: 0.5, alignSelf: "center" }}
+                ></Ionicons>
+                <Text style={{}}>{item.productCartQuantity}</Text>
+                <Ionicons
+                  name="add-outline"
+                  size={16}
+                  style={{ borderWidth: 0.5, alignSelf: "center" }}
+                ></Ionicons>
+              </View>
             </View>
           </Pressable>
         </Link>
         <Link
           href={{
             pathname: "/CheckoutScreen",
-            params: { amount: productPriceToBaht.toString().toLocaleString(), name: item.productName, quantity: item.productCartQuantity },
+            params: {
+              amount: productPriceToBaht.toString().toLocaleString(),
+              name: item.productName,
+              quantity: item.productCartQuantity,
+            },
           }}
           asChild
         >
-          <Pressable onPress={() => handleCartSubmit()}>
+          <Pressable
+            style={{ alignSelf: "center" }}
+            onPress={() => handleCartSubmit()}
+          >
             <Text>Checkout</Text>
           </Pressable>
         </Link>
@@ -144,23 +169,38 @@ export const CartScreen = memo(() => {
           <Ionicons name="arrow-back-outline" size={20}></Ionicons>
         </Link>
       </View>
-      <FlashList
-        data={getCartQuery.data}
-        renderItem={render}
-        keyExtractor={(item) => item.productId}
-        numColumns={1}
-        showsVerticalScrollIndicator={false}
-        estimatedItemSize={200}
-        horizontal={false}
-        ListEmptyComponent={() => (
-          <Pressable onPress={() => getCartQuery.refetch()}>
-            <Text>Press to refresh (Placeholder)</Text>
-          </Pressable>
-        )}
-        extraData={[getCartQuery.data]} // re renders if isLoading/products change
-        onEndReachedThreshold={0.5}
-        // onEndReached={loadMore}
-      />
+      <View
+        style={{
+          width: deviceWidth,
+          height: 500,
+          justifyContent: "center",
+          alignSelf: "center",
+        }}
+      >
+        <FlashList
+          data={getCartQuery.data}
+          renderItem={render}
+          keyExtractor={(item) => item.productId}
+          numColumns={1}
+          showsVerticalScrollIndicator={false}
+          estimatedItemSize={200}
+          horizontal={false}
+          ListEmptyComponent={() => (
+            <Pressable onPress={() => getCartQuery.refetch()}>
+              <Text>Press to refresh (Placeholder)</Text>
+            </Pressable>
+          )}
+          extraData={[getCartQuery.data]} // re renders if isLoading/products change
+          onEndReachedThreshold={0.5}
+          refreshing={isRefreshing}
+          onRefresh={() => {
+            setIsRefreshing(true);
+            getCartQuery.refetch();
+            setIsRefreshing(false);
+          }}
+          // onEndReached={loadMore}
+        />
+      </View>
     </SafeAreaView>
   );
 });
@@ -179,6 +219,7 @@ const styles = StyleSheet.create({
     padding: 5,
     backgroundColor: "white",
     width: deviceWidth / 2,
+    alignSelf: "center",
   },
   imageItem: {
     minHeight: 125,
