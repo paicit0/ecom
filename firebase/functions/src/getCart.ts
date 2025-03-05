@@ -13,7 +13,9 @@ const getCart = functions.https.onRequest(async (req, res) => {
 
     if (!userEmail) {
       console.log("getCart: no/invalid userEmail in query!");
-      res.status(401).json({ error: "getCart: no/invalid userEmail in query!" });
+      res
+        .status(401)
+        .json({ error: "getCart: no/invalid userEmail in query!" });
       return;
     }
 
@@ -41,10 +43,7 @@ const getCart = functions.https.onRequest(async (req, res) => {
       .where("userEmail", "==", userEmail)
       .limit(1)
       .get();
-    console.log(
-      "getCart: usersQuerySnapshot.size",
-      usersQuerySnapshot.size
-    );
+    console.log("getCart: usersQuerySnapshot.size", usersQuerySnapshot.size);
 
     if (usersQuerySnapshot.empty) {
       console.error("getCart: User not found", userEmail);
@@ -62,10 +61,7 @@ const getCart = functions.https.onRequest(async (req, res) => {
 
     const cartItemsArray = userDoc.data().cartItemsArray;
     console.log("getCart: cartItemsArray:", cartItemsArray);
-    console.log(
-      "getCart: cartItemsArray.length:",
-      cartItemsArray.length
-    );
+    console.log("getCart: cartItemsArray.length:", cartItemsArray.length);
 
     if (cartItemsArray.length === 0) {
       console.log("getCart: No cart items found", { email: userEmail });
@@ -73,16 +69,27 @@ const getCart = functions.https.onRequest(async (req, res) => {
       return;
     }
 
+    const productIds = cartItemsArray.map(
+      (item: { productId: string; productQuantity: number }) => item.productId
+    );
+
     const productsSnapshot = await db
       .collection("products")
-      .where(FieldPath.documentId(), "in", cartItemsArray)
+      .where(FieldPath.documentId(), "in", productIds)
       .get();
     console.log("getCart: productsSnapshot:", productsSnapshot);
 
-    const cartProducts = productsSnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const cartProducts = productsSnapshot.docs.map((doc) => {
+      const cartItem = cartItemsArray.find(
+        (item: { productId: string; productCartQuantity: number }) =>
+          item.productId === doc.id
+      );
+      return {
+        id: doc.id,
+        ...doc.data(),
+        productCartQuantity: cartItem ? cartItem.productQuantity : 0,
+      };
+    });
 
     console.log("getCart: cartProducts", cartProducts);
 
