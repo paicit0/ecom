@@ -2,8 +2,9 @@
 import { Pressable, View, Text, StyleSheet } from "react-native";
 import { useEffect, useState } from "react";
 import { useStripe } from "@stripe/stripe-react-native";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { getAuth } from "firebase/auth";
+
 import axios from "axios";
 
 function CheckoutScreen() {
@@ -12,6 +13,7 @@ function CheckoutScreen() {
   const [loading, setLoading] = useState(false);
   const auth = getAuth();
   const userEmail = auth.currentUser?.email;
+  const router = useRouter();
 
   useEffect(() => {
     initializePaymentSheet();
@@ -81,9 +83,11 @@ function CheckoutScreen() {
 
     if (error) {
       console.error("CheckOutScreen: Error:", error);
+      router.replace("/FailedPaymentScreen");
       setLoading(false);
     } else {
       console.log("CheckOutScreen: Success", "Your order is confirmed!");
+      router.replace("/SuccessPaymentScreen");
       setLoading(false);
     }
   };
@@ -105,7 +109,7 @@ function CheckoutScreen() {
           openPaymentSheet();
         }}
       >
-        <Text>Price: ฿{amountInBaht}</Text>
+        <Text>Price: ฿{amountInBaht.toLocaleString()}</Text>
         <Text>PRESS HERE TO OPEN PAYMENT SHEET</Text>
       </Pressable>
     </>

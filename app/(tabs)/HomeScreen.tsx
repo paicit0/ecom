@@ -17,11 +17,13 @@ import axios from "axios";
 import { useGetProducts } from "../../hooks/fetch/useGetProducts";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { useUserSession } from "../auth/firebaseAuth";
 
 export const HomeScreen = memo(function HomeScreen() {
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [currentProductNumber, setCurrentProductNumber] = useState<number>(0);
+  const { userInfo } = useUserSession();
   const numberOfItems = 50;
   const loadMoreProductNumber = 20;
 
@@ -85,9 +87,9 @@ export const HomeScreen = memo(function HomeScreen() {
     }
   };
 
-  if (getProductsQuery.isLoading) {
+  if ((getProductsQuery.isLoading, getProductsQuery.isFetching)) {
     console.log(
-      "HomeScreen: getProductsQuery.isLoading",
+      "HomeScreen: getProductsQuery is loading:",
       getProductsQuery.isLoading
     );
     return (
@@ -269,7 +271,7 @@ export const HomeScreen = memo(function HomeScreen() {
                 }}
               >
                 <Text style={{ fontSize: 14, color: "#333" }}>
-                  ฿{item.productPrice}
+                  ฿{item.productPrice.toLocaleString()}
                 </Text>
                 <Text style={{ fontSize: 14, color: "#888" }}>
                   Stock: {item.productStock}
@@ -398,7 +400,7 @@ const styles = StyleSheet.create({
   },
   imageItem: {
     marginHorizontal: 16,
-    marginTop:16,
+    marginTop: 16,
     minHeight: 125,
     maxWidth: deviceWidth / 2 - 12,
     // backgroundColor: "green",

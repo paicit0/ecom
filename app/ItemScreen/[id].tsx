@@ -13,7 +13,6 @@ import { Link, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
 import axios, { AxiosError } from "axios";
 import { Product } from "../store/store";
-import { FlashList } from "@shopify/flash-list";
 import AnimatedLoadingIndicator from "../../components/AnimatedLoadingIndicator";
 import { useAddFavorite } from "../../hooks/fetch/useAddFavorite";
 import { useDeleteFavorite } from "../../hooks/fetch/useDeleteFavorite";
@@ -25,7 +24,7 @@ const ItemScreen = memo(function ItemScreen() {
   const [product, setProduct] = useState<Product>();
   const [loading, setLoading] = useState<boolean>(false);
   const [isFavorited, setIsFavorited] = useState<boolean>(false);
-  const [imagePage, setImagePage] = useState<number>(1);
+  const [productImageNo, setProductImageNo] = useState<number>(0);
 
   const { id: productId }: { id: string } = useLocalSearchParams();
   const auth = getAuth();
@@ -102,30 +101,26 @@ const ItemScreen = memo(function ItemScreen() {
         setLoading(false);
       }
     };
-
     getTheProduct();
   }, []);
 
-  const render = ({ item }: { item: Product }) => {
-    return (
-      <View>
-        <Image
-          style={styles.imageItem}
-          source={{ uri: item.productThumbnailUrl[0] }}
-          contentFit="cover"
-          transition={200}
-        />
-      </View>
-    );
+  const handleImageSwitch = () => {
+    if (true) {
+      setProductImageNo((prev) => prev + 1);
+    } else {
+      setProductImageNo((prev) => prev - 1);
+    }
   };
 
-  if (loading) {
-    return (
-      <View style={{ marginTop: 60 }}>
-        <AnimatedLoadingIndicator loading={loading} />
-      </View>
-    );
-  }
+  const handlePrevImage = () => {};
+
+  // if (loading) {
+  //   return (
+  //     <View style={{ marginTop: 60 }}>
+  //       <AnimatedLoadingIndicator loading={loading} />
+  //     </View>
+  //   );
+  // }
 
   if (!product) {
     return (
@@ -137,108 +132,126 @@ const ItemScreen = memo(function ItemScreen() {
           alignSelf: "center",
         }}
       >
-        <Text>No Product Found... It may have been deleted.</Text>
+        {/* <Text>No Product Found... It may have been deleted.</Text> */}
       </View>
     );
   }
 
   return (
     <SafeAreaView style={styles.mainContainer}>
-      <ScrollView accessible={false}>
-        <View style={{ flex: 1 }}>
-          <Link href="../(tabs)/HomeScreen">
-            <Ionicons name="arrow-back-outline" size={20}></Ionicons>
-          </Link>
-          <View style={styles.FlashListStyle}>
-            <FlashList
-              data={[product]}
-              renderItem={render}
-              keyExtractor={(item) => item.productId}
-              showsVerticalScrollIndicator={false}
-              estimatedItemSize={200}
-              snapToAlignment="start"
-              horizontal={true}
-              pagingEnabled={true}
-              disableIntervalMomentum={true}
-              ListEmptyComponent={() => (
-                <Text style={{ color: "red" }}>No Images to Display</Text>
-              )}
+      <ScrollView>
+        {/* <View style={{ flex: 1 }}> */}
+        <Link href="../(tabs)/HomeScreen" asChild>
+          <Pressable style={styles.backButton}>
+            <Ionicons name="arrow-back-outline" size={20} color={"white"}></Ionicons>
+          </Pressable>
+        </Link>
+
+        <View style={styles.imageItem}>
+          {product.productImageUrl.map((item, index) => (
+            <Image
+              style={{ flex: 1, width: "100%" }}
+              key={index}
+              source={{ uri: item }}
+              contentFit="cover"
+              transition={200}
             />
-          </View>
+          ))}
+        </View>
 
-          <View style={styles.mainDescription}>
-            <View style={styles.itemHeader}>
-              <View style={styles.productPrice}>
-                <Text style={styles.productPriceText}>
-                  {"฿" + product.productPrice}
-                </Text>
-              </View>
-              <View style={styles.productStock}>
-                <Text>Stock: {product.productStock}</Text>
-              </View>
-              {isFavorited ? (
-                <Pressable
-                  onPress={() => {
-                    deleteFavoriteMutation.mutate(
-                      { userEmail: userEmail, productId: productId },
-                      {
-                        onSuccess: () => {
-                          console.log(
-                            "ItemScreen/[id]/: deleteFavorite success"
-                          ),
-                            setIsFavorited(false);
-                        },
-                        onError: () => {
-                          console.log("ItemScreen/[id]/: error"),
-                            setIsFavorited(true);
-                        },
-                      }
-                    );
-                  }}
-                >
-                  <View style={styles.favoriteButton}>
-                    <Ionicons name="heart" size={24} color="black" />
-                  </View>
-                </Pressable>
-              ) : (
-                <Pressable
-                  onPress={() => {
-                    addFavoriteMutation.mutate(
-                      { userEmail: userEmail, productId: productId },
-                      {
-                        onSuccess: () => {
-                          console.log(
-                            "ItemScreen/[id]/: addFavoriteMutation success"
-                          ),
-                            setIsFavorited(true);
-                        },
-                        onError: () => {
-                          console.log(
-                            "ItemScreen/[id]/: addFavoriteMutation error"
-                          ),
-                            setIsFavorited(false);
-                        },
-                      }
-                    );
-                  }}
-                >
-                  <View style={styles.favoriteButton}>
-                    <Ionicons name="heart-outline" size={24} color="black" />
-                  </View>
-                </Pressable>
-              )}
-            </View>
-
-            <View style={styles.productName}>
-              <Text style={styles.productNameText}>{product.productName}</Text>
-            </View>
-            <View style={styles.productDescription}>
-              <Text style={styles.productDescriptionText}>
-                {product.productDescription}
+        <View style={styles.mainDescription}>
+          <View style={styles.itemHeader}>
+            <View style={styles.productPriceContainer}>
+              <Text style={styles.productPriceText}>
+                {"฿" + product.productPrice.toLocaleString()}
               </Text>
             </View>
+            <View style={styles.productStockFavoriteContainer}>
+              <Text>Stock: {product.productStock}</Text>
+              <View style={styles.favoriteContainer}>
+                {isFavorited ? (
+                  <Pressable
+                    onPress={() => {
+                      deleteFavoriteMutation.mutate(
+                        { userEmail: userEmail, productId: productId },
+                        {
+                          onSuccess: () => {
+                            console.log(
+                              "ItemScreen/[id]/: deleteFavorite success"
+                            ),
+                              setIsFavorited(false);
+                          },
+                          onError: () => {
+                            console.log("ItemScreen/[id]/: error"),
+                              setIsFavorited(true);
+                          },
+                        }
+                      );
+                    }}
+                  >
+                    <View style={styles.favoriteButton}>
+                      <Ionicons name="heart" size={24} color="black" />
+                    </View>
+                  </Pressable>
+                ) : (
+                  <Pressable
+                    onPress={() => {
+                      addFavoriteMutation.mutate(
+                        { userEmail: userEmail, productId: productId },
+                        {
+                          onSuccess: () => {
+                            console.log(
+                              "ItemScreen/[id]/: addFavoriteMutation success"
+                            ),
+                              setIsFavorited(true);
+                          },
+                          onError: () => {
+                            console.log(
+                              "ItemScreen/[id]/: addFavoriteMutation error"
+                            ),
+                              setIsFavorited(false);
+                          },
+                        }
+                      );
+                    }}
+                  >
+                    <View style={styles.favoriteButton}>
+                      <Ionicons name="heart-outline" size={24} color="black" />
+                    </View>
+                  </Pressable>
+                )}
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.productNameContainer}>
+            <Text style={styles.productNameText}>{product.productName}</Text>
+          </View>
+          <View style={styles.productDescriptionContainer}>
+            <Text style={styles.productDescriptionText}>
+              {product.productDescription}
+            </Text>
+          </View>
+          <View
+            style={{
+              width: deviceWidth,
+              flexDirection: "row",
+              alignContent: "flex-start",
+              alignItems: "center",
+              paddingLeft: 15,
+              paddingTop: 15,
+              paddingBottom: 15,
+              gap: 8,
+              borderColor: "grey",
+              borderTopWidth: 0.5,
+              borderBottomWidth: 0.5,
+              backgroundColor: "white",
+            }}
+          >
+            <Text>ส่งฟรี</Text>
           </View>
         </View>
+        {/* </View> */}
       </ScrollView>
 
       <View style={styles.ItemFooter}>
@@ -273,46 +286,53 @@ const ItemScreen = memo(function ItemScreen() {
         </Pressable>
         <Pressable style={styles.buyFooter}>
           <Text style={{ color: "white", alignSelf: "center" }}>Buy Now</Text>
+          <Text style={{ color: "white", alignSelf: "center", fontSize: 22 }}>
+            ฿{product.productPrice.toLocaleString()}
+          </Text>
         </Pressable>
       </View>
     </SafeAreaView>
   );
 });
 
+const deviceHeight = Dimensions.get("window").height;
+const deviceWidth = Dimensions.get("window").width;
+
 const styles = StyleSheet.create({
   mainContainer: {
-    flex: 0,
-    backgroundColor: "orange",
+    flex: 1,
+    backgroundColor: "white",
+    // backgroundColor: "orange",
+  },
+  backButton: {
+    marginBottom: -20,
+    zIndex: 1,
+    marginLeft: 10,
+    borderWidth:2,
+    width:30,
+    borderRadius:90,
+    // backgroundColor:"white",
+    opacity:50
   },
   imageItem: {
-    minHeight: 150,
-    minWidth: 150,
-  },
-  FlashListStyle: {
-    flex: 1,
-    height: (Dimensions.get("window").height / 2) * 0.8,
-    width: Dimensions.get("window").width,
-    marginTop: 35,
-    borderBottomColor: "black",
-    borderWidth: 1,
+    flexDirection: "row",
+    aspectRatio: 3 / 2,
+    height: undefined,
+    width: deviceWidth,
   },
   itemHeader: {
     flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    borderBottomColor: "black",
-    borderWidth: 1,
+    borderBottomColor: "grey",
+    borderBottomWidth: 0.5,
   },
   mainDescription: {
     // padding: 20
   },
-  image: {
-    width: 200,
-    height: 200,
-    resizeMode: "contain",
-  },
-  productName: {
+  productNameContainer: {
+    marginLeft: 8,
     marginTop: 12,
   },
   productNameText: {
@@ -320,9 +340,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#333",
   },
-  productDescription: {},
+  productDescriptionContainer: { marginLeft: 8, marginBottom: 8 },
   productDescriptionText: {},
-  productPrice: {
+  productPriceContainer: {
+    marginLeft: 8,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -331,39 +352,34 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "green",
   },
-  productStock: {
+  productStockFavoriteContainer: {
+    flexDirection: "row",
+    gap: 10,
     alignItems: "center",
     justifyContent: "center",
   },
+  favoriteContainer: { marginRight: 8 },
   favoriteButton: {
     alignItems: "center",
     justifyContent: "center",
   },
-  idContainer: {
-    marginTop: 8,
-  },
-  idText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#666",
-  },
   ItemFooter: {
     flexDirection: "row",
     justifyContent: "space-between",
-    padding: 12,
+    paddingBottom: 20,
     backgroundColor: "black",
   },
   addToCartFooter: {
     flexDirection: "column",
-    justifyContent: "space-between",
+    // justifyContent: "space-between",
     padding: 8,
   },
   buyFooter: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: "column",
+    // justifyContent: "space-between",
     padding: 8,
   },
-  badge: {
+  cartBadge: {
     position: "absolute",
     top: -5,
     right: -5,

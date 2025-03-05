@@ -122,12 +122,14 @@ function FavoriteScreen() {
               contentFit="cover"
               transition={200}
             />
-            <Text numberOfLines={2} ellipsizeMode="tail" style={{}}>
-              {item.productName}
-            </Text>
-            <View style={styles.priceStockContainer}>
-              <Text style={{}}>฿{item.productPrice}</Text>
-              <Text style={{}}>Stock: {item.productStock}</Text>
+            <View>
+              <Text numberOfLines={2} ellipsizeMode="tail" style={{}}>
+                {item.productName}
+              </Text>
+              <View style={styles.priceStockContainer}>
+                <Text style={{}}>฿{item.productPrice.toLocaleString()}</Text>
+                <Text style={{}}>Stock: {item.productStock}</Text>
+              </View>
             </View>
           </Pressable>
         </Link>
@@ -137,34 +139,31 @@ function FavoriteScreen() {
 
   return (
     <SafeAreaView style={styles.mainContainer}>
-      <ScrollView>
-        <View style={{ height: 60 }}></View>
-        <View>
-          <Link href="../(tabs)/ProfileScreen">
-            <Ionicons name="arrow-back-outline" size={20}></Ionicons>
-          </Link>
-          <Text style={{ textAlign: "center" }}>Your Favorite</Text>
-        </View>
-        <FlashList
-          data={getFavoriteQuery.data}
-          renderItem={render}
-          keyExtractor={(item) => item.productId}
-          numColumns={2}
-          showsVerticalScrollIndicator={false}
-          estimatedItemSize={190}
-          horizontal={false}
-          ListEmptyComponent={() => (
-            <Pressable onPress={() => getFavoriteQuery.refetch()}>
-              <Text>Press to refresh (Placeholder)</Text>
-            </Pressable>
-          )}
-          extraData={[isLoading, getFavoriteQuery.data]} // re renders if isLoading/products change
-          onEndReachedThreshold={0.5}
-          // onEndReached={loadMore}
-        />
+      <View style={{ flexDirection: "row" }}>
+        <Link href="../(tabs)/ProfileScreen">
+          <Ionicons name="arrow-back-outline" size={20}></Ionicons>
+        </Link>
+        <Text style={{ textAlign: "center" }}>Your Favorite</Text>
+      </View>
+      <FlashList
+        data={getFavoriteQuery.data}
+        renderItem={render}
+        keyExtractor={(item) => item.productId}
+        numColumns={1}
+        showsVerticalScrollIndicator={false}
+        estimatedItemSize={400}
+        horizontal={false}
+        ListEmptyComponent={() => (
+          <Pressable onPress={() => getFavoriteQuery.refetch()}>
+            <Text>Press to refresh (Placeholder)</Text>
+          </Pressable>
+        )}
+        extraData={[isLoading, getFavoriteQuery.data]} // re renders if isLoading/products change
+        onEndReachedThreshold={0.5}
+        // onEndReached={loadMore}
+      />
 
-        <View style={styles.favoriteItemsArrayContainer}></View>
-      </ScrollView>
+      {/* <View style={styles.favoriteItemsArrayContainer}></View> */}
     </SafeAreaView>
   );
 }
@@ -175,28 +174,24 @@ const deviceWidth = Dimensions.get("window").width;
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    flexDirection: "column",
-    alignContent: "center",
-    justifyContent: "center",
-    alignSelf: "center",
+    width: deviceWidth,
   },
-  favoriteItemsArrayContainer: {
-    flex: 1,
-  },
+
   renderStyle: { height: "100%", width: "100%" },
   itemContainer: {
     flex: 1,
+    flexDirection: "row",
     padding: 5,
     backgroundColor: "white",
-    width: deviceWidth / 2,
+    width: deviceWidth,
   },
   imageItem: {
-    minHeight: 125,
-    minWidth: 125,
+    height: 125,
+    width: 125,
     // backgroundColor: "green",
   },
   priceStockContainer: {
-    flexDirection: "row",
+    flexDirection: "column",
     justifyContent: "space-between",
     // width: (Dimensions.get("window").width / 2) - 15,
   },

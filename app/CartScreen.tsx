@@ -49,7 +49,9 @@ export const CartScreen = memo(() => {
   const getCartQuery = useGetCart({ userEmail: userEmail as string });
   const deleteCartMutation = useDeleteCart();
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    console.log("CartScreen: Cart array Length:",getCartQuery.data?.length);
+  }, []);
 
   const handleCartSubmit = () => {
     try {
@@ -123,7 +125,7 @@ export const CartScreen = memo(() => {
         <Link
           href={{
             pathname: "/CheckoutScreen",
-            params: { amount: productPriceToBaht.toString() }, 
+            params: { amount: productPriceToBaht.toString().toLocaleString(), name: item.productName, quantity: item.productCartQuantity },
           }}
           asChild
         >
@@ -137,7 +139,6 @@ export const CartScreen = memo(() => {
 
   return (
     <SafeAreaView style={styles.mainContainer}>
-      <View style={{ height: 60 }}></View>
       <View>
         <Link href="../(tabs)/HomeScreen">
           <Ionicons name="arrow-back-outline" size={20}></Ionicons>
@@ -149,7 +150,7 @@ export const CartScreen = memo(() => {
         keyExtractor={(item) => item.productId}
         numColumns={1}
         showsVerticalScrollIndicator={false}
-        estimatedItemSize={190}
+        estimatedItemSize={200}
         horizontal={false}
         ListEmptyComponent={() => (
           <Pressable onPress={() => getCartQuery.refetch()}>
@@ -170,8 +171,9 @@ const deviceWidth = Dimensions.get("window").width;
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
+    alignItems: "center",
   },
-  renderStyle: { height: "100%", width: "100%" },
+  renderStyle: {},
   itemContainer: {
     flex: 1,
     padding: 5,
