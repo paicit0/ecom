@@ -2,7 +2,14 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
-import { View, Text, StyleSheet, TextInput, Pressable, Dimensions } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  Pressable,
+  Dimensions,
+} from "react-native";
 import { useUserSession } from "./auth/firebaseAuth";
 import AnimatedLoadingIndicator from "../components/AnimatedLoadingIndicator";
 import { Image } from "expo-image";
@@ -33,9 +40,7 @@ function LoginScreen() {
       const { success, message } = await login(email, password);
       console.log("LoginScreen: login:", success);
       if (success) {
-        console.log(
-          "LoginScreen: redirecting to:../(tabs)/HomeScreen"
-        );
+        console.log("LoginScreen: redirecting to:../(tabs)/HomeScreen");
         router.replace("/(tabs)/HomeScreen");
       } else {
         console.error("LoginScreen: Login failed:", message);
