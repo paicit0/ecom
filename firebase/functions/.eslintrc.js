@@ -33,6 +33,7 @@ module.exports = {
     "object-curly-spacing": ["error", "always"],
     "no-empty": 0,
     "@typescript-eslint/no-empty-function": "off",
+    "space-before-function-paren": "off",
   },
 };
 
