@@ -88,7 +88,7 @@ function SubmitProductScreen() {
       );
       return;
     }
-    if (productStock > 0) {
+    if (productStock <= 0) {
       console.log(
         "SubmitProductScreen.handleSubmit: stock should be > 0 items"
       );
