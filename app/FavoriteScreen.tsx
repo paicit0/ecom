@@ -106,6 +106,27 @@ function FavoriteScreen() {
     );
   }
 
+  function FavoriteHeader() {
+    return (
+      <View style={styles.headerContainer}>
+        <Link href="../(tabs)/HomeScreen" asChild>
+          <Pressable style={{ marginLeft: 8 }}>
+            <Ionicons name="arrow-back-outline" size={20}></Ionicons>
+          </Pressable>
+        </Link>
+        <View
+          style={{
+            flex: 1,
+            marginLeft: -32,
+            alignItems: "center",
+          }}
+        >
+          <Text>Favorite</Text>
+        </View>
+      </View>
+    );
+  }
+
   const render = ({ item }: { item: Product }) => {
     return (
       <View style={styles.renderStyle}>
@@ -139,38 +160,34 @@ function FavoriteScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.mainContainer}>
-      <View style={{ flexDirection: "row" }}>
-        <Link href="../(tabs)/ProfileScreen">
-          <Ionicons name="arrow-back-outline" size={20}></Ionicons>
-        </Link>
-        <Text style={{ textAlign: "center" }}>Your Favorite</Text>
+    <>
+      <SafeAreaView style={{ backgroundColor: "white" }}></SafeAreaView>
+      <FavoriteHeader />
+      <View style={styles.mainContainer}>
+        <FlashList
+          data={getFavoriteQuery.data}
+          renderItem={render}
+          keyExtractor={(item) => item.productId}
+          numColumns={1}
+          showsVerticalScrollIndicator={false}
+          estimatedItemSize={400}
+          horizontal={false}
+          ListEmptyComponent={() => (
+            <Pressable onPress={() => getFavoriteQuery.refetch()}>
+              <Text>Press to refresh (Placeholder)</Text>
+            </Pressable>
+          )}
+          extraData={[isLoading, getFavoriteQuery.data]} // re renders if isLoading/products change
+          onEndReachedThreshold={0.5}
+          // onEndReached={loadMore}
+          refreshing={isRefreshing}
+          onRefresh={() => {
+            setIsRefreshing(true);
+            getFavoriteQuery.refetch().then(() => setIsRefreshing(false));
+          }}
+        />
       </View>
-      <FlashList
-        data={getFavoriteQuery.data}
-        renderItem={render}
-        keyExtractor={(item) => item.productId}
-        numColumns={1}
-        showsVerticalScrollIndicator={false}
-        estimatedItemSize={400}
-        horizontal={false}
-        ListEmptyComponent={() => (
-          <Pressable onPress={() => getFavoriteQuery.refetch()}>
-            <Text>Press to refresh (Placeholder)</Text>
-          </Pressable>
-        )}
-        extraData={[isLoading, getFavoriteQuery.data]} // re renders if isLoading/products change
-        onEndReachedThreshold={0.5}
-        // onEndReached={loadMore}
-        refreshing={isRefreshing}
-        onRefresh={() => {
-          setIsRefreshing(true);
-          getFavoriteQuery.refetch().then(() => setIsRefreshing(false));
-        }}
-      />
-
-      {/* <View style={styles.favoriteItemsArrayContainer}></View> */}
-    </SafeAreaView>
+    </>
   );
 }
 
@@ -178,6 +195,12 @@ const deviceHeight = Dimensions.get("window").height;
 const deviceWidth = Dimensions.get("window").width;
 
 const styles = StyleSheet.create({
+  headerContainer: {
+    flexDirection: "row",
+    paddingBottom: 16,
+    marginBottom: 8,
+    backgroundColor: "white",
+  },
   mainContainer: {
     flex: 1,
     width: deviceWidth,
