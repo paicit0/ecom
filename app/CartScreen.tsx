@@ -92,20 +92,41 @@ export const CartScreen = memo(() => {
 
   function CartHeader() {
     return (
-      <View
-        style={{
-          backgroundColor: "white",
-          marginBottom: 8,
-          flexDirection: "row",
-        }}
-      >
+      <View style={styles.headerContainer}>
         <Link href="../(tabs)/HomeScreen" asChild>
-          <Pressable style={{ flexDirection: "row", justifyContent: "center" }}>
+          <Pressable
+            style={{ marginLeft: 8 }}
+          >
             <Ionicons name="arrow-back-outline" size={20}></Ionicons>
           </Pressable>
         </Link>
-        <View>
+        <View
+          style={{
+            flex: 1,
+            marginLeft:-32,
+            alignItems: "center",
+          }}
+        >
           <Text>Cart</Text>
+        </View>
+      </View>
+    );
+  }
+
+  function CartFooter() {
+    return (
+      <View style={styles.headerContainer}>
+        <Link href="../(tabs)/HomeScreen" asChild>
+          <Pressable style={{ marginLeft: 8 }}>
+            <Ionicons name="arrow-back-outline" size={20}></Ionicons>
+          </Pressable>
+        </Link>
+        <View
+          style={{
+            backgroundColor: "red",
+          }}
+        >
+          <Text>Footer</Text>
         </View>
       </View>
     );
@@ -245,6 +266,7 @@ export const CartScreen = memo(() => {
           />
         </View>
       </View>
+      {/* <CartFooter /> */}
     </>
   );
 });
@@ -253,6 +275,12 @@ const deviceHeight = Dimensions.get("window").height;
 const deviceWidth = Dimensions.get("window").width;
 
 const styles = StyleSheet.create({
+  headerContainer: {
+    flexDirection: "row",
+    paddingBottom: 16,
+    marginBottom: 8,
+    backgroundColor: "white",
+  },
   mainContainer: {
     flex: 1,
   },
@@ -260,11 +288,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   itemContainerRender: {
-    backgroundColor: "white",
     marginBottom: 8,
     paddingVertical: 8,
     borderRadius: 8,
     marginHorizontal: 16,
+    backgroundColor: "white",
   },
   itemContainer: {
     flexDirection: "row",
