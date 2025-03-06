@@ -51,10 +51,12 @@ export const HomeScreen = memo(function HomeScreen() {
   useEffect(() => {
     setCurrentProductNumber(0);
     getProductsQuery.refetch();
-    if (!getProductsQuery.data){
+    if (!getProductsQuery.data) {
       return;
     }
-    const filterProduct = getProductsQuery.data.filter((item:Product)=>item.productCategory === selectedCategory)
+    const filterProduct = getProductsQuery.data.filter(
+      (item: Product) => item.productCategory === selectedCategory
+    );
     setFilteredProduct(filterProduct);
   }, [selectedCategory]);
 
@@ -125,7 +127,7 @@ export const HomeScreen = memo(function HomeScreen() {
     );
   }
 
-  const belowSearchBar = () => {
+  const header = () => {
     return (
       <>
         <View style={{ backgroundColor: "orange", height: 30 }}></View>
@@ -303,70 +305,80 @@ export const HomeScreen = memo(function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.mainContainer}>
-      <View style={{ flex: 1, backgroundColor: "#F5F5F5" }}>
-        <View style={{ backgroundColor: "transparent" }}>
-          <EmptySearchBar
-            placeholderArray={[
-              "Electric Drill",
-              "Meat",
-              "shovel",
-              "Jars",
-              "Batteries",
-            ]}
-            intervalMs={5000}
+    <>
+      <SafeAreaView style={styles.header}></SafeAreaView>
+      <View style={styles.mainContainer}>
+        <View style={{ flex: 1, backgroundColor: "#F5F5F5" }}>
+          <View>
+            <EmptySearchBar
+              placeholderArray={[
+                "Electric Drill",
+                "Meat",
+                "shovel",
+                "Jars",
+                "Batteries",
+              ]}
+              intervalMs={5000}
+            />
+          </View>
+
+          <FlashList
+            data={
+              filteredProduct?.length ?? 0 > 0
+                ? filteredProduct
+                : getProductsQuery.data
+            }
+            renderItem={render}
+            keyExtractor={(item) => item.productId}
+            // contentContainerStyle={styles.verticalListContainer}
+            numColumns={2}
+            showsVerticalScrollIndicator={false}
+            estimatedItemSize={250}
+            horizontal={false}
+            ListHeaderComponent={header}
+            ListEmptyComponent={() => (
+              <Pressable onPress={() => getProductsQuery.refetch()}>
+                <Text>Press to refresh (Placeholder)</Text>
+              </Pressable>
+            )}
+            extraData={[getProductsQuery.isLoading, getProductsQuery.data]} // re renders if isLoading/data change
+            // onEndReachedThreshold={0.5}
+            // onEndReached={loadMore}
           />
-        </View>
 
-        <FlashList
-          data={filteredProduct?.length ?? 0 > 0 ? filteredProduct : getProductsQuery.data}
-          renderItem={render}
-          keyExtractor={(item) => item.productId}
-          // contentContainerStyle={styles.verticalListContainer}
-          numColumns={2}
-          showsVerticalScrollIndicator={false}
-          estimatedItemSize={250}
-          horizontal={false}
-          ListHeaderComponent={belowSearchBar}
-          ListEmptyComponent={() => (
-            <Pressable onPress={() => getProductsQuery.refetch()}>
-              <Text>Press to refresh (Placeholder)</Text>
-            </Pressable>
+          {isLoadingMore && (
+            <Text style={{ textAlign: "center", height: 30 }}>Loading...</Text>
           )}
-          extraData={[getProductsQuery.isLoading, getProductsQuery.data]} // re renders if isLoading/data change
-          // onEndReachedThreshold={0.5}
-          // onEndReached={loadMore}
-        />
+          {process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev" && (
+            <>
+              <Pressable
+                onPress={() => {
+                  console.log("HomeScreen: refresh");
 
-        {isLoadingMore && (
-          <Text style={{ textAlign: "center", height: 30 }}>Loading...</Text>
-        )}
-        {process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev" && (
-          <>
-            <Pressable
-              onPress={() => {
-                console.log("HomeScreen: refresh");
-
-                setCurrentProductNumber(0);
-                getProductsQuery.refetch();
-                console.log(
-                  "HomeScreen: getProductsQuery.data",
-                  getProductsQuery.data
-                );
-              }}
-            >
-              <Text>devtool refresh all</Text>
-            </Pressable>
-          </>
-        )}
+                  setCurrentProductNumber(0);
+                  getProductsQuery.refetch();
+                  console.log(
+                    "HomeScreen: getProductsQuery.data",
+                    getProductsQuery.data
+                  );
+                }}
+              >
+                <Text>devtool refresh all</Text>
+              </Pressable>
+            </>
+          )}
+        </View>
       </View>
-    </SafeAreaView>
+    </>
   );
 });
 const deviceHeight = Dimensions.get("window").height;
 const deviceWidth = Dimensions.get("window").width;
 
 const styles = StyleSheet.create({
+  header: {
+    backgroundColor: "orange",
+  },
   mainContainer: {
     flex: 1,
     backgroundColor: "orange",
