@@ -3,88 +3,80 @@ import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import sharp from "sharp";
 import * as functions from "firebase-functions";
 import { v4 as uuidv4 } from "uuid";
-import * as admin from "firebase-admin";
-require("firebase-functions/logger/compat"); // enables console.log()
+import express from "express";
+import verifyBearerAndIdtoken from "./middlewares/verifyBearerAndIdtoken";
 
-console.log("uploadAwsS3 reached");
+const app = express();
 
-const REGION = process.env.AWS_REGION;
-const BUCKET_NAME = process.env.AWS_BUCKET_NAME;
-const ACCESS_KEY = process.env.AWS_ACCESS_KEY_ID;
-const SECRET_KEY = process.env.AWS_SECRET_ACCESS_KEY;
+app.use(verifyBearerAndIdtoken);
 
-const s3Client = new S3Client({
-  region: REGION,
-  credentials: {
-    accessKeyId: ACCESS_KEY || "",
-    secretAccessKey: SECRET_KEY || "",
-  },
-});
+app.post("/", async (req, res) => {
+  const REGION = process.env.AWS_REGION;
+  const BUCKET_NAME = process.env.AWS_BUCKET_NAME;
+  const ACCESS_KEY = process.env.AWS_ACCESS_KEY_ID;
+  const SECRET_KEY = process.env.AWS_SECRET_ACCESS_KEY;
 
-const uploadToS3 = async (buffer: Buffer, key: string, contentType: string) => {
-  console.log("uploadAwsS3.ts.uploadToS3");
-  try {
-    const command = new PutObjectCommand({
-      Bucket: BUCKET_NAME,
-      Key: key,
-      Body: buffer,
-      ContentType: contentType,
-    });
-    await s3Client.send(command);
-    const url = `https://${BUCKET_NAME}.s3.${REGION}.amazonaws.com/${key}`;
-    return url;
-  } catch (error) {
-    console.log("uploadToS3 error", error);
-    return;
-  }
-};
+  const s3Client = new S3Client({
+    region: REGION,
+    credentials: {
+      accessKeyId: ACCESS_KEY || "",
+      secretAccessKey: SECRET_KEY || "",
+    },
+  });
 
-const createThumbnail = async (imageBuffer: Buffer) => {
-  console.log("uploadAwsS3.createThumbnail");
-  try {
-    return await sharp(imageBuffer).resize({ width: 150 }).toBuffer();
-  } catch (error) {
-    console.error("Sharp error:", error);
-    throw new Error("Failed to create thumbnail.");
-  }
-};
+  const uploadToS3 = async (
+    buffer: Buffer,
+    key: string,
+    contentType: string
+  ) => {
+    console.log("uploadAwsS3.ts.uploadToS3");
+    try {
+      const command = new PutObjectCommand({
+        Bucket: BUCKET_NAME,
+        Key: key,
+        Body: buffer,
+        ContentType: contentType,
+      });
+      await s3Client.send(command);
+      const url = `https://${BUCKET_NAME}.s3.${REGION}.amazonaws.com/${key}`;
+      return url;
+    } catch (error) {
+      console.log("uploadToS3 error", error);
+      return;
+      // return res
+      //   .status(400)
+      //   .json({ error: "uploadAwsS3: uploadToS3 error: " + error });
+    }
+  };
 
-const uploadAwsS3 = functions.https.onRequest(async (req, res) => {
+  const createThumbnail = async (imageBuffer: Buffer) => {
+    console.log("uploadAwsS3.createThumbnail");
+    try {
+      return await sharp(imageBuffer).resize({ width: 150 }).toBuffer();
+    } catch (error) {
+      console.error("Sharp error:", error);
+      return;
+      // return res
+      //   .status(400)
+      //   .json({ error: "uploadAwsS3: failed to create the thumbnail" });
+    }
+  };
   console.log("uploadAwsS3.uploadAwsS3 function reached");
   try {
     const uniqueName = uuidv4();
-    const authHeader = req.headers.authorization;
     const { imageBase64, contentType } = req.body;
-    console.log("uploadAwsS3 received headers:", authHeader);
-    if (!authHeader || !authHeader.toLowerCase().startsWith("bearer")) {
-      console.log("uploadAwsS3: no/invalid auth in headers!");
-      res.status(401).json({ error: "uploadAwsS3: no auth in headers!!" });
-      return;
-    }
-    const idToken = authHeader.replace(/^Bearer\s+/i, "").trim();
-    try {
-      const decodedToken = await admin.auth().verifyIdToken(idToken);
-      if (!decodedToken) {
-        res.status(401).json({ error: "uploadAwsS3: No auth token." });
-        return;
-      }
-    } catch (error) {
-      console.log(error);
-      res.status(401).json({ error: `uploadAwsS3: Unauthorized! ${error}` });
-      return;
-    }
 
     if (!Array.isArray(imageBase64)) {
-      res
+      return res
         .status(400)
         .json({ error: "uploadAwsS3: imageBase64 must be an array" });
-      return;
     }
 
     const validContentTypes = ["image/jpeg", "image/png", "image/gif"];
     if (!validContentTypes.includes(contentType)) {
-      res.status(400).json({ error: "uploadAwsS3: Invalid content type" });
-      return;
+      return res
+        .status(400)
+        .json({ error: "uploadAwsS3: Invalid content type" });
     }
 
     const resImageUrlArray: string[] = [];
@@ -99,6 +91,12 @@ const uploadAwsS3 = functions.https.onRequest(async (req, res) => {
       const originalKey = `uploads/${uniqueName}-${i}`;
       const thumbnailKey = `thumbnails/${uniqueName}-${i}`;
 
+      if (!imageBuffer || !thumbnailBuffer) {
+        return res
+          .status(400)
+          .json({ error: "uploadAwsS3: no imageBuffer/thumbnailBuffer" });
+      }
+
       const [imageUrl, thumbnailUrl] = await Promise.all([
         uploadToS3(imageBuffer, originalKey, contentType),
         uploadToS3(thumbnailBuffer, thumbnailKey, contentType),
@@ -110,12 +108,13 @@ const uploadAwsS3 = functions.https.onRequest(async (req, res) => {
       }
     }
     console.log("Urls Array", resImageUrlArray, resThumbnailUrlArray);
-    res.status(201).json({ resImageUrlArray, resThumbnailUrlArray });
-    return;
+    return res.status(201).json({ resImageUrlArray, resThumbnailUrlArray });
   } catch (error) {
     console.error("uploadAwsS3: Error generating upload URL:", error);
-    res.status(500).json({ error: "uploadAwsS3: Internal server error" });
+    return res
+      .status(500)
+      .json({ error: "uploadAwsS3: Internal server error" });
   }
 });
 
-export { uploadAwsS3 };
+export const uploadAwsS3 = functions.https.onRequest(app);

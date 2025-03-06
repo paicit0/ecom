@@ -2,32 +2,15 @@
 import * as functions from "firebase-functions";
 import { db } from "./index";
 import { Timestamp } from "firebase-admin/firestore";
-import * as admin from "firebase-admin";
+import express from "express";
+import verifyBearerAndIdtoken from "./middlewares/verifyBearerAndIdtoken";
 
-const createProduct = functions.https.onRequest(async (req, res) => {
+const app = express();
+
+app.use(verifyBearerAndIdtoken);
+
+app.post("/", async (req, res) => {
   try {
-    console.log("createProduct: req.header: ", req.headers.authorization);
-    console.log("createProduct: req.body: ", req.body);
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.toLowerCase().startsWith("bearer")) {
-      console.log("createProduct: no/invalid auth in headers!");
-      res.status(401).json({ error: "createProduct: no auth in headers!" });
-      return;
-    }
-    const idToken = authHeader.replace(/^Bearer\s+/i, "").trim();
-    try {
-      const decodedToken = await admin.auth().verifyIdToken(idToken);
-      if (!decodedToken) {
-        console.log("createProduct: No auth token.");
-        res.status(401).json({ error: "createProduct: No auth token." });
-        return;
-      }
-    } catch (error) {
-      console.log(error);
-      res.status(401).json({ error: `createProduct: Unauthorized! ${error}` });
-      return;
-    }
-
     const {
       productName,
       productDescription = "Contact the owner",
@@ -46,8 +29,9 @@ const createProduct = functions.https.onRequest(async (req, res) => {
       !productThumbnailUrl ||
       !productOwner
     ) {
-      res.status(400).json({ error: "createProduct: incomplete fields!" });
-      return;
+      return res
+        .status(400)
+        .json({ error: "createProduct: incomplete fields!" });
     }
 
     const product = {
@@ -73,18 +57,16 @@ const createProduct = functions.https.onRequest(async (req, res) => {
       .doc(createOneProduct.id)
       .set(productsWithId);
 
-    res.status(201).json({
+    return res.status(201).json({
       message:
         "createProduct: Product submitted sucessfully! " + createOneProduct.id,
     });
-    return;
   } catch (error) {
-    res
-      .status(400)
-      .json({ error: "createProduct: failed the create product!" });
     console.log(error);
-    return;
+    return res
+      .status(500)
+      .json({ error: "createProduct: failed the create product!" });
   }
 });
 
-export { createProduct };
+export const createProduct = functions.https.onRequest(app);

@@ -1,10 +1,12 @@
 // getProducts.ts
 import * as functions from "firebase-functions";
 import { db } from "./index";
+import express from "express";
 
-const getProducts = functions.https.onRequest(async (req, res) => {
+const app = express();
+
+app.get("/", async (req, res) => {
   try {
-    // fix this up
     console.log("getProducts req.query: ", req.query);
     const numberOfItems = parseInt(req.query.numberOfItems as string, 10);
     const currentProductNumber = parseInt(
@@ -24,11 +26,11 @@ const getProducts = functions.https.onRequest(async (req, res) => {
     }));
     console.log("getProducts: productsData.length: ", productsData.length);
 
-    res.status(200).json({ productsData: productsData });
+    return res.status(200).json({ productsData: productsData });
   } catch (error) {
     console.log("getProducts error: ", error);
-    res.status(400);
+    return res.status(400);
   }
 });
 
-export { getProducts };
+export const getProducts = functions.https.onRequest(app);

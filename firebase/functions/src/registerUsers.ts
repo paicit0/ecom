@@ -2,8 +2,11 @@
 import * as functions from "firebase-functions";
 import { db } from "./index";
 import { Timestamp } from "firebase-admin/firestore";
+import express from "express";
 
-const registerUsers = functions.https.onRequest(async (req, res) => {
+const app = express();
+
+app.post("/", async (req, res) => {
   try {
     console.log("registerUsers: Connected.");
     const { email } = await req.body;
@@ -22,14 +25,16 @@ const registerUsers = functions.https.onRequest(async (req, res) => {
     };
 
     if (!email) {
-      res.status(400).json({ message: "registerUsers: No email provided" });
-      return;
+      return res
+        .status(400)
+        .json({ message: "registerUsers: No email provided" });
     }
 
     if (docGet.exists) {
       console.log("registerUsers: User already exists!");
-      res.status(409).json({ message: "registerUsers: User already exists!" });
-      return;
+      return res
+        .status(409)
+        .json({ message: "registerUsers: User already exists!" });
     } else {
       const addUser = await db.collection("users").add(user);
       console.log(
@@ -38,15 +43,17 @@ const registerUsers = functions.https.onRequest(async (req, res) => {
       );
       const userWithId = { ...user, userId: addUser.id };
       await db.collection("users").doc(addUser.id).set(userWithId);
-      res.status(201).json({
+      return res.status(201).json({
         message: "registerUsers: User registered successfully!",
         userId: addUser.id,
       });
     }
   } catch (error) {
     console.log("registerUsers: Registering failed: " + error);
-    res.status(500).json({ message: "registerUsers: Registering failed" }); // don't include "error" due to security risk.
+    return res
+      .status(500)
+      .json({ message: "registerUsers: Registering failed" });
   }
 });
 
-export { registerUsers };
+export const registerUsers = functions.https.onRequest(app);

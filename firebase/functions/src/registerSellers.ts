@@ -1,27 +1,23 @@
 // registerSellers.ts
 import * as functions from "firebase-functions";
 import { db } from "./index";
-import * as admin from "firebase-admin";
+import express from "express";
+import verifyBearerAndIdtoken from "./middlewares/verifyBearerAndIdtoken";
 
-const registerSellers = functions.https.onRequest(async (req, res) => {
+const app = express();
+
+app.use(verifyBearerAndIdtoken);
+
+app.post("/", async (req, res) => {
   console.log("registerSellers");
   try {
     const { email } = req.body;
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      res.status(401).json({ message: "No authHeader/Header doesn't start with Bearer , Unauthorized!" });
-      return;
-    }
-    const idToken = authHeader.split("Bearer ")[1];
-    const decodedToken = await admin.auth().verifyIdToken(idToken);
-    const userEmail = decodedToken.email;
-    console.log("registerSellers req.header bearer: ", idToken);
-    console.log("registerSellers userEmail: ", userEmail);
 
     if (!email) {
       console.log("No email received!");
-      res.status(404).json({ message: "Error 404: Didn't receive an email" });
-      return;
+      return res
+        .status(404)
+        .json({ message: "Error 404: Didn't receive an email" });
     }
 
     const userRef = db.collection("users").where("userEmail", "==", email);
@@ -29,16 +25,17 @@ const registerSellers = functions.https.onRequest(async (req, res) => {
 
     if (getUser.empty) {
       console.log("No such user exists!");
-      res.status(404).json({ message: "Error 404: No user found" });
-      return;
+      return res.status(404).json({ message: "Error 404: No user found" });
     } else {
       const userDocRef = getUser.docs[0].ref;
       await userDocRef.update({ userRole: "seller" });
-      res.status(200).json({ message: "Success 200: userRole changed to seller" });
+      return res
+        .status(200)
+        .json({ message: "Success 200: userRole changed to seller" });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({
+    return res.status(500).json({
       message:
         "Error 500: Registering failed on registerSellers Cloud Function.",
       error: error,
@@ -46,4 +43,4 @@ const registerSellers = functions.https.onRequest(async (req, res) => {
   }
 });
 
-export { registerSellers };
+export const registerSellers = functions.https.onRequest(app);
