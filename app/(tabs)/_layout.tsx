@@ -4,12 +4,18 @@ import { Ionicons } from "@expo/vector-icons";
 import { useUserSession } from "../auth/firebaseAuth";
 import { View, StyleSheet, Dimensions } from "react-native";
 import { getAuth } from "firebase/auth";
+import { useEffect } from "react";
 
 export default function TabsLayout() {
   const auth = getAuth();
   const userAuth = auth.currentUser;
-  console.log("(tabs)/_layout: userAuth.email:", userAuth?.email);
   const userInfoFromStore = useUserSession((state) => state.userInfo);
+
+  useEffect(() => {
+    if (userInfoFromStore && userAuth) {
+      console.log("app/(tabs)/_layout: mounted")
+    }
+  }, [userInfoFromStore, userAuth]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -46,6 +52,8 @@ export default function TabsLayout() {
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="add-circle" size={size} color={color} />
             ),
+            // to fix
+            // the condition is not checked on app start, only when going to other Tabs.
             tabBarButton:
               userInfoFromStore.userRole === "seller" && userAuth
                 ? undefined
@@ -62,17 +70,26 @@ export default function TabsLayout() {
             href: null,
           }}
         />
+        <Tabs.Screen
+          name="test"
+          options={{
+            tabBarLabel: "test",
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="map" size={size} color={color} />
+              
+            ),
+            href:null,
+          }}
+        />
       </Tabs>
     </View>
   );
 }
 const deviceHeight = Dimensions.get("window").height;
 const deviceWidth = Dimensions.get("window").width;
-// console.log(deviceHeight);
 
 const styles = StyleSheet.create({
   tabBar: {
-    // fix later. make the icon stay at the top of bar
     height: deviceHeight * 0.0765,
     backgroundColor: "white",
   },
