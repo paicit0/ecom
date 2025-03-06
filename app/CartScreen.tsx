@@ -1,12 +1,6 @@
 // CartScreen.tsx
 import { memo, useEffect, useState } from "react";
-import {
-  View,
-  StyleSheet,
-  Pressable,
-  ScrollView,
-  Dimensions,
-} from "react-native";
+import { View, StyleSheet, Pressable, Dimensions } from "react-native";
 import { Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
@@ -14,6 +8,7 @@ import { getAuth } from "firebase/auth";
 import AnimatedLoadingIndicator from "../components/AnimatedLoadingIndicator";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useGetCart } from "../hooks/fetch/useGetCart";
+import { useAddCart } from "../hooks/fetch/useAddCart";
 import { useDeleteCart } from "../hooks/fetch/useDeleteCart";
 import { Product } from "./store/store";
 import { Image } from "expo-image";
@@ -48,18 +43,12 @@ export const CartScreen = memo(() => {
   const userEmail = userAuth.email;
 
   const getCartQuery = useGetCart({ userEmail: userEmail as string });
+  const addCartMutation = useAddCart();
   const deleteCartMutation = useDeleteCart();
 
   useEffect(() => {
     console.log("CartScreen: Cart array Length:", getCartQuery.data?.length);
   }, []);
-
-  const handleCartSubmit = () => {
-    try {
-    } catch (error) {
-      console.error("Error submitting cart: ", error);
-    }
-  };
 
   if (getCartQuery.isLoading) {
     return (
@@ -101,107 +90,162 @@ export const CartScreen = memo(() => {
     );
   }
 
+  function CartHeader() {
+    return (
+      <View
+        style={{
+          backgroundColor: "white",
+          marginBottom: 8,
+          flexDirection: "row",
+        }}
+      >
+        <Link href="../(tabs)/HomeScreen" asChild>
+          <Pressable style={{ flexDirection: "row", justifyContent: "center" }}>
+            <Ionicons name="arrow-back-outline" size={20}></Ionicons>
+          </Pressable>
+        </Link>
+        <View>
+          <Text>Cart</Text>
+        </View>
+      </View>
+    );
+  }
+
   const render = ({ item }: { item: Product }) => {
     const productPriceToBaht = item.productPrice * 100;
     return (
-      <View style={styles.renderStyle}>
-        <Link
-          href={{
-            pathname: "/ItemScreen/[id]",
-            params: { id: item.productId },
-          }}
-          asChild
-        >
-          <Pressable style={styles.itemContainer}>
-            <Image
-              style={styles.imageItem}
-              source={{ uri: item.productThumbnailUrl[0] }}
-              contentFit="cover"
-              transition={200}
-            />
-            <Text numberOfLines={2} ellipsizeMode="tail" style={{}}>
-              {item.productName}
-            </Text>
-            <View style={styles.priceStockContainer}>
-              <Text style={{}}>฿{item.productPrice}</Text>
-              <View style={{ flexDirection: "row", gap: 5 }}>
-                <Ionicons
-                  name="remove-outline"
-                  size={16}
-                  style={{ borderWidth: 0.5, alignSelf: "center" }}
-                ></Ionicons>
-                <Text style={{}}>{item.productCartQuantity}</Text>
-                <Ionicons
-                  name="add-outline"
-                  size={16}
-                  style={{ borderWidth: 0.5, alignSelf: "center" }}
-                ></Ionicons>
-              </View>
-            </View>
-          </Pressable>
-        </Link>
-        <Link
-          href={{
-            pathname: "/CheckoutScreen",
-            params: {
-              amount: productPriceToBaht.toString().toLocaleString(),
-              name: item.productName,
-              quantity: item.productCartQuantity,
-            },
-          }}
-          asChild
-        >
-          <Pressable
-            style={{ alignSelf: "center" }}
-            onPress={() => handleCartSubmit()}
+      <>
+        <View style={styles.itemContainerRender}>
+          <View style={{ flexDirection: "row", marginLeft: 16, gap: 5 }}>
+            <Ionicons
+              name="storefront-outline"
+              size={18}
+              style={{ alignSelf: "center" }}
+            ></Ionicons>
+            <Text style={{ fontWeight: "bold" }}>{item.productOwner}</Text>
+          </View>
+
+          <Link
+            href={{
+              pathname: "/ItemScreen/[id]",
+              params: { id: item.productId },
+            }}
+            asChild
           >
-            <Text>Checkout</Text>
-          </Pressable>
-        </Link>
-      </View>
+            <Pressable style={styles.itemContainer}>
+              <Image
+                style={styles.imageItem}
+                source={{ uri: item.productThumbnailUrl[0] }}
+                contentFit="cover"
+                transition={200}
+              />
+              <View style={styles.namePriceStockContainer}>
+                <Text numberOfLines={2} ellipsizeMode="tail" style={{}}>
+                  {item.productName}
+                </Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text style={{ color: "red" }}>
+                    ฿{item.productPrice.toLocaleString()}
+                  </Text>
+                  <View style={{ flexDirection: "row", gap: 5 }}>
+                    <Pressable>
+                      <Ionicons
+                        name="remove-outline"
+                        size={16}
+                        style={{ borderWidth: 0.5, alignSelf: "center" }}
+                      ></Ionicons>
+                    </Pressable>
+
+                    <Text style={{}}>{item.productCartQuantity}</Text>
+                    <Pressable
+                      onPress={() => {
+                        addCartMutation.mutate(
+                          {
+                            userEmail: userEmail as string,
+                            productId: item.productId,
+                          },
+                          {
+                            onSuccess: () => {
+                              console.log(
+                                "ItemScreen/[id]/: addCartMutation success"
+                              );
+                            },
+                            onError: () => {
+                              console.log(
+                                "ItemScreen/[id]/: addCartMutation error"
+                              );
+                            },
+                          }
+                        );
+                      }}
+                    >
+                      <Ionicons
+                        name="add-outline"
+                        size={16}
+                        style={{ borderWidth: 0.5, alignSelf: "center" }}
+                      ></Ionicons>
+                    </Pressable>
+                  </View>
+                </View>
+              </View>
+            </Pressable>
+          </Link>
+          <Link
+            href={{
+              pathname: "/CheckoutScreen",
+              params: {
+                amount: productPriceToBaht.toString().toLocaleString(),
+                name: item.productName,
+                quantity: item.productCartQuantity,
+              },
+            }}
+            asChild
+          >
+            <Pressable style={{ alignSelf: "flex-end", marginRight: 16 }}>
+              <Text>Checkout</Text>
+            </Pressable>
+          </Link>
+        </View>
+      </>
     );
   };
 
   return (
-    <SafeAreaView style={styles.mainContainer}>
-      <View>
-        <Link href="../(tabs)/HomeScreen">
-          <Ionicons name="arrow-back-outline" size={20}></Ionicons>
-        </Link>
+    <>
+      <SafeAreaView style={{ backgroundColor: "white" }}></SafeAreaView>
+      <CartHeader />
+      <View style={styles.mainContainer}>
+        <View style={styles.flashListContainer}>
+          <FlashList
+            data={getCartQuery.data}
+            renderItem={render}
+            keyExtractor={(item) => item.productId}
+            numColumns={1}
+            showsVerticalScrollIndicator={false}
+            estimatedItemSize={200}
+            horizontal={false}
+            ListEmptyComponent={() => (
+              <Pressable onPress={() => getCartQuery.refetch()}>
+                <Text>Press to refresh (Placeholder)</Text>
+              </Pressable>
+            )}
+            extraData={[getCartQuery.data]}
+            onEndReachedThreshold={0.5}
+            refreshing={isRefreshing}
+            onRefresh={() => {
+              setIsRefreshing(true);
+              getCartQuery.refetch().then(() => setIsRefreshing(false));
+            }}
+            // onEndReached={loadMore}
+          />
+        </View>
       </View>
-      <View
-        style={{
-          width: deviceWidth,
-          height: 500,
-          justifyContent: "center",
-          alignSelf: "center",
-        }}
-      >
-        <FlashList
-          data={getCartQuery.data}
-          renderItem={render}
-          keyExtractor={(item) => item.productId}
-          numColumns={1}
-          showsVerticalScrollIndicator={false}
-          estimatedItemSize={200}
-          horizontal={false}
-          ListEmptyComponent={() => (
-            <Pressable onPress={() => getCartQuery.refetch()}>
-              <Text>Press to refresh (Placeholder)</Text>
-            </Pressable>
-          )}
-          extraData={[getCartQuery.data]} // re renders if isLoading/products change
-          onEndReachedThreshold={0.5}
-          refreshing={isRefreshing}
-          onRefresh={() => {
-            setIsRefreshing(true);
-            getCartQuery.refetch();
-            setIsRefreshing(false);
-          }}
-          // onEndReached={loadMore}
-        />
-      </View>
-    </SafeAreaView>
+    </>
   );
 });
 
@@ -211,26 +255,32 @@ const deviceWidth = Dimensions.get("window").width;
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    alignItems: "center",
   },
-  renderStyle: {},
-  itemContainer: {
+  flashListContainer: {
     flex: 1,
-    padding: 5,
+  },
+  itemContainerRender: {
     backgroundColor: "white",
-    width: deviceWidth / 2,
-    alignSelf: "center",
+    marginBottom: 8,
+    paddingVertical: 8,
+    borderRadius: 8,
+    marginHorizontal: 16,
+  },
+  itemContainer: {
+    flexDirection: "row",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
   },
   imageItem: {
-    minHeight: 125,
-    minWidth: 125,
-    // backgroundColor: "green",
+    height: 100,
+    width: 100,
+    borderRadius: 8,
   },
-  priceStockContainer: {
-    flexDirection: "row",
+  namePriceStockContainer: {
+    flex: 1,
+    flexDirection: "column",
     justifyContent: "space-between",
-    // width: (Dimensions.get("window").width / 2) - 15,
+    marginLeft: 16,
   },
 });
-
 export default CartScreen;
