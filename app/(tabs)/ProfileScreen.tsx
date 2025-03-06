@@ -27,9 +27,10 @@ function ProfileScreen() {
     console.log("ProfileScreen: not logged in");
   }
 
-  useEffect(() => {
-    console.log("ProfileScreen: loading:", loading);
-  }, []);
+  // useEffect(() => {
+  //   console.log("ProfileScreen: loading:", loading);
+  //   console.log("ProfileScreen: userAuth: ", userAuth);
+  // }, []);
 
   const handleSellerRegister = async () => {
     if (!userIsSignedIn) {
@@ -315,7 +316,7 @@ function ProfileScreen() {
                     backgroundColor: "white",
                   }}
                 >
-                  <Ionicons name="heart" size={26} color={"red"}/>
+                  <Ionicons name="heart" size={26} color={"red"} />
                   <Text>Your Favorites</Text>
                 </Pressable>
               </Link>
@@ -361,7 +362,14 @@ function ProfileScreen() {
             </View>
           </>
           <Pressable
-            onPress={() => console.log(userInfoFromStore)}
+            onPress={() => {
+              console.log(
+                "ProfileScreen: userInfoFromStore:",
+                userInfoFromStore
+              );
+              console.log("ProfileScreen: loading:", loading);
+              console.log("ProfileScreen: userAuth: ", userAuth);
+            }}
             style={styles.button}
           >
             <Text style={styles.buttonText}>Get user status</Text>
