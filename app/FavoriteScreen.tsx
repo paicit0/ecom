@@ -21,6 +21,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 function FavoriteScreen() {
   const [isLoading, setLoading] = useState<boolean>(false);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const auth = getAuth();
   const userAuth = auth.currentUser;
   if (!userAuth) {
@@ -161,6 +162,11 @@ function FavoriteScreen() {
         extraData={[isLoading, getFavoriteQuery.data]} // re renders if isLoading/products change
         onEndReachedThreshold={0.5}
         // onEndReached={loadMore}
+        refreshing={isRefreshing}
+        onRefresh={() => {
+          setIsRefreshing(true);
+          getFavoriteQuery.refetch().then(() => setIsRefreshing(false));
+        }}
       />
 
       {/* <View style={styles.favoriteItemsArrayContainer}></View> */}
