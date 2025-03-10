@@ -2,6 +2,8 @@
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import { useMutation } from "@tanstack/react-query";
+import { useMemo } from "react";
+import { debounce } from "lodash";
 
 type fetchAddCartType = {
   userEmail: string;
@@ -10,14 +12,14 @@ type fetchAddCartType = {
 
 type fetchAddCartResponseSuccess = {
   message: string;
-}
+};
 type fetchAddCartResponseFailed = {
   error: string;
-}
+};
 
-type fetchAddCartResponseType = 
-  | fetchAddCartResponseSuccess 
-  | fetchAddCartResponseFailed 
+type fetchAddCartResponseType =
+  | fetchAddCartResponseSuccess
+  | fetchAddCartResponseFailed;
 
 const fetchAddCart = async ({
   userEmail,
@@ -52,9 +54,21 @@ const fetchAddCart = async ({
   }
 };
 
-export const useAddCart = () => {
-  return useMutation({
-    mutationFn: ({ userEmail, productId }: fetchAddCartType) =>
-      fetchAddCart({ userEmail, productId }),
+export const useAddCart = (debounceTime = 500) => {
+  const debouncedFetchAddCart = useMemo(
+    () =>
+      debounce(
+        ({ userEmail, productId }: fetchAddCartType) =>
+          fetchAddCart({ userEmail, productId }),
+        debounceTime,
+        { leading: true }
+      ),
+    [debounceTime]
+  );
+
+  const mutation = useMutation({
+    mutationFn: debouncedFetchAddCart,
   });
+
+  return mutation;
 };
