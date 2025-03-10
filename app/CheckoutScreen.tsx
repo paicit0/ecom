@@ -9,18 +9,20 @@ import { thailandProvinces } from "../assets/db/province";
 import { Dropdown } from "react-native-element-dropdown";
 import { useUserSession } from "./auth/firebaseAuth";
 import * as SecureStore from "expo-secure-store";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 function CheckoutScreen() {
   const [loading, setLoading] = useState(false);
   const [customerCity, setCustomerCity] = useState<string>("");
   const [province, setProvince] = useState<string>("");
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
-  const { amount, name, quantity } = useLocalSearchParams();
   const auth = getAuth();
   const userEmail = auth.currentUser?.email;
   const router = useRouter();
   const userSession = useUserSession();
-  const userInfo = userSession.getUserInfo;
+
+  const { amount, name, quantity } = useLocalSearchParams();
+  const total = parseInt(amount as string) * parseInt(quantity as string);
 
   useEffect(() => {
     initializePaymentSheet();
@@ -76,7 +78,7 @@ function CheckoutScreen() {
       const fetchPaymentSheet = await axios.post(
         `${stripePaymentSheetUrl}/payment-sheet`,
         {
-          amount: parseInt(amount as string) * parseInt(quantity as string),
+          amount: total,
           userEmail: userEmail,
           customerCity: province,
           customerName: userEmail,
@@ -141,7 +143,13 @@ function CheckoutScreen() {
       setLoading(false);
     } else {
       console.log("CheckOutScreen: Success", "Your order is confirmed!");
-      router.replace("/SucceededPaymentScreen");
+      router.replace({
+        pathname: "/SucceededPaymentScreen",
+        params: {
+          total: total / 100,
+          quantity: quantity,
+        },
+      });
       setLoading(false);
     }
   };
@@ -156,47 +164,59 @@ function CheckoutScreen() {
   const amountInBaht =
     (parseInt(amount as string) / 100) * parseInt(quantity as string);
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignContent: "center",
-        alignSelf: "center",
-      }}
-    >
-      <TextInput
-        style={{}}
-        placeholder="City"
-        value={customerCity}
-        onChangeText={(text) => setCustomerCity(text)}
-      ></TextInput>
-      <Dropdown
-        style={{}}
-        data={thailandProvinces}
-        onChange={(item) => {
-          setProvince(item.value);
-        }}
-        placeholder="   Select Province"
-        value={province}
-        labelField="label"
-        valueField="value"
-      />
-      <Pressable
-        // style={{ flex: 1, justifyContent: "center", alignSelf: "center" }}
-        disabled={loading}
-        onPress={() => {
-          openPaymentSheet();
-        }}
-      >
-        <Text>
-          {quantity}x {name}
-        </Text>
-        <Text>Price: ฿{amountInBaht.toLocaleString()}</Text>
-        <Text>PRESS HERE TO OPEN PAYMENT SHEET</Text>
-      </Pressable>
-    </View>
+    <SafeAreaView style={styles.mainContainer}>
+      <View style={styles.infoContainer}>
+        <TextInput
+          style={{}}
+          placeholder="City"
+          value={customerCity}
+          onChangeText={(text) => setCustomerCity(text)}
+        ></TextInput>
+        <Dropdown
+          style={{}}
+          data={thailandProvinces}
+          onChange={(item) => {
+            setProvince(item.value);
+          }}
+          placeholder="   Select Province"
+          value={province}
+          labelField="label"
+          valueField="value"
+        />
+        <Pressable
+          // style={{ flex: 1, justifyContent: "center", alignSelf: "center" }}
+          disabled={loading}
+          onPress={() => {
+            openPaymentSheet();
+          }}
+        >
+          <Text>
+            {quantity}x {name}
+          </Text>
+          <Text>Price: ฿{amountInBaht.toLocaleString()}</Text>
+          <Text>PRESS HERE TO OPEN PAYMENT SHEET</Text>
+        </Pressable>
+      </View>
+
+      <View style={styles.footer}><Text style={{color:'red'}}>FOOTER</Text></View>
+    </SafeAreaView>
   );
 }
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+    justifyContent: "space-between",
+    alignContent: "center",
+  },
+  infoContainer:{
+    alignSelf: "center",
+  },
+  footer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingBottom: 20,
+    backgroundColor: "black",
+  },
+});
 
 export default CheckoutScreen;
