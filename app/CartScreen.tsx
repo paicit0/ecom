@@ -16,6 +16,7 @@ import { FlashList } from "@shopify/flash-list";
 
 export const CartScreen = memo(() => {
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  
   const auth = getAuth();
   const userAuth = auth.currentUser;
   const router = useRouter();
@@ -94,16 +95,14 @@ export const CartScreen = memo(() => {
     return (
       <View style={styles.headerContainer}>
         <Link href="../(tabs)/HomeScreen" asChild>
-          <Pressable
-            style={{ marginLeft: 8 }}
-          >
+          <Pressable style={{ marginLeft: 8 }}>
             <Ionicons name="arrow-back-outline" size={20}></Ionicons>
           </Pressable>
         </Link>
         <View
           style={{
             flex: 1,
-            marginLeft:-32,
+            marginLeft: -32,
             alignItems: "center",
           }}
         >
@@ -174,7 +173,28 @@ export const CartScreen = memo(() => {
                     ฿{item.productPrice.toLocaleString()}
                   </Text>
                   <View style={{ flexDirection: "row", gap: 5 }}>
-                    <Pressable>
+                    <Pressable
+                      onPress={() => {
+                        deleteCartMutation.mutate(
+                          {
+                            userEmail: userEmail as string,
+                            productId: item.productId,
+                          },
+                          {
+                            onSuccess: () => {
+                              console.log(
+                                "ItemScreen/[id]/: deleteCartMutation success"
+                              );
+                            },
+                            onError: () => {
+                              console.log(
+                                "ItemScreen/[id]/: deleteCartMutation error"
+                              );
+                            },
+                          }
+                        );
+                      }}
+                    >
                       <Ionicons
                         name="remove-outline"
                         size={16}
