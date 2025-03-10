@@ -140,10 +140,13 @@ const ItemScreen = memo(function ItemScreen() {
   return (
     <SafeAreaView style={styles.mainContainer}>
       <ScrollView>
-        {/* <View style={{ flex: 1 }}> */}
         <Link href="../(tabs)/HomeScreen" asChild>
           <Pressable style={styles.backButton}>
-            <Ionicons name="arrow-back-outline" size={24} color={"white"}></Ionicons>
+            <Ionicons
+              name="arrow-back-outline"
+              size={24}
+              color={"white"}
+            ></Ionicons>
           </Pressable>
         </Link>
 
@@ -251,7 +254,6 @@ const ItemScreen = memo(function ItemScreen() {
             <Text>Delivery Options:</Text>
           </View>
         </View>
-        {/* </View> */}
       </ScrollView>
 
       <View style={styles.ItemFooter}>
@@ -284,12 +286,25 @@ const ItemScreen = memo(function ItemScreen() {
           />
           <Text style={{ color: "white" }}>Add to Cart</Text>
         </Pressable>
-        <Pressable style={styles.buyFooter}>
-          <Text style={{ color: "white", alignSelf: "center" }}>Buy Now</Text>
-          <Text style={{ color: "white", alignSelf: "center", fontSize: 22 }}>
-            ฿{product.productPrice.toLocaleString()}
-          </Text>
-        </Pressable>
+
+        <Link
+          href={{
+            pathname: "/CheckoutScreen",
+            params: {
+              amount: product.productPrice * 100,
+              name: product.productName,
+              quantity: 1,
+            },
+          }}
+          asChild
+        >
+          <Pressable style={styles.buyFooter}>
+            <Text style={{ color: "white", alignSelf: "center" }}>Buy Now</Text>
+            <Text style={{ color: "white", alignSelf: "center", fontSize: 22 }}>
+              ฿{product.productPrice.toLocaleString()}
+            </Text>
+          </Pressable>
+        </Link>
       </View>
     </SafeAreaView>
   );
@@ -308,11 +323,11 @@ const styles = StyleSheet.create({
     marginBottom: -30,
     zIndex: 1,
     marginLeft: 10,
-    borderWidth:2,
-    width:30,
-    borderRadius:90,
-    backgroundColor:"black",
-    opacity:20
+    borderWidth: 2,
+    width: 30,
+    borderRadius: 90,
+    backgroundColor: "black",
+    opacity: 20,
   },
   imageItem: {
     flexDirection: "row",
@@ -367,17 +382,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     paddingBottom: 20,
-    backgroundColor: "black",
+    backgroundColor: "orange",
   },
   addToCartFooter: {
     flexDirection: "column",
-    // justifyContent: "space-between",
-    padding: 8,
+    margin: 8,
   },
   buyFooter: {
     flexDirection: "column",
-    // justifyContent: "space-between",
-    padding: 8,
+    margin: 8,
   },
   cartBadge: {
     position: "absolute",
