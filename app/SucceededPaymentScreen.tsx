@@ -14,7 +14,7 @@ function SucceededPaymentScreen() {
         style={{ color: "green" }}
       ></Ionicons>
       <View>
-        <Text>$500 Paid!</Text>
+        <Text>฿500 Paid!</Text>
       </View>
       <Pressable
         style={{
