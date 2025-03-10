@@ -82,7 +82,7 @@ app.post("/payment-sheet", async (req, res) => {
       "stripePaymentSheet/payment-sheet: paymentIntent.id",
       paymentIntent.id
     );
-
+    
     return res.status(200).json({
       paymentIntent: paymentIntent.client_secret,
       ephemeralKey: ephemeralKey.secret,
