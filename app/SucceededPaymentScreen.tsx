@@ -1,20 +1,19 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Pressable, View, Text } from "react-native";
 
 function SucceededPaymentScreen() {
   const router = useRouter();
+  const {total, quantity} = useLocalSearchParams();
   return (
-    <View style={{         flex: 1,
-      justifyContent: "center",
-      alignItems: "center",}}>
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <Ionicons
         name="checkmark-circle-outline"
         size={40}
         style={{ color: "green" }}
       ></Ionicons>
       <View>
-        <Text>฿500 Paid!</Text>
+        <Text>฿{parseInt(total as string).toLocaleString()} Paid!</Text>
       </View>
       <Pressable
         style={{
