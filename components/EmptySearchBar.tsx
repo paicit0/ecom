@@ -51,7 +51,7 @@ const EmptySearchBar = memo(function SearchBar({
             <Ionicons name="search-outline" size={24} style={{marginRight:4}}></Ionicons>
             <TextInput
               placeholder={currentPlaceholder.text}
-              placeholderTextColor="#FF8C00"
+              placeholderTextColor="grey"
               editable={false}
               pointerEvents="none"
               style={styles.searchBarTextInput}
@@ -103,8 +103,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   searchBarTextInput: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 14,
+    fontWeight: "200",
   },
   badge: {
     position: "absolute",
