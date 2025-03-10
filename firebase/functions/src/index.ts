@@ -60,3 +60,6 @@ export { deleteCart };
 
 import { stripePaymentSheet } from "./stripePaymentSheet";
 export { stripePaymentSheet };
+
+import { user } from "./user";
+export { user };
