@@ -40,7 +40,6 @@ const fetchGetProducts = async ({
   }
 };
 
-/******  a95ab75e-9956-4c52-8f04-74b720eb8443  *******/
 export const useGetProducts = ({
   numberOfItems,
   currentProductNumber,
