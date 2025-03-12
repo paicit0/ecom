@@ -64,8 +64,8 @@ export default function TabsLayout() {
           name="MapScreen"
           options={{
             tabBarLabel: "Map",
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="map" size={size} color={color} />
+            tabBarIcon: () => (
+              <Ionicons name="map" size={24} color={"orange"} />
             ),
             href: null,
           }}
@@ -74,8 +74,8 @@ export default function TabsLayout() {
           name="test"
           options={{
             tabBarLabel: "test",
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="map" size={size} color={color} />
+            tabBarIcon: () => (
+              <Ionicons name="map" size={24} color={"orange"} />
             ),
             href: null,
           }}
