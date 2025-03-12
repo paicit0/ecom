@@ -2,7 +2,7 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useUserSession } from "../auth/firebaseAuth";
-import { View, StyleSheet, Dimensions } from "react-native";
+import { View, StyleSheet, Dimensions, Text } from "react-native";
 import { getAuth } from "firebase/auth";
 import { useEffect } from "react";
 
@@ -30,27 +30,45 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="HomeScreen"
           options={{
-            tabBarLabel: "Home",
-            tabBarIcon: () => (
-              <Ionicons name="home-outline" size={24} color={"orange"} />
+            tabBarLabel: ({ focused, color }) => (
+              <Text style={{ color: focused ? "orange" : color }}>Home</Text>
+            ),
+            tabBarIcon: ({ color, size, focused }) => (
+              <Ionicons
+                name="home-outline"
+                size={size}
+                color={focused ? "orange" : color}
+              />
             ),
           }}
         />
         <Tabs.Screen
           name="ProfileScreen"
           options={{
-            tabBarLabel: "Profile",
-            tabBarIcon: () => (
-              <Ionicons name="person-outline" size={24} color={"orange"} />
+            tabBarLabel: ({ color, focused }) => (
+              <Text style={{ color: focused ? "orange" : color }}>Profile</Text>
+            ),
+            tabBarIcon: ({ color, size, focused }) => (
+              <Ionicons
+                name="person-outline"
+                size={size}
+                color={focused ? "orange" : color}
+              />
             ),
           }}
         />
         <Tabs.Screen
           name="SubmitProductScreen"
           options={{
-            tabBarLabel: "Submit",
-            tabBarIcon: () => (
-              <Ionicons name="add-circle-outline" size={24} color={"orange"} />
+            tabBarLabel: ({ color, focused }) => (
+              <Text style={{ color: focused ? "orange" : color }}>Submit</Text>
+            ),
+            tabBarIcon: ({ color, size, focused }) => (
+              <Ionicons
+                name="add-circle-outline"
+                size={size}
+                color={focused ? "orange" : color}
+              />
             ),
             // to fix
             // the condition is not checked on app start, only when going to other Tabs.
@@ -63,9 +81,15 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="MapScreen"
           options={{
-            tabBarLabel: "Map",
-            tabBarIcon: () => (
-              <Ionicons name="map" size={24} color={"orange"} />
+            tabBarLabel: ({ color, focused }) => (
+              <Text style={{ color: focused ? "orange" : color }}>Map</Text>
+            ),
+            tabBarIcon: ({ color, size, focused }) => (
+              <Ionicons
+                name="map"
+                size={size}
+                color={focused ? "orange" : color}
+              />
             ),
             href: null,
           }}
@@ -74,8 +98,12 @@ export default function TabsLayout() {
           name="test"
           options={{
             tabBarLabel: "test",
-            tabBarIcon: () => (
-              <Ionicons name="map" size={24} color={"orange"} />
+            tabBarIcon: ({ color, size, focused }) => (
+              <Ionicons
+                name="map"
+                size={size}
+                color={focused ? "orange" : color}
+              />
             ),
             href: null,
           }}
