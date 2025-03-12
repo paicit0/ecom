@@ -29,7 +29,13 @@ const fetchCart = async ({ userEmail }: fetchCartType): Promise<Product[]> => {
         "Content-Type": "application/json",
       },
     });
-    console.log("useGetCart: data.CartProducts", data.cartProducts);
+    if (data.CartProducts) {
+      console.log(
+        "useGetCart: data.CartProducts[0].id",
+        data.cartProducts[0].id
+      );
+    }
+
     return data.cartProducts;
   } catch (error) {
     console.error("useGetCart: ", error);
