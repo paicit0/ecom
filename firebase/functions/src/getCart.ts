@@ -34,20 +34,19 @@ app.get("/", async (req, res) => {
     }
 
     const userDoc = usersQuerySnapshot.docs[0];
-    console.log("getCart: userDoc", userDoc);
+    console.log("getCart: userDoc exists", userDoc.exists);
     if (!userDoc.exists) {
       console.error("getCart: User's data not found", userEmail);
       return res.status(404).json({ error: "getCart: User's data not found" });
     }
 
     const cartItemsArray = userDoc.data().cartItemsArray;
-    console.log("getCart: cartItemsArray:", cartItemsArray);
-    console.log("getCart: cartItemsArray.length:", cartItemsArray.length);
-
     if (cartItemsArray.length === 0) {
       console.log("getCart: No cart items found", { email: userEmail });
       return res.status(200).json({ cartProducts: [] });
     }
+    console.log("getCart: cartItemsArray[0]:", cartItemsArray[0]);
+    console.log("getCart: cartItemsArray.length:", cartItemsArray.length);
 
     const productIds = cartItemsArray.map(
       (item: { productId: string; productQuantity: number }) => item.productId
@@ -57,7 +56,7 @@ app.get("/", async (req, res) => {
       .collection("products")
       .where(FieldPath.documentId(), "in", productIds)
       .get();
-    console.log("getCart: productsSnapshot:", productsSnapshot);
+    console.log("getCart: productsSnapshot.size:", productsSnapshot.size);
 
     const cartProducts = productsSnapshot.docs.map((doc) => {
       const cartItem = cartItemsArray.find(
@@ -71,7 +70,7 @@ app.get("/", async (req, res) => {
       };
     });
 
-    console.log("getCart: cartProducts", cartProducts);
+    console.log("getCart: cartProducts[0].id", cartProducts[0].id);
 
     console.log("getCart: cartItemsArray's data Found, sending now..");
     return res.status(200).json({ cartProducts: cartProducts });
