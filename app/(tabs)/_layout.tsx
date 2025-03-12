@@ -13,7 +13,7 @@ export default function TabsLayout() {
 
   useEffect(() => {
     if (userInfoFromStore && userAuth) {
-      console.log("app/(tabs)/_layout: mounted")
+      console.log("app/(tabs)/_layout: mounted");
     }
   }, [userInfoFromStore, userAuth]);
 
@@ -31,8 +31,8 @@ export default function TabsLayout() {
           name="HomeScreen"
           options={{
             tabBarLabel: "Home",
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="home-outline" size={size} color={"orange"} />
+            tabBarIcon: () => (
+              <Ionicons name="home-outline" size={24} color={"orange"} />
             ),
           }}
         />
@@ -40,8 +40,8 @@ export default function TabsLayout() {
           name="ProfileScreen"
           options={{
             tabBarLabel: "Profile",
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="person-outline" size={size} color={"orange"} />
+            tabBarIcon: () => (
+              <Ionicons name="person-outline" size={24} color={"orange"} />
             ),
           }}
         />
@@ -49,8 +49,8 @@ export default function TabsLayout() {
           name="SubmitProductScreen"
           options={{
             tabBarLabel: "Submit",
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="add-circle-outline" size={size} color={"orange"} />
+            tabBarIcon: () => (
+              <Ionicons name="add-circle-outline" size={24} color={"orange"} />
             ),
             // to fix
             // the condition is not checked on app start, only when going to other Tabs.
@@ -76,9 +76,8 @@ export default function TabsLayout() {
             tabBarLabel: "test",
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="map" size={size} color={color} />
-              
             ),
-            href:null,
+            href: null,
           }}
         />
       </Tabs>
