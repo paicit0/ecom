@@ -117,7 +117,7 @@ const deviceWidth = Dimensions.get("window").width;
 
 const styles = StyleSheet.create({
   tabBar: {
-    height: deviceHeight * 0.0765,
+    height: deviceHeight * 0.088,
     backgroundColor: "white",
   },
   tabBarItem: {
