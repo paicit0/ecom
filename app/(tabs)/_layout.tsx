@@ -32,7 +32,7 @@ export default function TabsLayout() {
           options={{
             tabBarLabel: "Home",
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="home" size={size} color={color} />
+              <Ionicons name="home-outline" size={size} color={"orange"} />
             ),
           }}
         />
@@ -41,7 +41,7 @@ export default function TabsLayout() {
           options={{
             tabBarLabel: "Profile",
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="person" size={size} color={color} />
+              <Ionicons name="person-outline" size={size} color={"orange"} />
             ),
           }}
         />
@@ -50,7 +50,7 @@ export default function TabsLayout() {
           options={{
             tabBarLabel: "Submit",
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="add-circle" size={size} color={color} />
+              <Ionicons name="add-circle-outline" size={size} color={"orange"} />
             ),
             // to fix
             // the condition is not checked on app start, only when going to other Tabs.
