@@ -11,12 +11,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { memo, useEffect, useState } from "react";
 import { Link } from "expo-router";
 import { useCart } from "@/app/store/store";
-import Animated, { AnimatedStyle } from "react-native-reanimated";
-
+import Animated from "react-native-reanimated";
 type SearchBarProps = {
   placeholderArray: string[];
   intervalMs?: number;
-  style?: ViewStyle | AnimatedStyle;
+  style?: ViewStyle;
   borderColor?: string;
   borderWidth?: number;
 };
