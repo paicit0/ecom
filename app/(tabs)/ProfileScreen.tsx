@@ -167,7 +167,7 @@ function ProfileScreen() {
                             justifyContent: "center",
                           }}
                         >
-                          <Text>Piyapat</Text>
+                          <Text style={styles.userNameText}>Piyapat</Text>
                           <View style={{ flexDirection: "row", gap: 10 }}>
                             <Text>50 Followers</Text>
                             <Text>50 Following</Text>
@@ -374,7 +374,9 @@ function ProfileScreen() {
           >
             <Text style={styles.buttonText}>Get user status</Text>
           </Pressable>
-          <Pressable onPress={()=>router.replace('/(tabs)/test')}><Text>Go Test</Text></Pressable>
+          <Pressable onPress={() => router.replace("/(tabs)/test")}>
+            <Text>Go Test</Text>
+          </Pressable>
         </ScrollView>
       </SafeAreaView>
     </>
@@ -409,6 +411,10 @@ const styles = StyleSheet.create({
     // paddingLeft: 15,
     // backgroundColor: "blue",
   },
+  userNameText: {
+    color: "white",
+  },
+
   loginRegisterContainer: {
     flexDirection: "row",
     justifyContent: "flex-end",
