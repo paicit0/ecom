@@ -1,19 +1,21 @@
 //EmptySearchScreen.tsx
-import { StyleSheet, View, Text, TextInput, Pressable } from "react-native";
+import { StyleSheet, View, Text, TextInput, Pressable, ViewStyle } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { memo, useEffect, useState } from "react";
 import { Link } from "expo-router";
 import { useCart } from "@/app/store/store";
-import { FadeIn, FadeOut } from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 type SearchBarProps = {
   placeholderArray: string[];
-  intervalMs: number;
+  intervalMs?: number;
+  style: ViewStyle;
 };
 
 const EmptySearchBar = memo(function SearchBar({
   placeholderArray,
-  intervalMs,
+  intervalMs = 5000,
+  style,
 }: SearchBarProps) {
   const [currentPlaceholder, setCurrentPlaceholder] = useState(() =>
     getRandomPlaceholder(-1)
@@ -39,68 +41,45 @@ const EmptySearchBar = memo(function SearchBar({
   }, []);
 
   return (
-    <View style={styles.mainContainer}>
-      <View style={styles.searchBarContainer}>
-        <Link href="/SearchScreen" asChild>
-          <Pressable
-            onPress={() => {
-              console.log("EmptySearchBar Tapped.");
-            }}
-            style={{ flex: 1, flexDirection: "row", alignItems: "center" }}
-          >
-            <Ionicons name="search-outline" size={24} style={{marginRight:4}}></Ionicons>
-            <TextInput
-              placeholder={currentPlaceholder.text}
-              placeholderTextColor="grey"
-              editable={false}
-              pointerEvents="none"
-              style={styles.searchBarTextInput}
-            />
-            {/* <Ionicons name="search" size={30} color="#666" /> */}
-          </Pressable>
-        </Link>
-      </View>
-      <View style={styles.cartContainer}>
-        <Link href="/CartScreen" asChild>
-          <Pressable style={{ marginLeft: 10 }}>
-            {cart.length > 0 && (
-              <Text style={styles.badge}>
-                {cart.length > 99 ? "99+" : cart.length}
-              </Text>
-            )}
-            <Ionicons name="cart-outline" size={28} color="white" />
-          </Pressable>
-        </Link>
-        <Ionicons name="chatbubble-ellipses-outline" size={28} color="white" />
-      </View>
-    </View>
+    <Animated.View style={[styles.searchBarContainer, style]}>
+      <Link href="/SearchScreen" asChild>
+        <Pressable
+          onPress={() => {
+            console.log("EmptySearchBar Tapped.");
+          }}
+          style={{ flex: 1, flexDirection: "row", alignItems: "center" }}
+        >
+          <Ionicons
+            name="search-outline"
+            size={24}
+            style={{ marginRight: 4 }}
+          ></Ionicons>
+          <TextInput
+            placeholder={currentPlaceholder.text}
+            placeholderTextColor="grey"
+            editable={false}
+            pointerEvents="none"
+            style={styles.searchBarTextInput}
+          />
+        </Pressable>
+      </Link>
+    </Animated.View>
   );
 });
 
 const styles = StyleSheet.create({
-  mainContainer: {
-    width: "100%",
-    padding: 10,
-    flexDirection: "row",
-    backgroundColor: "orange",
-  },
   searchBarContainer: {
     flex: 4,
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "white",
     borderRadius: 8,
-    paddingHorizontal: 12,
+    paddingLeft: 12,
     borderColor: "black",
-    height: 45,
-    borderWidth: 0.5,
-  },
-  cartContainer: {
-    flexDirection: "row",
-    gap: 18,
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    height: 40,
+    width: "100%",
+    alignSelf: "center",
+    opacity: 1,
   },
   searchBarTextInput: {
     fontSize: 14,
