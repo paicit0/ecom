@@ -1,21 +1,32 @@
 // EmptySearchScreen.tsx
-import { StyleSheet, View, Text, TextInput, Pressable, ViewStyle } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  ViewStyle,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { memo, useEffect, useState } from "react";
 import { Link } from "expo-router";
 import { useCart } from "@/app/store/store";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import Animated, { AnimatedStyle } from "react-native-reanimated";
 
 type SearchBarProps = {
   placeholderArray: string[];
   intervalMs?: number;
-  style: ViewStyle;
+  style?: ViewStyle | AnimatedStyle;
+  borderColor?: string;
+  borderWidth?: number;
 };
 
 const EmptySearchBar = memo(function SearchBar({
   placeholderArray,
   intervalMs = 5000,
   style,
+  borderColor = "black",
+  borderWidth = 0.5,
 }: SearchBarProps) {
   const [currentPlaceholder, setCurrentPlaceholder] = useState(() =>
     getRandomPlaceholder(-1)
@@ -41,7 +52,13 @@ const EmptySearchBar = memo(function SearchBar({
   }, []);
 
   return (
-    <Animated.View style={[styles.searchBarContainer, style]}>
+    <Animated.View
+      style={[
+        styles.searchBarContainer,
+        style,
+        { borderColor: borderColor, borderWidth: borderWidth },
+      ]}
+    >
       <Link href="/SearchScreen" asChild>
         <Pressable
           onPress={() => {
@@ -80,6 +97,7 @@ const styles = StyleSheet.create({
     width: "100%",
     alignSelf: "center",
     opacity: 1,
+    borderWidth: 0.5,
   },
   searchBarTextInput: {
     fontSize: 14,
