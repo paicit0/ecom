@@ -165,7 +165,7 @@ export const HomeScreen = memo(function HomeScreen() {
                   ฿0.00
                 </Text>
               </View>
-              <Text style={{ alignSelf: "flex-start" }}>abcd</Text>
+              <Text style={{ alignSelf: "flex-start" }}>Card</Text>
             </View>
             <View
               style={{
@@ -306,22 +306,33 @@ export const HomeScreen = memo(function HomeScreen() {
 
   return (
     <>
-      <SafeAreaView style={styles.header}></SafeAreaView>
+      <SafeAreaView style={{ backgroundColor: "orange" }}></SafeAreaView>
       <View style={styles.mainContainer}>
-        <View style={{ flex: 1, backgroundColor: "#F5F5F5" }}>
-          <View>
-            <EmptySearchBar
-              placeholderArray={[
-                "Electric Drill",
-                "Meat",
-                "shovel",
-                "Jars",
-                "Batteries",
-              ]}
-              intervalMs={5000}
+        <View style={styles.header}>
+          <EmptySearchBar
+            placeholderArray={[
+              "Electric Drill",
+              "Meat",
+              "shovel",
+              "Jars",
+              "Batteries",
+            ]}
+            intervalMs={5000}
+          />
+          <View style={styles.cartContainer}>
+            <Link href="/CartScreen" asChild>
+              <Pressable style={{ marginLeft: 10 }}>
+                <Ionicons name="cart-outline" size={28} color="white" />
+              </Pressable>
+            </Link>
+            <Ionicons
+              name="chatbubble-ellipses-outline"
+              size={28}
+              color="white"
             />
           </View>
-
+        </View>
+        <View style={{ flex: 1, backgroundColor: "#F5F5F5" }}>
           <FlashList
             data={
               filteredProduct?.length ?? 0 > 0
@@ -378,6 +389,14 @@ const deviceWidth = Dimensions.get("window").width;
 const styles = StyleSheet.create({
   header: {
     backgroundColor: "orange",
+    flexDirection: "row",
+    padding:10
+  },
+  cartContainer: {
+    flexDirection: "row",
+    gap: 18,
+    alignItems: "center",
+    justifyContent: "center",
   },
   mainContainer: {
     flex: 1,
