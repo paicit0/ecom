@@ -9,69 +9,67 @@ const app = express();
 app.use(verifyBearerAndIdtoken);
 
 app.post("/", async (req, res) => {
+  const { userEmail, productId } = req.body;
+  const authHeader = req.headers.authorization;
+
+  console.log("addCart: req.body:", req.body);
+  console.log("addCart: req.headers.authorization:", authHeader);
+
+  if (!userEmail || !productId) {
+    return res.status(400).json({
+      error: "addCart: no/invalid userEmail or productId in body.",
+    });
+  }
+
   try {
-    const { userEmail, productId } = req.body;
-    const authHeader = req.headers.authorization;
+    await db.runTransaction(async (transaction) => {
+      const usersSnapshot = await db
+        .collection("users")
+        .where("userEmail", "==", userEmail)
+        .get();
+      console.log("addCart: usersSnapshot.size:", usersSnapshot.size);
 
-    console.log("addCart: req.body: ", userEmail, productId);
-    console.log("addCart: req.headers.authorization:", authHeader);
+      if (usersSnapshot.empty) {
+        console.error("addCart: No user found with userEmail:", userEmail);
+        return res.status(404).json({ error: "addCart: User not found." });
+      }
 
-    if (!userEmail || !productId) {
-      return res.status(400).json({
-        error: "addCart: no/invalid userEmail or productId in body.",
-      });
-    }
+      const userDoc = usersSnapshot.docs[0];
+      console.log("addCart: userDoc.id:", userDoc.id);
 
-    const usersSnapshot = await db
-      .collection("users")
-      .where("userEmail", "==", userEmail)
-      .get();
-    console.log("addCart: usersSnapshot.size:", usersSnapshot.size);
+      const userData = userDoc.data() || {};
 
-    if (usersSnapshot.empty) {
-      console.error("addCart: No user found with userEmail:", userEmail);
-      return res.status(404).json({ error: "addCart: User not found." });
-    }
+      const cartItemsArray: { productId: string; productQuantity: number }[] =
+        userData.cartItemsArray;
 
-    const userDoc = usersSnapshot.docs[0];
-    console.log("addCart: userDoc.id:", userDoc.id);
-    if (!userDoc.exists) {
-      console.error("addCart: No user data found with userEmail:", userEmail);
-      return res.status(404).json({ error: "addCart: User data not found." });
-    }
-    console.log("addCart: userDoc", userDoc);
+      console.log("addCart: cartItemsArray:", cartItemsArray);
 
-    const userData = userDoc.data() || {};
+      const updatedCartItems = [...cartItemsArray];
 
-    const cartItemsArray: { productId: string; productQuantity: number }[] =
-      Array.isArray(userData.cartItemsArray) ? userData.cartItemsArray : [];
+      const existingItemIndex = updatedCartItems.findIndex(
+        (item) => item.productId === productId
+      );
 
-    console.log("addCart: cartItemsArray:", cartItemsArray);
+      if (existingItemIndex !== -1) {
+        console.log("addCart: Incrementing existing product quantity!");
+        updatedCartItems[existingItemIndex] = {
+          ...updatedCartItems[existingItemIndex],
+          productQuantity:
+            updatedCartItems[existingItemIndex].productQuantity + 1,
+        };
+      } else {
+        console.log("addCart: Adding new product to cart");
+        updatedCartItems.push({
+          productId,
+          productQuantity: 1,
+        });
+      }
 
-    const updatedCartItems = [...cartItemsArray];
-
-    const existingItemIndex = updatedCartItems.findIndex(
-      (item) => item.productId === productId
-    );
-
-    if (existingItemIndex !== -1) {
-      console.log("addCart: Incrementing existing product quantity!");
-      updatedCartItems[existingItemIndex] = {
-        ...updatedCartItems[existingItemIndex],
-        productQuantity:
-          updatedCartItems[existingItemIndex].productQuantity + 1,
-      };
-    } else {
-      console.log("addCart: Adding new product to cart");
-      updatedCartItems.push({
-        productId,
-        productQuantity: 1,
-      });
-    }
-
-    await userDoc.ref.update({ cartItemsArray: updatedCartItems });
-    return res.status(201).json({
-      message: "addCart: Item added to cartItemsArray",
+      transaction.update(userDoc.ref, { cartItemsArray: updatedCartItems });
+      return true;
+    });
+    return res.status(200).json({
+      message: "addCart: finished executing",
     });
   } catch (error) {
     console.error("addCart: internal error:", error);
@@ -80,3 +78,4 @@ app.post("/", async (req, res) => {
 });
 
 export const addCart = functions.https.onRequest(app);
+
