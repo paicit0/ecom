@@ -17,6 +17,12 @@ export default function TabsLayout() {
     }
   }, [userInfoFromStore, userAuth]);
 
+  type styleType = {
+    focused: boolean;
+    size: number;
+    color: string;
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <Tabs
@@ -30,10 +36,10 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="HomeScreen"
           options={{
-            tabBarLabel: ({ focused, color }) => (
+            tabBarLabel: ({ focused, color }: styleType) => (
               <Text style={{ color: focused ? "orange" : color }}>Home</Text>
             ),
-            tabBarIcon: ({ color, size, focused }) => (
+            tabBarIcon: ({ color, size, focused }: styleType) => (
               <Ionicons
                 name="home-outline"
                 size={size}
@@ -45,46 +51,45 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="ProfileScreen"
           options={{
-            tabBarLabel: ({ color, focused }) => (
+            tabBarLabel: ({ color, focused }: styleType) => (
               <Text style={{ color: focused ? "orange" : color }}>Profile</Text>
             ),
-            tabBarIcon: ({ color, size, focused }) => (
+            tabBarIcon: ({ color, size, focused }: styleType) => (
               <Ionicons
                 name="person-outline"
                 size={size}
                 color={focused ? "orange" : color}
               />
             ),
+            href: "ProfileScreen",
           }}
         />
         <Tabs.Screen
           name="SubmitProductScreen"
           options={{
-            tabBarLabel: ({ color, focused }) => (
+            tabBarLabel: ({ color, focused }: styleType) => (
               <Text style={{ color: focused ? "orange" : color }}>Submit</Text>
             ),
-            tabBarIcon: ({ color, size, focused }) => (
+            tabBarIcon: ({ color, size, focused }: styleType) => (
               <Ionicons
                 name="add-circle-outline"
                 size={size}
                 color={focused ? "orange" : color}
               />
             ),
-            // to fix
-            // the condition is not checked on app start, only when going to other Tabs.
-            tabBarButton:
+            href:
               userInfoFromStore.userRole === "seller" && userAuth
-                ? undefined
-                : () => null,
+                ? "SubmitProductScreen"
+                : null,
           }}
         />
         <Tabs.Screen
           name="MapScreen"
           options={{
-            tabBarLabel: ({ color, focused }) => (
+            tabBarLabel: ({ color, focused }: styleType) => (
               <Text style={{ color: focused ? "orange" : color }}>Map</Text>
             ),
-            tabBarIcon: ({ color, size, focused }) => (
+            tabBarIcon: ({ color, size, focused }: styleType) => (
               <Ionicons
                 name="map"
                 size={size}
@@ -98,7 +103,7 @@ export default function TabsLayout() {
           name="test"
           options={{
             tabBarLabel: "test",
-            tabBarIcon: ({ color, size, focused }) => (
+            tabBarIcon: ({ color, size, focused }: styleType) => (
               <Ionicons
                 name="map"
                 size={size}
