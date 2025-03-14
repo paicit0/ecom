@@ -32,7 +32,10 @@ app.post("/payment-sheet", async (req, res) => {
         },
       });
       customerIdStripe = customer.id;
-      console.log("stripePaymentSheet/payment-sheet: new customer", customer.id);
+      console.log(
+        "stripePaymentSheet/payment-sheet: new customer",
+        customer.id
+      );
     } else {
       const getCustomer = await stripe.customers.retrieve(customerId);
       console.log(
@@ -43,11 +46,9 @@ app.post("/payment-sheet", async (req, res) => {
         customerIdStripe = getCustomer.id;
       } else {
         console.error("stripePaymentSheet/payment-sheet: error");
-        return res
-          .status(500)
-          .json({
-            error: "stripePaymentSheet/payment-sheet: failed to get customer",
-          });
+        return res.status(500).json({
+          error: "stripePaymentSheet/payment-sheet: failed to get customer",
+        });
       }
     }
 
@@ -82,7 +83,7 @@ app.post("/payment-sheet", async (req, res) => {
       "stripePaymentSheet/payment-sheet: paymentIntent.id",
       paymentIntent.id
     );
-    
+
     return res.status(200).json({
       paymentIntent: paymentIntent.client_secret,
       ephemeralKey: ephemeralKey.secret,
