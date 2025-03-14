@@ -1,13 +1,6 @@
 // ItemScreen/[id].tsx
 import { memo, useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  Dimensions,
-} from "react-native";
+import { View, Text, StyleSheet, Pressable, Dimensions } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Link, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
@@ -19,6 +12,13 @@ import { useDeleteFavorite } from "../../hooks/fetch/useDeleteFavorite";
 import { useAddCart } from "../../hooks/fetch/useAddCart";
 import { getAuth } from "firebase/auth";
 import { SafeAreaView } from "react-native-safe-area-context";
+import EmptySearchBar from "../../components/EmptySearchBar";
+import Animated, {
+  useAnimatedScrollHandler,
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from "react-native-reanimated";
 
 const ItemScreen = memo(function ItemScreen() {
   const [product, setProduct] = useState<Product>();
@@ -113,6 +113,28 @@ const ItemScreen = memo(function ItemScreen() {
   };
 
   const handlePrevImage = () => {};
+  const opacitySearchBar = useSharedValue<number>(1);
+  const buttonCircleColor = useSharedValue<string>("red");
+
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event, ctx: { prevY: number | undefined }) => {
+      const currentY = event.contentOffset.y;
+      if (ctx.prevY !== undefined) {
+        opacitySearchBar.value = withTiming(currentY > ctx.prevY ? 0 : 1, {
+          duration: 200,
+        });
+        buttonCircleColor.value = currentY > ctx.prevY ? "orange" : "red";
+      }
+      ctx.prevY = currentY;
+    },
+  });
+  const animatedHeaderStyle = useAnimatedStyle(() => ({
+    opacity: opacitySearchBar.value,
+  }));
+
+  const buttonCircleStyle = useAnimatedStyle(() => ({
+    backgroundColor: buttonCircleColor.value,
+  }));
 
   if (loading) {
     return (
@@ -132,24 +154,57 @@ const ItemScreen = memo(function ItemScreen() {
           alignSelf: "center",
         }}
       >
-        {/* <Text>No Product Found... It may have been deleted.</Text> */}
+        <Text>No Product Found... It may have been deleted.</Text>
       </View>
     );
   }
 
   return (
     <SafeAreaView style={styles.mainContainer}>
-      <ScrollView>
-        <Link href="../(tabs)/HomeScreen" asChild>
-          <Pressable style={styles.backButton}>
+      <View style={styles.header}>
+        <View style={{ alignSelf: "center", marginRight: 8 }}>
+          <Link href="../(tabs)/HomeScreen" asChild>
+            <Pressable style={[styles.headerButtonCircle, buttonCircleStyle]}>
+              <Ionicons
+                name="arrow-back-outline"
+                size={28}
+                color={"white"}
+              ></Ionicons>
+            </Pressable>
+          </Link>
+        </View>
+
+        <EmptySearchBar
+          placeholderArray={["Wrench", "Drill"]}
+          style={animatedHeaderStyle}
+        />
+        <View
+          style={{
+            flexDirection: "row",
+            alignSelf: "center",
+            gap: 10,
+            marginLeft: 8,
+            // opacity:0.5
+          }}
+        >
+          <Pressable style={styles.headerButtonCircle}>
+            <Ionicons name="share-outline" size={28} color={"white"}></Ionicons>
+          </Pressable>
+          <Link href="/CartScreen" asChild>
+            <Pressable style={styles.headerButtonCircle}>
+              <Ionicons name="cart-outline" size={28} color="white" />
+            </Pressable>
+          </Link>
+          <Pressable style={styles.headerButtonCircle}>
             <Ionicons
-              name="arrow-back-outline"
-              size={24}
+              name="ellipsis-vertical-outline"
+              size={28}
               color={"white"}
             ></Ionicons>
           </Pressable>
-        </Link>
-
+        </View>
+      </View>
+      <Animated.ScrollView onScroll={scrollHandler} scrollEventThrottle={16}>
         <View style={styles.imageItem}>
           {product.productImageUrl.map((item, index) => (
             <Image
@@ -235,26 +290,12 @@ const ItemScreen = memo(function ItemScreen() {
               {product.productDescription}
             </Text>
           </View>
-          <View
-            style={{
-              width: deviceWidth,
-              flexDirection: "row",
-              alignContent: "flex-start",
-              alignItems: "center",
-              paddingLeft: 15,
-              paddingTop: 15,
-              paddingBottom: 15,
-              gap: 8,
-              borderColor: "grey",
-              borderTopWidth: 0.5,
-              borderBottomWidth: 0.5,
-              backgroundColor: "white",
-            }}
-          >
+          <View style={styles.deliveryOptionContainer}>
             <Text>Delivery Options:</Text>
           </View>
+          <View style={{ height: 600 }}></View>
         </View>
-      </ScrollView>
+      </Animated.ScrollView>
 
       <View style={styles.ItemFooter}>
         <Pressable
@@ -316,19 +357,16 @@ const deviceWidth = Dimensions.get("window").width;
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: "white",
-    // backgroundColor: "orange",
+    backgroundColor: "orange",
   },
-  backButton: {
-    marginBottom: -30,
-    zIndex: 1,
-    marginLeft: 10,
-    borderWidth: 2,
-    width: 30,
-    borderRadius: 90,
-    backgroundColor: "black",
-    opacity: 20,
+  header: {
+    flexDirection: "row",
+    padding: 10,
+    backgroundColor: "orange",
+    // marginBottom:-50,
+    // zIndex:1
   },
+  headerButtonCircle: { borderRadius: 20 },
   imageItem: {
     flexDirection: "row",
     aspectRatio: 3 / 2,
@@ -340,10 +378,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    backgroundColor: "white",
     borderBottomColor: "grey",
     borderBottomWidth: 0.5,
   },
   mainDescription: {
+    backgroundColor: "white",
     // padding: 20
   },
   productNameContainer: {
@@ -377,6 +417,19 @@ const styles = StyleSheet.create({
   favoriteButton: {
     alignItems: "center",
     justifyContent: "center",
+  },
+  deliveryOptionContainer: {
+    flexDirection: "row",
+    alignContent: "flex-start",
+    alignItems: "center",
+    paddingLeft: 15,
+    paddingTop: 15,
+    paddingBottom: 15,
+    gap: 8,
+    borderColor: "grey",
+    borderTopWidth: 0.5,
+    borderBottomWidth: 0.5,
+    backgroundColor: "white",
   },
   ItemFooter: {
     flexDirection: "row",
