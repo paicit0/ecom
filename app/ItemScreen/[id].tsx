@@ -14,9 +14,10 @@ import { getAuth } from "firebase/auth";
 import { SafeAreaView } from "react-native-safe-area-context";
 import EmptySearchBar from "../../components/EmptySearchBar";
 import Animated, {
-  useAnimatedScrollHandler,
   useSharedValue,
+  useAnimatedScrollHandler,
   useAnimatedStyle,
+  useAnimatedProps,
   withTiming,
 } from "react-native-reanimated";
 
@@ -113,27 +114,63 @@ const ItemScreen = memo(function ItemScreen() {
   };
 
   const handlePrevImage = () => {};
-  const opacitySearchBar = useSharedValue<number>(1);
-  const buttonCircleColor = useSharedValue<string>("red");
+  const searchBarOpacity = useSharedValue<number>(0);
+  const headerRGBAOpacity = useSharedValue<number>(0);
+  const headerButtonIconColor = useSharedValue<string>(`rgb(247, 187, 57, 1)`);
+  const headerButtonCircleColor = useSharedValue<string>(`rgba(0, 0, 0, 0.5)`);
+
+  const AnimatedIcon = Animated.createAnimatedComponent(Ionicons);
+
+  const testOpacaity = () => {
+    searchBarOpacity.value = searchBarOpacity.value + 0.1;
+    headerRGBAOpacity.value = headerRGBAOpacity.value + 0.1;
+    console.log("[id]: searchBarOpacity: ", searchBarOpacity.value);
+    console.log("[id]: headerRGBAOpacity: ", headerRGBAOpacity.value);
+    return;
+  };
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event, ctx: { prevY: number | undefined }) => {
       const currentY = event.contentOffset.y;
       if (ctx.prevY !== undefined) {
-        opacitySearchBar.value = withTiming(currentY > ctx.prevY ? 0 : 1, {
+        searchBarOpacity.value,
+          (searchBarOpacity.value = withTiming(currentY > ctx.prevY ? 1 : 0, {
+            duration: 200,
+          }));
+        headerRGBAOpacity.value = withTiming(currentY > ctx.prevY ? 1 : 0, {
           duration: 200,
         });
-        buttonCircleColor.value = currentY > ctx.prevY ? "orange" : "red";
+        headerButtonIconColor.value = withTiming(
+          currentY > ctx.prevY ? `rgb(247, 187, 57, 1)` : `rgba(0, 0, 0, 0.5)`,
+          {
+            duration: 200,
+          }
+        );
+        headerButtonCircleColor.value = withTiming(
+          currentY > ctx.prevY ? `rgba(0, 0, 0, 0.5)` : `rgb(247, 187, 57, 1)`,
+          {
+            duration: 200,
+          }
+        );
       }
       ctx.prevY = currentY;
     },
   });
-  const animatedHeaderStyle = useAnimatedStyle(() => ({
-    opacity: opacitySearchBar.value,
+
+  const headerStyle = useAnimatedStyle(() => ({
+    backgroundColor: `rgba(255,255,255,${headerRGBAOpacity.value})`,
+  }));
+  const headerIconStyle = useAnimatedStyle(() => ({
+    color: headerButtonIconColor.value,
+  }));
+
+  const searchBarStyle = useAnimatedStyle(() => ({
+    opacity: searchBarOpacity.value,
   }));
 
   const buttonCircleStyle = useAnimatedStyle(() => ({
-    backgroundColor: buttonCircleColor.value,
+    backgroundColor: headerButtonCircleColor.value,
+    borderRadius: 20,
   }));
 
   if (loading) {
@@ -161,22 +198,20 @@ const ItemScreen = memo(function ItemScreen() {
 
   return (
     <SafeAreaView style={styles.mainContainer}>
-      <View style={styles.header}>
-        <View style={{ alignSelf: "center", marginRight: 8 }}>
+      <Animated.View style={[styles.header, headerStyle]}>
+        <View style={[{ alignSelf: "center", marginRight: 8 }]}>
           <Link href="../(tabs)/HomeScreen" asChild>
-            <Pressable style={[styles.headerButtonCircle, buttonCircleStyle]}>
-              <Ionicons
-                name="arrow-back-outline"
-                size={28}
-                color={"white"}
-              ></Ionicons>
+            <Pressable>
+              <Animated.Text style={[headerIconStyle, buttonCircleStyle]}>
+                <Ionicons name="arrow-back-outline" size={28} />
+              </Animated.Text>
             </Pressable>
           </Link>
         </View>
-
         <EmptySearchBar
           placeholderArray={["Wrench", "Drill"]}
-          style={animatedHeaderStyle}
+          style={searchBarStyle}
+          borderColor={"red"}
         />
         <View
           style={{
@@ -184,26 +219,29 @@ const ItemScreen = memo(function ItemScreen() {
             alignSelf: "center",
             gap: 10,
             marginLeft: 8,
-            // opacity:0.5
           }}
         >
-          <Pressable style={styles.headerButtonCircle}>
-            <Ionicons name="share-outline" size={28} color={"white"}></Ionicons>
+          <Pressable>
+            <Animated.Text style={[headerIconStyle, buttonCircleStyle]}>
+              <Ionicons name="share-outline" size={28} />
+            </Animated.Text>
           </Pressable>
-          <Link href="/CartScreen" asChild>
-            <Pressable style={styles.headerButtonCircle}>
-              <Ionicons name="cart-outline" size={28} color="white" />
-            </Pressable>
-          </Link>
-          <Pressable style={styles.headerButtonCircle}>
-            <Ionicons
-              name="ellipsis-vertical-outline"
-              size={28}
-              color={"white"}
-            ></Ionicons>
+          <View>
+            <Link href="/CartScreen" asChild>
+              <Pressable>
+                <Animated.Text style={[headerIconStyle, buttonCircleStyle]}>
+                  <Ionicons name="cart-outline" size={28} />
+                </Animated.Text>
+              </Pressable>
+            </Link>
+          </View>
+          <Pressable>
+            <Animated.Text style={[headerIconStyle, buttonCircleStyle]}>
+              <Ionicons name="ellipsis-vertical-outline" size={28} />
+            </Animated.Text>
           </Pressable>
         </View>
-      </View>
+      </Animated.View>
       <Animated.ScrollView onScroll={scrollHandler} scrollEventThrottle={16}>
         <View style={styles.imageItem}>
           {product.productImageUrl.map((item, index) => (
@@ -293,6 +331,9 @@ const ItemScreen = memo(function ItemScreen() {
           <View style={styles.deliveryOptionContainer}>
             <Text>Delivery Options:</Text>
           </View>
+          <Pressable onPress={testOpacaity}>
+            <Text>Test Opacity</Text>
+          </Pressable>
           <View style={{ height: 600 }}></View>
         </View>
       </Animated.ScrollView>
@@ -357,14 +398,13 @@ const deviceWidth = Dimensions.get("window").width;
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: "orange",
+    backgroundColor: "white",
   },
   header: {
     flexDirection: "row",
     padding: 10,
-    backgroundColor: "orange",
-    // marginBottom:-50,
-    // zIndex:1
+    marginBottom: -60,
+    zIndex: 1,
   },
   headerButtonCircle: { borderRadius: 20 },
   imageItem: {
