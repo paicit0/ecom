@@ -374,6 +374,7 @@ function ProfileScreen() {
           >
             <Text style={styles.buttonText}>Get user status</Text>
           </Pressable>
+          <Pressable onPress={()=>router.replace('/(tabs)/test')}><Text>Go Test</Text></Pressable>
         </ScrollView>
       </SafeAreaView>
     </>
