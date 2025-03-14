@@ -133,6 +133,7 @@ function CheckoutScreen() {
   };
 
   const openPaymentSheet = async () => {
+    const idToken = await SecureStore.getItemAsync("authToken");
     console.log("CheckoutScreen: openPaymentSheet");
     const { error } = await presentPaymentSheet();
     setLoading(true);
@@ -142,6 +143,32 @@ function CheckoutScreen() {
       router.replace("/FailedPaymentScreen");
       setLoading(false);
     } else {
+      try {
+        const addTransactionUrl =
+          process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
+            ? process.env.EXPO_PUBLIC_addTransaction_emulator
+            : process.env.EXPO_PUBLIC_addTransaction_prod;
+        if (!addTransactionUrl) {
+          throw new Error("CheckoutScreen: addTransaction url not good.");
+        }
+        const fetchTransaction = axios.post(
+          addTransactionUrl,
+          {
+            userEmail: userEmail,
+            productId: "abac123123Test",
+            productPrice: parseInt(amount as string) / 100,
+            location: "khon kaen test",
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${idToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const fetchTransactionData = (await fetchTransaction).data;
+        console.log("CheckoutScreen: transaction added:", fetchTransactionData);
+      } catch (error) {console.error("CheckoutScreen: addTransaction error", error)}
       console.log("CheckOutScreen: Success", "Your order is confirmed!");
       router.replace({
         pathname: "/SucceededPaymentScreen",
@@ -166,6 +193,7 @@ function CheckoutScreen() {
   return (
     <SafeAreaView style={styles.mainContainer}>
       <View style={styles.infoContainer}>
+        <Text>Your Email: {userEmail}</Text>
         <TextInput
           style={{}}
           placeholder="City"
@@ -198,7 +226,9 @@ function CheckoutScreen() {
         </Pressable>
       </View>
 
-      <View style={styles.footer}><Text style={{color:'red'}}>FOOTER</Text></View>
+      <View style={styles.footer}>
+        <Text style={{ color: "red" }}>FOOTER</Text>
+      </View>
     </SafeAreaView>
   );
 }
@@ -208,7 +238,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignContent: "center",
   },
-  infoContainer:{
+  infoContainer: {
     alignSelf: "center",
   },
   footer: {
