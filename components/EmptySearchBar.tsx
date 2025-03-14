@@ -1,4 +1,4 @@
-//EmptySearchScreen.tsx
+// EmptySearchScreen.tsx
 import { StyleSheet, View, Text, TextInput, Pressable, ViewStyle } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { memo, useEffect, useState } from "react";

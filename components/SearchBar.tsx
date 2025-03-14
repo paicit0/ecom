@@ -1,4 +1,4 @@
-import React from "react";
+// SearchBar.tsx
 import { Pressable, StyleSheet, TextInput, View, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { memo } from "react";

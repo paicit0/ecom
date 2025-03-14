@@ -1,3 +1,4 @@
+// AnimatedLoadingIndicator.tsx
 import { useEffect } from "react";
 import { ActivityIndicator } from "react-native";
 import Animated, {
