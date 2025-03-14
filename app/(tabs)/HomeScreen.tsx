@@ -318,6 +318,8 @@ export const HomeScreen = memo(function HomeScreen() {
               "Batteries",
             ]}
             intervalMs={5000}
+            borderWidth={2}
+            borderColor={"black"}
           />
           <View style={styles.cartContainer}>
             <Link href="/CartScreen" asChild>
