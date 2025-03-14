@@ -1,0 +1,242 @@
+[33mcommit 85cca8bc5565736c612e070601712e925bb6ce79[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m)[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Fri Mar 14 16:05:58 2025 +0700
+
+    feat: update ProfileScreen to display full name with white text color
+
+[33mcommit 7faa61b700674d0b5660798fc073e4dbb01b9aa1[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Fri Mar 14 16:01:22 2025 +0700
+
+    feat: implement transaction handling in deleteCart function to manage cart item removal
+
+[33mcommit 298d730def28bd1832965a0af9b8bf7175138a96[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Fri Mar 14 16:00:48 2025 +0700
+
+    feat: refactor addCart function to use Firestore transactions for cart updates
+
+[33mcommit 5d15f0f1bb44fb2feb64a288d6bedb9e4232d203[m[33m ([m[1;31morigin/master[m[33m)[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Fri Mar 14 15:59:31 2025 +0700
+
+    feat: enhance EmptySearchBar with customizable border color and width
+
+[33mcommit 7feb649f879036160beabe897b69cc56d92ada1b[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Fri Mar 14 15:59:25 2025 +0700
+
+    feat: add border styling to carousel in HomeScreen
+
+[33mcommit f64ef524ac6f3de34cb96d158a467db9c1cc1a4b[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Fri Mar 14 15:59:12 2025 +0700
+
+    feat: implement transaction handling in CheckoutScreen and display user email
+
+[33mcommit 94136796314264855fb8a65a455cbc531a6d4f03[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Fri Mar 14 15:59:02 2025 +0700
+
+    feat: add navigation button to ProfileScreen for testing
+
+[33mcommit 6dabfc5988fb3a18de782724a61d8d492dce09d5[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Fri Mar 14 10:47:30 2025 +0700
+
+    style: add file headers to AnimatedLoadingIndicator, EmptySearchBar, and SearchBar components
+
+[33mcommit 0bbbd9894bb2a44e822b1bf3d0502b4b22208d90[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Fri Mar 14 10:46:47 2025 +0700
+
+    refactor: remove unused Slider component
+
+[33mcommit 218955119bfce930a26e6acc0aa182c4f506bb7b[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Fri Mar 14 10:46:41 2025 +0700
+
+    refactor: integrate animated search bar and enhance header layout in ItemScreen
+
+[33mcommit 18185a855faee3cff27aed6ce7978c5f9bb08e3f[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Fri Mar 14 10:46:33 2025 +0700
+
+    refactor: update HomeScreen layout and improve header styling
+
+[33mcommit c1e814198341ffdc88a9df1dd1d52923d774602b[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Fri Mar 14 10:46:21 2025 +0700
+
+    refactor: update EmptySearchBar component to use Animated.View and improve props handling
+
+[33mcommit ba19841d72e6441aaacac7ed593d6948406165b1[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Fri Mar 14 10:46:15 2025 +0700
+
+    style: increase tabBarItem padding for improved layout
+
+[33mcommit 4fba44c8944502ed7a9efa035f32757aadd75cb4[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Wed Mar 12 12:50:24 2025 +0700
+
+    refactor: remove unnecessary comment from useGetProducts hook
+
+[33mcommit eea1eef1ea9cd88ba8e93085eaf53278dcc636cc[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Wed Mar 12 12:50:19 2025 +0700
+
+    refactor: enhance logging in fetchCart function for improved data visibility
+
+[33mcommit 16619590dc8fc9c4556aeb1f674ab8bede8a923d[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Wed Mar 12 12:50:01 2025 +0700
+
+    refactor: improve logging in getCart function for better debugging
+
+[33mcommit 1d9e516715855b71bd653276b96f7e97db2826df[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Wed Mar 12 12:49:54 2025 +0700
+
+    feat: export transaction module from index
+
+[33mcommit 4b538796d332cf4e0c906f6d30eab737b5aa36b9[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Wed Mar 12 12:49:47 2025 +0700
+
+    style: increase tabBar height for improved visibility
+
+[33mcommit 88bdb85780b8e3d76c45e1930abf2a47f8676e9e[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Wed Mar 12 11:41:46 2025 +0700
+
+    style: update tabBarLabel and tabBarIcon to support dynamic color based on focus state
+
+[33mcommit f39647a8aed8f36d163bca54ece1fdc90998372e[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Wed Mar 12 11:35:21 2025 +0700
+
+    style: update tabBarIcon to use fixed size and orange color
+
+[33mcommit 639792ca283c9ae51b8ad4c8dc756108d1129281[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Wed Mar 12 11:34:43 2025 +0700
+
+    fix: correct tabBarIcon implementation
+
+[33mcommit f027bcd8b1ca7431f2dd6cf6c9751177a0b8321c[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Wed Mar 12 11:32:29 2025 +0700
+
+    style: update tab icons to use outline versions with orange color
+
+[33mcommit f99aada58d8cdcd6a4e6cfb5ebac279832fae48a[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Wed Mar 12 11:31:14 2025 +0700
+
+    -
+
+[33mcommit 0eaeb833d9ec05bf504519e92544f0d829585df6[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Mon Mar 10 16:47:43 2025 +0700
+
+    added temporary footer for now
+
+[33mcommit e7cfe3fa607a1047004c15f785a9312e0995d916[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Mon Mar 10 16:19:49 2025 +0700
+
+    fix: add missing semicolon in useGetCart logging statement
+
+[33mcommit d1f9dfaf833aced6308822f893de63fd4ad94921[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Mon Mar 10 16:18:50 2025 +0700
+
+    add delete functionality to cart items with success and error logging
+
+[33mcommit bb306558b2db3345c8f41a883f17c8895b8b6922[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Mon Mar 10 16:18:37 2025 +0700
+
+    update SucceededPaymentScreen to display formatted total amount from payment parameters
+
+[33mcommit c721719caaa0e53cdd95965ad3569061c844b1d6[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Mon Mar 10 16:18:29 2025 +0700
+
+    update EmptySearchBar styles: change placeholder color to grey and adjust font size and weight
+
+[33mcommit df38040766b7bbae125a06b0e7939254127c3a13[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Mon Mar 10 16:18:18 2025 +0700
+
+    remove unnecessary whitespace in stripePaymentSheet endpoint
+
+[33mcommit 7fe43870b542d8bfd830459de2c8fc422a91a456[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Mon Mar 10 16:17:51 2025 +0700
+
+    add debounce functionality to useAddCart hook for improved performance
+
+[33mcommit f5b8a6dc38744efb71bf41176988bed7d00c7e06[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Mon Mar 10 16:17:31 2025 +0700
+
+    refactor ItemScreen layout and update Buy Now link to CheckoutScreen
+
+[33mcommit 4958e142788f830c7dda3531931180765796ae2d[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Mon Mar 10 15:23:26 2025 +0700
+
+    check customerId on db first. added quantity to price calculation
+
+[33mcommit 81792aea354c3caa869ffb194ad6ed33e2108def[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Mon Mar 10 14:05:40 2025 +0700
+
+    now checks first to see if the stripe id is already exists on user account
+
+[33mcommit 9c0748cc4a09ff6247ad5f8484618099fc34376e[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Mon Mar 10 14:04:30 2025 +0700
+
+    $ to ฿
+
+[33mcommit ab6312583e8d8a30d44b33f0c08ef56fdc4722c2[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Mon Mar 10 14:04:18 2025 +0700
+
+    user route to get customerIdStripe field
+
+[33mcommit 20428f6df1af3593f4b79b8e9cb165bf03e17f30[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Mon Mar 10 14:03:59 2025 +0700
+
+    added user route
+
+[33mcommit 971620c1c7ba15c6b541e33965ed93cc6d66de6c[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Mon Mar 10 12:59:53 2025 +0700
+
+    yarn
+
+[33mcommit 2aac914325fff06899e0f6df09553f77ad1ba318[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Mon Mar 10 12:51:23 2025 +0700
+
+    added lodash and its type definitions to package.json
+
+[33mcommit 81f2463f8e2e01106f49d4233966f72b5294e696[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Thu Mar 6 17:54:56 2025 +0700
+
+    added header
+
+[33mcommit 187340a62bda8843833c166195732cba265c514a[m
+Author: Piyapat <piyapat.pai@outlook.com>
+Date:   Thu Mar 6 17:54:43 2025 +0700
+
+    added header.
+
+[33mcommit efe6596767a2a41d231cdadcd17c3f16c88c53de[m
+Autho
