@@ -212,6 +212,8 @@ const ItemScreen = memo(function ItemScreen() {
           placeholderArray={["Wrench", "Drill"]}
           style={searchBarStyle}
           borderColor={"red"}
+          backgroundColor={"rgb(238, 238, 238)"}
+          placeholderTextColor={"rgb(182, 182, 182)"}
         />
         <View
           style={{
