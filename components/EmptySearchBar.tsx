@@ -18,6 +18,8 @@ type SearchBarProps = {
   style?: ViewStyle;
   borderColor?: string;
   borderWidth?: number;
+  backgroundColor?: string;
+  placeholderTextColor?: string;
 };
 
 const EmptySearchBar = memo(function SearchBar({
@@ -26,6 +28,8 @@ const EmptySearchBar = memo(function SearchBar({
   style,
   borderColor = "black",
   borderWidth = 0.5,
+  backgroundColor = "white",
+  placeholderTextColor= "grey"
 }: SearchBarProps) {
   const [currentPlaceholder, setCurrentPlaceholder] = useState(() =>
     getRandomPlaceholder(-1)
@@ -55,7 +59,7 @@ const EmptySearchBar = memo(function SearchBar({
       style={[
         styles.searchBarContainer,
         style,
-        { borderColor: borderColor, borderWidth: borderWidth },
+        { borderColor: borderColor, borderWidth: borderWidth, backgroundColor: backgroundColor },
       ]}
     >
       <Link href="/SearchScreen" asChild>
@@ -67,12 +71,12 @@ const EmptySearchBar = memo(function SearchBar({
         >
           <Ionicons
             name="search-outline"
-            size={24}
+            size={18}
             style={{ marginRight: 4 }}
           ></Ionicons>
           <TextInput
             placeholder={currentPlaceholder.text}
-            placeholderTextColor="grey"
+            placeholderTextColor={placeholderTextColor}
             editable={false}
             pointerEvents="none"
             style={styles.searchBarTextInput}
@@ -88,7 +92,6 @@ const styles = StyleSheet.create({
     flex: 4,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "white",
     borderRadius: 8,
     paddingLeft: 12,
     borderColor: "black",
@@ -99,8 +102,8 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
   },
   searchBarTextInput: {
-    fontSize: 14,
-    fontWeight: "200",
+    fontSize: 15,
+    fontWeight: "300",
   },
   badge: {
     position: "absolute",
