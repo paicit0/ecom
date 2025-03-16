@@ -7,6 +7,7 @@ import {
   Dimensions,
   Pressable,
   ScrollView,
+  StatusBar,
 } from "react-native";
 import { Image } from "expo-image";
 import { Product } from "../store/store";
@@ -306,7 +307,7 @@ export const HomeScreen = memo(function HomeScreen() {
 
   return (
     <>
-      <SafeAreaView style={{ backgroundColor: "orange" }}></SafeAreaView>
+      <StatusBar backgroundColor="orange" barStyle="light-content" />
       <View style={styles.mainContainer}>
         <View style={styles.header}>
           <EmptySearchBar
@@ -318,7 +319,7 @@ export const HomeScreen = memo(function HomeScreen() {
               "Batteries",
             ]}
             intervalMs={5000}
-            borderWidth={2}
+            borderWidth={0}
             borderColor={"black"}
           />
           <View style={styles.cartContainer}>
