@@ -18,9 +18,9 @@ export default function TabsLayout() {
   }, [userInfoFromStore, userAuth]);
 
   type styleType = {
-    focused: boolean;
-    size: number;
-    color: string;
+    focused?: boolean;
+    size?: number;
+    color?: string;
   };
 
   return (
@@ -61,7 +61,7 @@ export default function TabsLayout() {
                 color={focused ? "orange" : color}
               />
             ),
-            href: "ProfileScreen",
+            href: "/ProfileScreen",
           }}
         />
         <Tabs.Screen
@@ -79,7 +79,7 @@ export default function TabsLayout() {
             ),
             href:
               userInfoFromStore.userRole === "seller" && userAuth
-                ? "SubmitProductScreen"
+                ? "/(tabs)/SubmitProductScreen"
                 : null,
           }}
         />
