@@ -19,6 +19,8 @@ import Animated, {
   useAnimatedStyle,
   useAnimatedProps,
   withTiming,
+  withSpring,
+  interpolateColor,
 } from "react-native-reanimated";
 
 const ItemScreen = memo(function ItemScreen() {
@@ -114,44 +116,23 @@ const ItemScreen = memo(function ItemScreen() {
   };
 
   const handlePrevImage = () => {};
+  const scrollValue = useSharedValue<number>(0);
   const searchBarOpacity = useSharedValue<number>(0);
   const headerRGBAOpacity = useSharedValue<number>(0);
-  const headerButtonIconColor = useSharedValue<string>(`rgb(247, 187, 57, 1)`);
-  const headerButtonCircleColor = useSharedValue<string>(`rgba(0, 0, 0, 0.5)`);
-
-  const AnimatedIcon = Animated.createAnimatedComponent(Ionicons);
-
-  const testOpacaity = () => {
-    searchBarOpacity.value = searchBarOpacity.value + 0.1;
-    headerRGBAOpacity.value = headerRGBAOpacity.value + 0.1;
-    console.log("[id]: searchBarOpacity: ", searchBarOpacity.value);
-    console.log("[id]: headerRGBAOpacity: ", headerRGBAOpacity.value);
-    return;
-  };
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event, ctx: { prevY: number | undefined }) => {
       const currentY = event.contentOffset.y;
       if (ctx.prevY !== undefined) {
-        searchBarOpacity.value,
-          (searchBarOpacity.value = withTiming(currentY > ctx.prevY ? 1 : 0, {
-            duration: 200,
-          }));
+        searchBarOpacity.value = withTiming(currentY > ctx.prevY ? 1 : 0, {
+          duration: 200,
+        });
         headerRGBAOpacity.value = withTiming(currentY > ctx.prevY ? 1 : 0, {
           duration: 200,
         });
-        headerButtonIconColor.value = withTiming(
-          currentY > ctx.prevY ? `rgb(247, 187, 57, 1)` : `rgba(0, 0, 0, 0.5)`,
-          {
-            duration: 200,
-          }
-        );
-        headerButtonCircleColor.value = withTiming(
-          currentY > ctx.prevY ? `rgba(0, 0, 0, 0.5)` : `rgb(247, 187, 57, 1)`,
-          {
-            duration: 200,
-          }
-        );
+        scrollValue.value = withTiming(currentY > ctx.prevY ? 1 : 0, {
+          duration: 200,
+        });
       }
       ctx.prevY = currentY;
     },
@@ -160,17 +141,22 @@ const ItemScreen = memo(function ItemScreen() {
   const headerStyle = useAnimatedStyle(() => ({
     backgroundColor: `rgba(255,255,255,${headerRGBAOpacity.value})`,
   }));
-  const headerIconStyle = useAnimatedStyle(() => ({
-    color: headerButtonIconColor.value,
-  }));
-
   const searchBarStyle = useAnimatedStyle(() => ({
     opacity: searchBarOpacity.value,
   }));
-
+  const headerIconStyle = useAnimatedStyle(() => ({
+    color: interpolateColor(
+      scrollValue.value,
+      [0, 1],
+      ["rgb(255, 255, 255)", "rgb(255, 189, 89)"]
+    ),
+  }));
   const buttonCircleStyle = useAnimatedStyle(() => ({
-    backgroundColor: headerButtonCircleColor.value,
-    borderRadius: 20,
+    backgroundColor: interpolateColor(
+      scrollValue.value,
+      [0, 1],
+      ["rgba(0, 0, 0, 0.5)", "rgba(255, 255, 255, 0)"]
+    ),
   }));
 
   if (loading) {
@@ -202,7 +188,13 @@ const ItemScreen = memo(function ItemScreen() {
         <View style={[{ alignSelf: "center", marginRight: 8 }]}>
           <Link href="../(tabs)/HomeScreen" asChild>
             <Pressable>
-              <Animated.Text style={[headerIconStyle, buttonCircleStyle]}>
+              <Animated.Text
+                style={[
+                  headerIconStyle,
+                  buttonCircleStyle,
+                  { borderRadius: 20 },
+                ]}
+              >
                 <Ionicons name="arrow-back-outline" size={28} />
               </Animated.Text>
             </Pressable>
@@ -211,9 +203,8 @@ const ItemScreen = memo(function ItemScreen() {
         <EmptySearchBar
           placeholderArray={["Wrench", "Drill"]}
           style={searchBarStyle}
-          borderColor={"red"}
+          borderColor={"black"}
           backgroundColor={"rgb(238, 238, 238)"}
-          placeholderTextColor={"rgb(182, 182, 182)"}
         />
         <View
           style={{
@@ -224,21 +215,31 @@ const ItemScreen = memo(function ItemScreen() {
           }}
         >
           <Pressable>
-            <Animated.Text style={[headerIconStyle, buttonCircleStyle]}>
+            <Animated.Text
+              style={[headerIconStyle, buttonCircleStyle, { borderRadius: 20 }]}
+            >
               <Ionicons name="share-outline" size={28} />
             </Animated.Text>
           </Pressable>
           <View>
             <Link href="/CartScreen" asChild>
               <Pressable>
-                <Animated.Text style={[headerIconStyle, buttonCircleStyle]}>
+                <Animated.Text
+                  style={[
+                    headerIconStyle,
+                    buttonCircleStyle,
+                    { borderRadius: 20 },
+                  ]}
+                >
                   <Ionicons name="cart-outline" size={28} />
                 </Animated.Text>
               </Pressable>
             </Link>
           </View>
           <Pressable>
-            <Animated.Text style={[headerIconStyle, buttonCircleStyle]}>
+            <Animated.Text
+              style={[headerIconStyle, buttonCircleStyle, { borderRadius: 20 }]}
+            >
               <Ionicons name="ellipsis-vertical-outline" size={28} />
             </Animated.Text>
           </Pressable>
@@ -333,7 +334,19 @@ const ItemScreen = memo(function ItemScreen() {
           <View style={styles.deliveryOptionContainer}>
             <Text>Delivery Options:</Text>
           </View>
-          <Pressable onPress={testOpacaity}>
+          <Pressable
+            onPress={() => {
+              console.log(
+                "ItemScreen/[id]: searchBarOpacity: ",
+                searchBarOpacity.value
+              );
+              console.log(
+                "ItemScreen/[id]: headerRGBAOpacity: ",
+                headerRGBAOpacity.value
+              );
+              console.log("ItemScreen/[id]: scrollValue: ", scrollValue.value);
+            }}
+          >
             <Text>Test Opacity</Text>
           </Pressable>
           <View style={{ height: 600 }}></View>
