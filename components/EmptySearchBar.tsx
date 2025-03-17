@@ -1,17 +1,25 @@
 // EmptySearchScreen.tsx
-import {
-  StyleSheet,
-  View,
-  Text,
-  TextInput,
-  Pressable,
-  ViewStyle,
-} from "react-native";
+import { StyleSheet, TextInput, Pressable, ViewStyle } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { memo, useEffect, useState } from "react";
 import { Link } from "expo-router";
 import { useCart } from "@/app/store/store";
 import Animated from "react-native-reanimated";
+
+/**
+ * A SearchBar component that displays a randomly rotating placeholder text.
+ * Used for an empty search screen.
+ *
+ * @param {{ placeholderArray: string[]; intervalMs?: number; style?: ViewStyle; borderColor?: string; borderWidth?: number; backgroundColor?: string; placeholderTextColor?: string; }} props
+ * @prop {string[]} placeholderArray the array of placeholder text strings to rotate through
+ * @prop {number} [intervalMs=5000] the interval in ms between placeholder text changes
+ * @prop {ViewStyle} [style] the style for the outer View of the component
+ * @prop {string} [borderColor="black"] the color of the border of the component
+ * @prop {number} [borderWidth=0.5] the width of the border of the component
+ * @prop {string} [backgroundColor="white"] the background color of the component
+ * @prop {string} [placeholderTextColor="grey"] the color of the placeholder text
+ */
+
 type SearchBarProps = {
   placeholderArray: string[];
   intervalMs?: number;
@@ -29,7 +37,7 @@ const EmptySearchBar = memo(function SearchBar({
   borderColor = "black",
   borderWidth = 0.5,
   backgroundColor = "white",
-  placeholderTextColor= "grey"
+  placeholderTextColor = "grey",
 }: SearchBarProps) {
   const [currentPlaceholder, setCurrentPlaceholder] = useState(() =>
     getRandomPlaceholder(-1)
@@ -59,7 +67,11 @@ const EmptySearchBar = memo(function SearchBar({
       style={[
         styles.searchBarContainer,
         style,
-        { borderColor: borderColor, borderWidth: borderWidth, backgroundColor: backgroundColor },
+        {
+          borderColor: borderColor,
+          borderWidth: borderWidth,
+          backgroundColor: backgroundColor,
+        },
       ]}
     >
       <Link href="/SearchScreen" asChild>
@@ -117,4 +129,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 });
+
 export default EmptySearchBar;
