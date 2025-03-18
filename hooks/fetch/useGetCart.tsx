@@ -45,7 +45,7 @@ const fetchCart = async ({ userEmail }: fetchCartType): Promise<Product[]> => {
 
 export const useGetCart = ({ userEmail }: fetchCartType) => {
   return useQuery({
-    queryKey: ["Cart"],
+    queryKey: ["Cart", userEmail],
     queryFn: () => fetchCart({ userEmail }),
     enabled: !!userEmail,
     staleTime: 5 * 60 * 1000,

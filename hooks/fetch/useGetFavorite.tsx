@@ -41,7 +41,7 @@ const fetchFavorites = async ({
 
 export const useGetFavorite = ({ userEmail }: fetchFavoritesType) => {
   return useQuery({
-    queryKey: ["favorites"],
+    queryKey: ["favorites", userEmail],
     queryFn: () => fetchFavorites({ userEmail }),
     enabled: !!userEmail,
     staleTime: 5 * 60 * 1000,
