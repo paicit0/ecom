@@ -21,9 +21,8 @@ function SearchScreen() {
     console.log("SearchScreen: getProductsQuery.data", getProductsQuery.data);
     if (getProductsQuery.data) {
       setTimeout(() => {
-        const filterItem = getProductsQuery.data.filter(
-          (item: Product) =>
-            item.productName.toLowerCase().startsWith(searchQuery.toLowerCase())
+        const filterItem = getProductsQuery.data.filter((item: Product) =>
+          item.productName.toLowerCase().startsWith(searchQuery.toLowerCase())
         );
         if (!searchQuery) {
           setFilteredItems([]);
@@ -70,7 +69,7 @@ function SearchScreen() {
             name="arrow-back-outline"
             style={{ paddingRight: 10 }}
             size={20}
-          ></Ionicons>
+          />
         </Link>
         <View style={styles.input}>
           <TextInput
@@ -82,7 +81,7 @@ function SearchScreen() {
           ></TextInput>
         </View>
         <Pressable onPress={() => setSearchQuery("")} style={{ padding: 10 }}>
-          <Ionicons name="close-circle-outline" size={24}></Ionicons>
+          <Ionicons name="close-circle-outline" size={24} />
         </Pressable>
         <Ionicons name="search" size={24} color="#666" style={{}} />
       </View>
