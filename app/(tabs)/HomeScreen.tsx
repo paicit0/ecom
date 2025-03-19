@@ -141,11 +141,7 @@ export const HomeScreen = memo(function HomeScreen() {
               paddingRight: 6,
             }}
           >
-            <Ionicons
-              name="barcode-outline"
-              size={30}
-              color={"gray"}
-            ></Ionicons>
+            <Ionicons name="barcode-outline" size={30} color={"gray"} />
           </View>
           <View style={{ flexDirection: "row", gap: 30 }}>
             <View
@@ -157,11 +153,7 @@ export const HomeScreen = memo(function HomeScreen() {
               }}
             >
               <View style={{ flexDirection: "row" }}>
-                <Ionicons
-                  name="card-outline"
-                  size={24}
-                  color={"red"}
-                ></Ionicons>
+                <Ionicons name="card-outline" size={24} color={"red"} />
                 <Text style={{ alignSelf: "center", marginLeft: 2 }}>
                   ฿0.00
                 </Text>
@@ -181,18 +173,14 @@ export const HomeScreen = memo(function HomeScreen() {
                   name="heart-circle-outline"
                   size={24}
                   color={"orange"}
-                ></Ionicons>
+                />
                 <Text style={{ alignSelf: "center", marginLeft: 2 }}>0.00</Text>
               </View>
               <Text style={{ alignSelf: "flex-start" }}>Coin</Text>
             </View>
             <View>
               <View style={{ flexDirection: "row", justifyContent: "center" }}>
-                <Ionicons
-                  name="gift-outline"
-                  size={24}
-                  color={"blue"}
-                ></Ionicons>
+                <Ionicons name="gift-outline" size={24} color={"blue"} />
                 <Text style={{ alignSelf: "center", marginLeft: 2 }}>0.00</Text>
               </View>
               <Text style={{ alignSelf: "flex-start" }}>Coupons</Text>
@@ -206,7 +194,7 @@ export const HomeScreen = memo(function HomeScreen() {
               paddingLeft: 6,
             }}
           >
-            <Ionicons name="logo-bitcoin" size={30} color={"orange"}></Ionicons>
+            <Ionicons name="logo-bitcoin" size={30} color={"orange"} />
           </View>
         </View>
         <View style={styles.categoryContainer}>
@@ -393,7 +381,7 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: "orange",
     flexDirection: "row",
-    padding:10
+    padding: 10,
   },
   cartContainer: {
     flexDirection: "row",

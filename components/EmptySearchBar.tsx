@@ -85,7 +85,7 @@ const EmptySearchBar = memo(function SearchBar({
             name="search-outline"
             size={18}
             style={{ marginRight: 4 }}
-          ></Ionicons>
+          />
           <TextInput
             placeholder={currentPlaceholder.text}
             placeholderTextColor={placeholderTextColor}

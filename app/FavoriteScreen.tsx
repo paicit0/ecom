@@ -111,7 +111,7 @@ function FavoriteScreen() {
       <View style={styles.headerContainer}>
         <Link href="../(tabs)/HomeScreen" asChild>
           <Pressable style={{ marginLeft: 8 }}>
-            <Ionicons name="arrow-back-outline" size={20}></Ionicons>
+            <Ionicons name="arrow-back-outline" size={20}/>
           </Pressable>
         </Link>
         <View

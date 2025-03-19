@@ -16,7 +16,7 @@ function FailedPaymentScreen() {
         name="close-circle-outline"
         size={40}
         style={{ color: "red" }}
-      ></Ionicons>
+      />
       <View>
         <Text>The payment was not successful!</Text>
       </View>

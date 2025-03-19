@@ -11,7 +11,7 @@ function SucceededPaymentScreen() {
         name="checkmark-circle-outline"
         size={40}
         style={{ color: "green" }}
-      ></Ionicons>
+      />
       <View>
         <Text>฿{parseInt(total as string).toLocaleString()} Paid!</Text>
       </View>
