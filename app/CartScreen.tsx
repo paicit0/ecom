@@ -10,7 +10,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useGetCart } from "../hooks/fetch/useGetCart";
 import { useAddCart } from "../hooks/fetch/useAddCart";
 import { useDeleteCart } from "../hooks/fetch/useDeleteCart";
-import { Product } from "./store/store";
+import { Product } from "../store/store";
 import { Image } from "expo-image";
 import { FlashList } from "@shopify/flash-list";
 

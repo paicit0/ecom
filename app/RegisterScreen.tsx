@@ -11,7 +11,7 @@ import "firebase/compat/database";
 import { Link, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, useUserSession } from "./auth/firebaseAuth";
+import { auth, useUserSession } from "../auth/firebaseAuth";
 import axios from "axios";
 import AnimatedLoadingIndicator from "../components/AnimatedLoadingIndicator";
 

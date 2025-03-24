@@ -10,7 +10,7 @@ import {
   Pressable,
   Dimensions,
 } from "react-native";
-import { useUserSession } from "./auth/firebaseAuth";
+import { useUserSession } from "../auth/firebaseAuth";
 import AnimatedLoadingIndicator from "../components/AnimatedLoadingIndicator";
 import { Image } from "expo-image";
 import ApuSVG from "../assets/svgs/ApuSVG.svg";
@@ -87,10 +87,28 @@ function LoginScreen() {
       <Pressable onPress={handleEyesPosition}>
         <Text>Big eye</Text>
       </Pressable> */}
-      <Link href="../(tabs)/ProfileScreen">
-        <Ionicons name="arrow-back-outline" size={20}/>
-      </Link>
-      <Text>Login</Text>
+
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          // backgroundColor: "red",
+          width: "100%",
+          height: 50,
+          marginBottom: 20,
+        }}
+      >
+        <Link
+          href="../(tabs)/ProfileScreen"
+          style={{ position: "absolute", left: 10 }}
+        >
+          <Ionicons name="arrow-back-outline" size={24} />
+        </Link>
+
+        <View style={{ flex: 1, alignItems: "center" }}>
+          <Text style={{ fontSize: 18, fontWeight: "bold" }}>Login</Text>
+        </View>
+      </View>
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -105,7 +123,7 @@ function LoginScreen() {
         onChangeText={(text) => setPassword(text)}
       ></TextInput>
       <Pressable onPress={handleLogin} style={styles.loginButton}>
-        <Text>Login!</Text>
+        <Text style={{ color: "white" }}>Login</Text>
       </Pressable>
     </SafeAreaView>
   );
@@ -124,7 +142,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderColor: "gray",
     borderWidth: 1,
-    marginVertical: 10,
+    marginVertical: 8,
     paddingHorizontal: 10,
     width: 300,
   },
@@ -132,6 +150,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     height: 40,
     backgroundColor: "orange",
+    width: 300,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop:8
   },
 });
 

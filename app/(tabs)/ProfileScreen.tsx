@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { StyleSheet } from "react-native";
 // @ts-ignore
-import { useUserSession } from "../auth/firebaseAuth";
+import { useUserSession } from "../../auth/firebaseAuth";
 import { useState, useEffect } from "react";
 import { getAuth } from "firebase/auth";
 import * as SecureStore from "expo-secure-store";

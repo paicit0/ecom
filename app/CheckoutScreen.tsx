@@ -7,7 +7,7 @@ import { getAuth } from "firebase/auth";
 import axios from "axios";
 import { thailandProvinces } from "../assets/db/province";
 import { Dropdown } from "react-native-element-dropdown";
-import { useUserSession } from "./auth/firebaseAuth";
+import { useUserSession } from "../auth/firebaseAuth";
 import * as SecureStore from "expo-secure-store";
 import { SafeAreaView } from "react-native-safe-area-context";
 

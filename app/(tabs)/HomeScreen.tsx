@@ -10,7 +10,7 @@ import {
   StatusBar,
 } from "react-native";
 import { Image } from "expo-image";
-import { Product } from "../store/store";
+import { Product } from "../../store/store";
 import { Link } from "expo-router";
 import { FlashList } from "@shopify/flash-list";
 import EmptySearchBar from "../../components/EmptySearchBar";
@@ -18,7 +18,7 @@ import axios from "axios";
 import { useGetProducts } from "../../hooks/fetch/useGetProducts";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useUserSession } from "../auth/firebaseAuth";
+import { useUserSession } from "../../auth/firebaseAuth";
 
 export const HomeScreen = memo(function HomeScreen() {
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);

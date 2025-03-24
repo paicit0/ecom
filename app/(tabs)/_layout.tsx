@@ -1,7 +1,7 @@
 // app/(tabs)/_layout.tsx
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { useUserSession } from "../auth/firebaseAuth";
+import { useUserSession } from "../../auth/firebaseAuth";
 import { View, StyleSheet, Dimensions, Text } from "react-native";
 import { getAuth } from "firebase/auth";
 import { useEffect } from "react";

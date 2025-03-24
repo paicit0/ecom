@@ -9,7 +9,7 @@ import {
   Dimensions,
 } from "react-native";
 import { Image } from "expo-image";
-import { Product } from "./store/store";
+import { Product } from "../store/store";
 import { Ionicons } from "@expo/vector-icons";
 import { getAuth } from "firebase/auth";
 import { Link } from "expo-router";

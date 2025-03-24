@@ -4,7 +4,7 @@ import { View, Text, TextInput, Pressable, Dimensions } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import { Link } from "expo-router";
 import { StyleSheet } from "react-native";
-import { Product } from "./store/store";
+import { Product } from "../store/store";
 import { Ionicons } from "@expo/vector-icons";
 import { useGetProducts } from "../hooks/fetch/useGetProducts";
 import { SafeAreaView } from "react-native-safe-area-context";
