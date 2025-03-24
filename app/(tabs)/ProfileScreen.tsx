@@ -1,6 +1,13 @@
 // ProfileScreen.tsx
 import { Link, useRouter } from "expo-router";
-import { View, Text, Pressable, Dimensions, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  Dimensions,
+  ScrollView,
+  StatusBar,
+} from "react-native";
 import { StyleSheet } from "react-native";
 // @ts-ignore
 import { useUserSession } from "../auth/firebaseAuth";

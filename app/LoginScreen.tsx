@@ -83,15 +83,14 @@ function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ApuSVG width={200} height={200} />
+      {/* <ApuSVG width={200} height={200} />
       <Pressable onPress={handleEyesPosition}>
         <Text>Big eye</Text>
-      </Pressable>
-
+      </Pressable> */}
       <Link href="../(tabs)/ProfileScreen">
-        <Ionicons name="arrow-back-outline" size={20}></Ionicons>
+        <Ionicons name="arrow-back-outline" size={20}/>
       </Link>
-      <Text>LoginScreen</Text>
+      <Text>Login</Text>
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -105,7 +104,7 @@ function LoginScreen() {
         value={password}
         onChangeText={(text) => setPassword(text)}
       ></TextInput>
-      <Pressable onPress={handleLogin}>
+      <Pressable onPress={handleLogin} style={styles.loginButton}>
         <Text>Login!</Text>
       </Pressable>
     </SafeAreaView>
@@ -128,6 +127,11 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     paddingHorizontal: 10,
     width: 300,
+  },
+  loginButton: {
+    borderRadius: 20,
+    height: 40,
+    backgroundColor: "orange",
   },
 });
 

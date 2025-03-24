@@ -59,7 +59,9 @@ function RegisterScreen() {
         )
           .then((userCredential) => {
             uid = userCredential.user.uid;
-            console.log("RegisterScreen: createUserWithEmailAndPassword successful.");
+            console.log(
+              "RegisterScreen: createUserWithEmailAndPassword successful."
+            );
             return true;
           })
           .catch((error) => {
@@ -125,7 +127,7 @@ function RegisterScreen() {
   return (
     <View style={styles.container}>
       <Link href="../(tabs)/ProfileScreen">
-        <Ionicons name="arrow-back-outline" size={20}></Ionicons>
+        <Ionicons name="arrow-back-outline" size={20}/>
       </Link>
       <Text style={styles.title}>Register</Text>
       <Text>{dataMessage}</Text>
@@ -149,7 +151,7 @@ function RegisterScreen() {
         value={confirmPassword}
         onChangeText={(text) => setConfirmPassword(text)}
       />
-      <TouchableOpacity style={styles.button} onPress={handleRegister}>
+      <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
         <Text style={styles.buttonText}>Register</Text>
       </TouchableOpacity>
     </View>
@@ -186,6 +188,11 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontSize: 16,
+  },
+  registerButton: {
+    borderRadius: 20,
+    height: 40,
+    backgroundColor: "orange",
   },
 });
 
