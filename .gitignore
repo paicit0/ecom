@@ -44,3 +44,4 @@ firebase/functions/firebase-export-17400470302636PYIAn
 app/(tabs)/test.tsx
 assets/db/items.tsx
 firebase/functions/src/test.ts
+auth/firebaseConfig.ts
