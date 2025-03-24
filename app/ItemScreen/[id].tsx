@@ -347,7 +347,6 @@ const ItemScreen = memo(function ItemScreen() {
       <View style={styles.ItemFooter}>
         <Pressable
           onPress={() => {
-            addCartMutation.variables;
             addCartMutation.mutate(
               { userEmail: userEmail, productId: productId },
               {
