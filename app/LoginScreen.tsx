@@ -28,7 +28,10 @@ function LoginScreen() {
   const login = useUserSession((state) => state.login);
   const router = useRouter();
 
-  const handleLogin = async () => {
+  const handleLogin = async (
+    email: string | undefined,
+    password: string | undefined
+  ) => {
     setLoading(true);
 
     try {
@@ -122,9 +125,24 @@ function LoginScreen() {
         value={password}
         onChangeText={(text) => setPassword(text)}
       ></TextInput>
-      <Pressable onPress={handleLogin} style={styles.loginButton}>
+      <Pressable
+        onPress={() => handleLogin(email, password)}
+        style={styles.loginButton}
+      >
         <Text style={{ color: "white" }}>Login</Text>
       </Pressable>
+      {process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev" && (
+        <>
+          <Pressable
+            style={{}}
+            onPress={() => {
+              handleLogin("testauth@gmail.com", "testauth");
+            }}
+          >
+            <Text>devmode: login</Text>
+          </Pressable>
+        </>
+      )}
     </SafeAreaView>
   );
 }
