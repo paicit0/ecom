@@ -5,7 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Link, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
 import axios, { AxiosError } from "axios";
-import { Product } from "../store/store";
+import { Product } from "../../store/store";
 import AnimatedLoadingIndicator from "../../components/AnimatedLoadingIndicator";
 import { useAddFavorite } from "../../hooks/fetch/useAddFavorite";
 import { useDeleteFavorite } from "../../hooks/fetch/useDeleteFavorite";
@@ -119,6 +119,7 @@ const ItemScreen = memo(function ItemScreen() {
   const scrollValue = useSharedValue<number>(0);
   const searchBarOpacity = useSharedValue<number>(0);
   const headerRGBAOpacity = useSharedValue<number>(0);
+  const test = useSharedValue<string>("test");
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event, ctx: { prevY: number | undefined }) => {
@@ -192,7 +193,7 @@ const ItemScreen = memo(function ItemScreen() {
                 style={[
                   headerIconStyle,
                   buttonCircleStyle,
-                  { borderRadius: 20 },
+                  { borderRadius: 22, padding: 1 },
                 ]}
               >
                 <Ionicons name="arrow-back-outline" size={28} />

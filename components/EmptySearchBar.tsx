@@ -3,7 +3,7 @@ import { StyleSheet, TextInput, Pressable, ViewStyle } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { memo, useEffect, useState } from "react";
 import { Link } from "expo-router";
-import { useCart } from "@/app/store/store";
+import { useCart } from "@/store/store";
 import Animated from "react-native-reanimated";
 
 /**

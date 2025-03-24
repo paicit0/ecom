@@ -2,7 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
-import { Product } from "../../app/store/store";
+import { Product } from "../../store/store";
 
 type fetchCartType = {
   userEmail: string;

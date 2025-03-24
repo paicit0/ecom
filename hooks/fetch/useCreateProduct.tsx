@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
 import * as SecureStore from "expo-secure-store";
-import { Product } from "../../app/store/store";
+import { Product } from "../../store/store";
 
 type fetchCreateProductResponseSuccess = {
   message: string;
