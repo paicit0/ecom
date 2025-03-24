@@ -16,7 +16,7 @@ import { FlashList } from "@shopify/flash-list";
 
 export const CartScreen = memo(() => {
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
-  
+
   const auth = getAuth();
   const userAuth = auth.currentUser;
   const router = useRouter();
@@ -96,7 +96,7 @@ export const CartScreen = memo(() => {
       <View style={styles.headerContainer}>
         <Link href="../(tabs)/HomeScreen" asChild>
           <Pressable style={{ marginLeft: 8 }}>
-            <Ionicons name="arrow-back-outline" size={20}></Ionicons>
+            <Ionicons name="arrow-back-outline" size={20} />
           </Pressable>
         </Link>
         <View
@@ -117,7 +117,7 @@ export const CartScreen = memo(() => {
       <View style={styles.headerContainer}>
         <Link href="../(tabs)/HomeScreen" asChild>
           <Pressable style={{ marginLeft: 8 }}>
-            <Ionicons name="arrow-back-outline" size={20}></Ionicons>
+            <Ionicons name="arrow-back-outline" size={20} />
           </Pressable>
         </Link>
         <View
@@ -141,7 +141,7 @@ export const CartScreen = memo(() => {
               name="storefront-outline"
               size={18}
               style={{ alignSelf: "center" }}
-            ></Ionicons>
+            />
             <Text style={{ fontWeight: "bold" }}>{item.productOwner}</Text>
           </View>
 
@@ -199,7 +199,7 @@ export const CartScreen = memo(() => {
                         name="remove-outline"
                         size={16}
                         style={{ borderWidth: 0.5, alignSelf: "center" }}
-                      ></Ionicons>
+                      />
                     </Pressable>
 
                     <Text style={{}}>{item.productCartQuantity}</Text>
@@ -229,7 +229,7 @@ export const CartScreen = memo(() => {
                         name="add-outline"
                         size={16}
                         style={{ borderWidth: 0.5, alignSelf: "center" }}
-                      ></Ionicons>
+                      />
                     </Pressable>
                   </View>
                 </View>
