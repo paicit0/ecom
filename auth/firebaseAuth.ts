@@ -190,8 +190,8 @@ export async function saveToken(user: User | null) {
       const token = await user.getIdToken();
       console.log("firebaseAuth.saveToken: Generating a tokenID:", token);
       console.log(
-        "firebaseAuth.saveToken: auth.currentUser",
-        auth.currentUser
+        "firebaseAuth.saveToken: auth.currentUser.email",
+        auth.currentUser?.email
       );
       await SecureStore.setItemAsync("authToken", token);
     } else {
