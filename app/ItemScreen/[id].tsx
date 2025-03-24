@@ -272,15 +272,10 @@ const ItemScreen = memo(function ItemScreen() {
                 {isFavorited ? (
                   <Pressable
                     onPress={() => {
+                      setIsFavorited(false);
                       deleteFavoriteMutation.mutate(
                         { userEmail: userEmail, productId: productId },
                         {
-                          onSuccess: () => {
-                            console.log(
-                              "ItemScreen/[id]/: deleteFavorite success"
-                            ),
-                              setIsFavorited(false);
-                          },
                           onError: () => {
                             console.log("ItemScreen/[id]/: error"),
                               setIsFavorited(true);
@@ -296,15 +291,10 @@ const ItemScreen = memo(function ItemScreen() {
                 ) : (
                   <Pressable
                     onPress={() => {
+                      setIsFavorited(true);
                       addFavoriteMutation.mutate(
                         { userEmail: userEmail, productId: productId },
                         {
-                          onSuccess: () => {
-                            console.log(
-                              "ItemScreen/[id]/: addFavoriteMutation success"
-                            ),
-                              setIsFavorited(true);
-                          },
                           onError: () => {
                             console.log(
                               "ItemScreen/[id]/: addFavoriteMutation error"
@@ -357,6 +347,7 @@ const ItemScreen = memo(function ItemScreen() {
       <View style={styles.ItemFooter}>
         <Pressable
           onPress={() => {
+            addCartMutation.variables;
             addCartMutation.mutate(
               { userEmail: userEmail, productId: productId },
               {
