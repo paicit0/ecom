@@ -1,7 +1,7 @@
 // useAddCart.tsx
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { debounce } from "lodash";
 
@@ -55,6 +55,7 @@ const fetchAddCart = async ({
 };
 
 export const useAddCart = (debounceTime = 500) => {
+  const queryClient = useQueryClient();
   const debouncedFetchAddCart = useMemo(
     () =>
       debounce(
@@ -68,6 +69,9 @@ export const useAddCart = (debounceTime = 500) => {
 
   const mutation = useMutation({
     mutationFn: debouncedFetchAddCart,
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ["Cart"] });
+    },
   });
 
   return mutation;
