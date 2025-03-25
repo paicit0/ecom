@@ -14,12 +14,15 @@ import { Product } from "../store/store";
 import { Image } from "expo-image";
 import { FlashList } from "@shopify/flash-list";
 import { Modal } from "react-native";
+import { getCart } from "../firebase/functions/src";
 
 export const CartScreen = memo(() => {
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [openConfirmationModal, setOpenConfirmationModal] =
     useState<boolean>(false);
-  const [checkBoxTicked, setCheckBoxTicked] = useState<boolean>(false);
+  const [selectAllCheckBoxTicked, setSelectAllCheckBoxTicked] =
+    useState<boolean>(false);
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const auth = getAuth();
   const userAuth = auth.currentUser;
   const router = useRouter();
@@ -53,6 +56,21 @@ export const CartScreen = memo(() => {
   useEffect(() => {
     console.log("CartScreen: Cart array Length:", getCartQuery.data?.length);
   }, []);
+
+  useEffect(() => {
+    console.log("CartScreen: selectedProducts useEffect: ", selectedProducts);
+  }, [selectedProducts]);
+
+  // fix later
+  useEffect(() => {
+    if (getCartQuery.data?.length === selectedProducts.length) {
+      setSelectAllCheckBoxTicked(true);
+    } else {
+      setSelectAllCheckBoxTicked(false);
+    }
+    console.log("CartScreen: selectedProducts useEffect: ", selectedProducts);
+    console.log("getCartQuery.data", getCartQuery.data);
+  }, [selectedProducts, getCartQuery.data]);
 
   if (getCartQuery.isLoading) {
     return (
@@ -124,10 +142,13 @@ export const CartScreen = memo(() => {
             marginLeft: 10,
           }}
         >
-          {checkBoxTicked ? (
+          {selectAllCheckBoxTicked ? (
             <Pressable
               style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
-              onPress={() => setCheckBoxTicked(false)}
+              onPress={() => {
+                setSelectAllCheckBoxTicked(false);
+                setSelectedProducts([]);
+              }}
             >
               <Ionicons name="checkbox" size={24} color={"orange"} />
               <Text>Select All</Text>
@@ -135,7 +156,12 @@ export const CartScreen = memo(() => {
           ) : (
             <Pressable
               style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
-              onPress={() => setCheckBoxTicked(true)}
+              onPress={() => {
+                setSelectAllCheckBoxTicked(true);
+                setSelectedProducts(
+                  getCartQuery.data?.map((product) => product.productId) ??[]
+                );
+              }}
             >
               <Ionicons name="square-outline" size={24} color={"orange"} />
               <Text>Select All</Text>
@@ -153,8 +179,8 @@ export const CartScreen = memo(() => {
           }}
         >
           <View style={{ flexDirection: "row", alignSelf: "flex-start" }}>
-            <Text style={{  alignSelf:'center',fontSize:12}}>Amount </Text>
-            {<Text style={{ color: "orange", fontSize:18}}>฿9,999</Text>}
+            <Text style={{ alignSelf: "center", fontSize: 12 }}>Amount </Text>
+            {<Text style={{ color: "orange", fontSize: 18 }}>฿9,999</Text>}
           </View>
           <Pressable
             style={{
@@ -167,7 +193,7 @@ export const CartScreen = memo(() => {
             }}
           >
             <Text style={{ color: "white" }}>
-              Checkout ({getCartQuery.data?.length})
+              Checkout ({selectedProducts.length})
             </Text>
           </Pressable>
         </View>
@@ -179,8 +205,33 @@ export const CartScreen = memo(() => {
     const productPriceToBaht = item.productPrice * 100;
     return (
       <>
-        <View style={styles.itemContainerRender}>
+        <View key={item.productId} style={styles.itemContainerRender}>
           <View style={{ flexDirection: "row", marginLeft: 16, gap: 5 }}>
+            <Pressable
+              onPress={() => {
+                if (selectedProducts.includes(item.productId)) {
+                  setSelectedProducts(
+                    selectedProducts.filter(
+                      (product) => product !== item.productId
+                    )
+                  );
+                  console.log(
+                    "CartScreen: Product found... removing from array"
+                  );
+                } else {
+                  setSelectedProducts([...selectedProducts, item.productId]);
+                  console.log(
+                    "CartScreen: Product not found... adding to array"
+                  );
+                }
+              }}
+            >
+              {selectedProducts.includes(item.productId) ? (
+                <Ionicons name="checkbox" size={24} color={"orange"} />
+              ) : (
+                <Ionicons name="square-outline" size={24} color={"orange"} />
+              )}
+            </Pressable>
             <Ionicons
               name="storefront-outline"
               size={18}
