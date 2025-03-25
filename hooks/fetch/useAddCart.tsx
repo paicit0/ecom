@@ -56,19 +56,8 @@ const fetchAddCart = async ({
 
 export const useAddCart = (debounceTime = 500) => {
   const queryClient = useQueryClient();
-  const debouncedFetchAddCart = useMemo(
-    () =>
-      debounce(
-        ({ userEmail, productId }: fetchAddCartType) =>
-          fetchAddCart({ userEmail, productId }),
-        debounceTime,
-        { leading: true }
-      ),
-    [debounceTime]
-  );
-
   const mutation = useMutation({
-    mutationFn: debouncedFetchAddCart,
+    mutationFn: fetchAddCart,
     onSettled: async () => {
       return await queryClient.invalidateQueries({ queryKey: ["Cart"] });
     },

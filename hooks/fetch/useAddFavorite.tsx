@@ -1,7 +1,7 @@
 // useAddFavorite.tsx
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 type fetchAddFavoriteType = {
   userEmail: string;
@@ -10,14 +10,14 @@ type fetchAddFavoriteType = {
 
 type fetchAddFavoriteResponseSuccess = {
   message: string;
-}
+};
 type fetchAddFavoriteResponseFailed = {
   error: string;
-}
+};
 
-type fetchAddFavoriteResponseType = 
-  | fetchAddFavoriteResponseSuccess 
-  | fetchAddFavoriteResponseFailed 
+type fetchAddFavoriteResponseType =
+  | fetchAddFavoriteResponseSuccess
+  | fetchAddFavoriteResponseFailed;
 
 const fetchAddFavorite = async ({
   userEmail,
@@ -53,8 +53,12 @@ const fetchAddFavorite = async ({
 };
 
 export const useAddFavorite = () => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ userEmail, productId }: fetchAddFavoriteType) =>
       fetchAddFavorite({ userEmail, productId }),
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ["favorites"] });
+    },
   });
 };
