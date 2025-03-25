@@ -3,7 +3,6 @@ import { StyleSheet, TextInput, Pressable, ViewStyle } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { memo, useEffect, useState } from "react";
 import { Link } from "expo-router";
-import { useCart } from "@/store/store";
 import Animated from "react-native-reanimated";
 
 /**
@@ -42,7 +41,6 @@ const EmptySearchBar = memo(function SearchBar({
   const [currentPlaceholder, setCurrentPlaceholder] = useState(() =>
     getRandomPlaceholder(-1)
   );
-  const cart = useCart((state) => state.cartItemsArray);
 
   function getRandomPlaceholder(excludeIndex: number) {
     let randomIndex;
