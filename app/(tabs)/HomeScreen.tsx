@@ -18,7 +18,8 @@ import axios from "axios";
 import { useGetProducts } from "../../hooks/fetch/useGetProducts";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useUserSession } from "../../auth/firebaseAuth";
+import { auth, useUserSession } from "../../auth/firebaseAuth";
+import { useGetCart } from "../../hooks/fetch/useGetCart";
 
 export const HomeScreen = memo(function HomeScreen() {
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
@@ -28,6 +29,14 @@ export const HomeScreen = memo(function HomeScreen() {
   const { userInfo } = useUserSession();
   const numberOfItems = 50;
   const loadMoreProductNumber = 20;
+
+  const userEmail = auth.currentUser?.email;
+
+  if (!userEmail) {
+    console.error("ItemScreen/[id]: no userEmail");
+    return;
+  }
+  const getCartQuery = useGetCart({ userEmail: userEmail as string });
 
   const getProductsQuery = useGetProducts({
     numberOfItems,
@@ -314,8 +323,16 @@ export const HomeScreen = memo(function HomeScreen() {
             <Link href="/CartScreen" asChild>
               <Pressable style={{ marginLeft: 10 }}>
                 <Ionicons name="cart-outline" size={28} color="white" />
+                {(getCartQuery.data?.length as number) > 0 && (
+                  <Text style={styles.cartBadge}>
+                    {(getCartQuery.data?.length as number) > 99
+                      ? "99+"
+                      : getCartQuery.data?.length}
+                  </Text>
+                )}
               </Pressable>
             </Link>
+
             <Ionicons
               name="chatbubble-ellipses-outline"
               size={28}
@@ -365,7 +382,7 @@ export const HomeScreen = memo(function HomeScreen() {
                   );
                 }}
               >
-                <Text>devtool refresh all</Text>
+                <Text>devmode: refresh all</Text>
               </Pressable>
             </>
           )}
@@ -452,7 +469,17 @@ const styles = StyleSheet.create({
     marginLeft: 16,
     marginTop: 8,
   },
-  badge: {},
+  cartBadge: {
+    position: "absolute",
+    top: -5,
+    right: -5,
+    zIndex: 1,
+    backgroundColor: "red",
+    color: "white",
+    borderRadius: 10,
+    paddingHorizontal: 5,
+    fontSize: 12,
+  },
 });
 
 export default HomeScreen;

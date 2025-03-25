@@ -5,7 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Link, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
 import axios, { AxiosError } from "axios";
-import { Product } from "../../store/store";
+import { Product, useCart } from "../../store/store";
 import AnimatedLoadingIndicator from "../../components/AnimatedLoadingIndicator";
 import { useAddFavorite } from "../../hooks/fetch/useAddFavorite";
 import { useDeleteFavorite } from "../../hooks/fetch/useDeleteFavorite";
@@ -22,6 +22,7 @@ import Animated, {
   withSpring,
   interpolateColor,
 } from "react-native-reanimated";
+import { useGetCart } from "../../hooks/fetch/useGetCart";
 
 const ItemScreen = memo(function ItemScreen() {
   const [product, setProduct] = useState<Product>();
@@ -31,6 +32,13 @@ const ItemScreen = memo(function ItemScreen() {
 
   const { id: productId }: { id: string } = useLocalSearchParams();
   const auth = getAuth();
+
+  const cartItemsArray = useCart((state) => state.cartItemsArray);
+
+  const addFavoriteMutation = useAddFavorite();
+  const deleteFavoriteMutation = useDeleteFavorite();
+
+  const addCartMutation = useAddCart();
 
   if (!auth.currentUser) {
     console.error("ItemScreen/[id]: no auth.currentUser");
@@ -60,10 +68,14 @@ const ItemScreen = memo(function ItemScreen() {
     return;
   }
 
-  const addFavoriteMutation = useAddFavorite();
-  const deleteFavoriteMutation = useDeleteFavorite();
+  const getCartQuery = useGetCart({ userEmail: userEmail as string });
 
-  const addCartMutation = useAddCart();
+  useEffect(() => {
+    console.log(
+      "ItemScreen/[id]: Cart array Length:",
+      getCartQuery.data?.length
+    );
+  }, []);
 
   useEffect(() => {
     const getTheProduct = async () => {
@@ -223,6 +235,13 @@ const ItemScreen = memo(function ItemScreen() {
             </Animated.Text>
           </Pressable>
           <View>
+            {(getCartQuery.data?.length as number) > 0 && (
+              <Text style={styles.cartBadge}>
+                {(getCartQuery.data?.length as number) > 99
+                  ? "99+"
+                  : getCartQuery.data?.length}
+              </Text>
+            )}
             <Link href="/CartScreen" asChild>
               <Pressable>
                 <Animated.Text
@@ -361,11 +380,6 @@ const ItemScreen = memo(function ItemScreen() {
           }}
           style={styles.addToCartFooter}
         >
-          {/* {cart.length > 0 && (
-            <Text style={styles.badge}>
-              {cart.length > 99 ? "99+" : cart.length}
-            </Text>
-          )} */}
           <Ionicons
             name="cart-outline"
             size={20}
