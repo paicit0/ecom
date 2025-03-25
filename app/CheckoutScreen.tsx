@@ -55,7 +55,7 @@ function CheckoutScreen() {
         },
       });
       const userData = fetchUser.data;
-      console.log(userData.message);
+      console.log("CheckoutScreen:userData.message:", userData.message);
 
       if (userData.customerIdStripe) {
         customerId = userData.customerIdStripe;
@@ -144,6 +144,7 @@ function CheckoutScreen() {
       setLoading(false);
     } else {
       try {
+        console.log("CheckoutScreen: adding transaction to user:", userEmail);
         const addTransactionUrl =
           process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
             ? process.env.EXPO_PUBLIC_addTransaction_emulator
@@ -168,7 +169,9 @@ function CheckoutScreen() {
         );
         const fetchTransactionData = (await fetchTransaction).data;
         console.log("CheckoutScreen: transaction added:", fetchTransactionData);
-      } catch (error) {console.error("CheckoutScreen: addTransaction error", error)}
+      } catch (error) {
+        console.error("CheckoutScreen: addTransaction error", error);
+      }
       console.log("CheckOutScreen: Success", "Your order is confirmed!");
       router.replace({
         pathname: "/SucceededPaymentScreen",
