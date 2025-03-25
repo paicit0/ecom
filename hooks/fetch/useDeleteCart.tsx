@@ -1,7 +1,7 @@
 // useDeleteCart.tsx
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 type fetchDeleteCartType = {
   userEmail: string;
@@ -53,8 +53,12 @@ const fetchDeleteCart = async ({
 };
 
 export const useDeleteCart = () => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ userEmail, productId }: fetchDeleteCartType) =>
       fetchDeleteCart({ userEmail, productId }),
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ["Cart"] });
+    },
   });
 };
