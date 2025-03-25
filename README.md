@@ -1,5 +1,7 @@
 <p align="center">
   <img src="https://github.com/paicit0/ecom/blob/master/readme/Screenshot_1740981740.png" width="350" title="Home Screen" alt="Home Screen">
+  <img src="https://github.com/paicit0/ecom/blob/master/readme/Screenshot_1742877843.png" width="350" title="Cart Screen1" alt="Cart Screen1">
+  <img src="https://github.com/paicit0/ecom/blob/master/readme/Screenshot_1742877850.png" width="350" title="Cart Screen2" alt="Cart Screen2">
   <img src="https://github.com/paicit0/ecom/blob/master/readme/Screenshot_1740981745.png" width="350" title="Profile Screen" alt="Profile Screen">
 </p>
 Stacks used:
