@@ -19,6 +19,7 @@ import AnimatedLoadingIndicator from "../../components/AnimatedLoadingIndicator"
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TouchableOpacity } from "react-native";
+import { useGetCart } from "../../hooks/fetch/useGetCart";
 function ProfileScreen() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -33,6 +34,7 @@ function ProfileScreen() {
   if (!userAuth) {
     console.log("ProfileScreen: not logged in");
   }
+  const getCartQuery = useGetCart({ userEmail: userAuth?.email as string });
 
   // useEffect(() => {
   //   console.log("ProfileScreen: loading:", loading);
@@ -141,11 +143,18 @@ function ProfileScreen() {
                 </Pressable>
               )}
             </View>
-            <View style={{ flexDirection: "row", gap: 12, marginRight: 16 }}>
+            <View style={styles.headerContainer}>
               <Ionicons name="settings-outline" size={28} color={"white"} />
               <Link href={"/CartScreen"} asChild>
                 <Pressable>
                   <Ionicons name="cart-outline" size={28} color={"white"} />
+                  {(getCartQuery.data?.length as number) > 0 && (
+                    <Text style={styles.cartBadge}>
+                      {(getCartQuery.data?.length as number) > 99
+                        ? "99+"
+                        : getCartQuery.data?.length}
+                    </Text>
+                  )}
                 </Pressable>
               </Link>
               <Ionicons
@@ -156,7 +165,7 @@ function ProfileScreen() {
             </View>
           </View>
           <>
-            <View style={styles.mainHeaderContainer}>
+            <View style={styles.mainUserProfileContainer}>
               <View style={styles.usersProfileContainer}>
                 {auth.currentUser ? (
                   <>
@@ -398,12 +407,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "orange",
   },
+  headerContainer: {
+    flexDirection: "row",
+    gap: 12,
+    marginRight: 16,
+    paddingTop: 5,
+  },
+
   topButtonsContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     backgroundColor: "orange",
   },
-  mainHeaderContainer: {
+  mainUserProfileContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -481,6 +497,17 @@ const styles = StyleSheet.create({
     color: "#ff6b81",
     fontSize: 14,
     marginBottom: 10,
+  },
+  cartBadge: {
+    position: "absolute",
+    top: -5,
+    right: -5,
+    zIndex: 1,
+    backgroundColor: "red",
+    color: "white",
+    borderRadius: 10,
+    paddingHorizontal: 5,
+    fontSize: 12,
   },
 });
 
