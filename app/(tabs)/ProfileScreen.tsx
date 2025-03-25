@@ -1,13 +1,6 @@
 // ProfileScreen.tsx
 import { Link, useRouter } from "expo-router";
-import {
-  View,
-  Text,
-  Pressable,
-  Dimensions,
-  ScrollView,
-  StatusBar,
-} from "react-native";
+import { View, Text, Pressable, Dimensions, ScrollView } from "react-native";
 import { StyleSheet } from "react-native";
 // @ts-ignore
 import { useUserSession } from "../../auth/firebaseAuth";
@@ -18,7 +11,6 @@ import axios from "axios";
 import AnimatedLoadingIndicator from "../../components/AnimatedLoadingIndicator";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { TouchableOpacity } from "react-native";
 import { useGetCart } from "../../hooks/fetch/useGetCart";
 function ProfileScreen() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -30,11 +22,13 @@ function ProfileScreen() {
   const router = useRouter();
 
   const auth = getAuth();
-  const userAuth = auth.currentUser;
-  if (!userAuth) {
-    console.log("ProfileScreen: not logged in");
+  const userEmail = auth.currentUser?.email;
+
+  if (!userEmail) {
+    console.log("ProfileScreen: no userEmail");
+    // return;
   }
-  const getCartQuery = useGetCart({ userEmail: userAuth?.email as string });
+  const getCartQuery = useGetCart({ userEmail: auth.currentUser?.email as string });
 
   // useEffect(() => {
   //   console.log("ProfileScreen: loading:", loading);
@@ -117,7 +111,7 @@ function ProfileScreen() {
         <ScrollView style={{ flex: 1, backgroundColor: "white" }}>
           <View style={styles.topButtonsContainer}>
             <View style={{ justifyContent: "flex-start" }}>
-              {userInfoFromStore.userRole !== "seller" && userAuth && (
+              {userInfoFromStore.userRole !== "seller" && auth.currentUser && (
                 <Pressable
                   style={{
                     flexDirection: "row",
@@ -384,7 +378,7 @@ function ProfileScreen() {
                 userInfoFromStore
               );
               console.log("ProfileScreen: loading:", loading);
-              console.log("ProfileScreen: userAuth: ", userAuth);
+              console.log("ProfileScreen: userAuth: ", auth.currentUser?.uid);
             }}
             style={styles.button}
           >
