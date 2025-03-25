@@ -13,10 +13,13 @@ import { useDeleteCart } from "../hooks/fetch/useDeleteCart";
 import { Product } from "../store/store";
 import { Image } from "expo-image";
 import { FlashList } from "@shopify/flash-list";
+import { Modal } from "react-native";
 
 export const CartScreen = memo(() => {
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
-
+  const [openConfirmationModal, setOpenConfirmationModal] =
+    useState<boolean>(false);
+  const [checkBoxTicked, setCheckBoxTicked] = useState<boolean>(false);
   const auth = getAuth();
   const userAuth = auth.currentUser;
   const router = useRouter();
@@ -95,18 +98,15 @@ export const CartScreen = memo(() => {
     return (
       <View style={styles.headerContainer}>
         <Link href="../(tabs)/HomeScreen" asChild>
-          <Pressable style={{ marginLeft: 8 }}>
+          <Pressable
+            style={{ marginLeft: 8, position: "absolute", paddingTop: 10 }}
+          >
             <Ionicons name="arrow-back-outline" size={20} />
           </Pressable>
         </Link>
-        <View
-          style={{
-            flex: 1,
-            marginLeft: -32,
-            alignItems: "center",
-          }}
-        >
-          <Text>Cart</Text>
+        <View style={styles.cartHeaderTextStyle}>
+          <Text>Cart </Text>
+          <Text style={{ top: -4 }}>({getCartQuery.data?.length})</Text>
         </View>
       </View>
     );
@@ -114,18 +114,62 @@ export const CartScreen = memo(() => {
 
   function CartFooter() {
     return (
-      <View style={styles.headerContainer}>
-        <Link href="../(tabs)/HomeScreen" asChild>
-          <Pressable style={{ marginLeft: 8 }}>
-            <Ionicons name="arrow-back-outline" size={20} />
-          </Pressable>
-        </Link>
+      <View style={styles.footerContainer}>
         <View
           style={{
-            backgroundColor: "red",
+            flex: 1,
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 10,
+            marginLeft: 10,
           }}
         >
-          <Text>Footer</Text>
+          {checkBoxTicked ? (
+            <Pressable
+              style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+              onPress={() => setCheckBoxTicked(false)}
+            >
+              <Ionicons name="checkbox" size={24} color={"orange"} />
+              <Text>Select All</Text>
+            </Pressable>
+          ) : (
+            <Pressable
+              style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+              onPress={() => setCheckBoxTicked(true)}
+            >
+              <Ionicons name="square-outline" size={24} color={"orange"} />
+              <Text>Select All</Text>
+            </Pressable>
+          )}
+        </View>
+        <View
+          style={{
+            flex: 1,
+            flexDirection: "row",
+            justifyContent: "flex-end",
+            gap: 10,
+            marginRight: 20,
+            alignItems: "center",
+          }}
+        >
+          <View style={{ flexDirection: "row", alignSelf: "flex-start" }}>
+            <Text style={{  alignSelf:'center',fontSize:12}}>Amount </Text>
+            {<Text style={{ color: "orange", fontSize:18}}>฿9,999</Text>}
+          </View>
+          <Pressable
+            style={{
+              width: 120,
+              height: 45,
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: 8,
+              backgroundColor: "orange",
+            }}
+          >
+            <Text style={{ color: "white" }}>
+              Checkout ({getCartQuery.data?.length})
+            </Text>
+          </Pressable>
         </View>
       </View>
     );
@@ -175,24 +219,57 @@ export const CartScreen = memo(() => {
                   <View style={{ flexDirection: "row", gap: 5 }}>
                     <Pressable
                       onPress={() => {
-                        deleteCartMutation.mutate(
-                          {
-                            userEmail: userEmail as string,
-                            productId: item.productId,
-                          },
-                          {
-                            onSuccess: () => {
-                              console.log(
-                                "ItemScreen/[id]/: deleteCartMutation success"
-                              );
+                        if (item.productCartQuantity === 1) {
+                          console.log("CartScreen: item Quantity = 1");
+                          return (
+                            <>
+                              <Modal
+                                animationType="slide"
+                                transparent={true}
+                                visible={openConfirmationModal}
+                                onRequestClose={() => {
+                                  console.log(
+                                    "CartScreen: Modal has been closed."
+                                  );
+                                  setOpenConfirmationModal(false);
+                                }}
+                              ></Modal>
+                              <Text>
+                                This will remove the product from your cart. Are
+                                you sure?
+                              </Text>
+                              <Pressable
+                                onPress={() => setOpenConfirmationModal(true)}
+                              >
+                                <Text>Yes</Text>
+                              </Pressable>
+                              <Pressable
+                                onPress={() => setOpenConfirmationModal(false)}
+                              >
+                                <Text>Cancel</Text>
+                              </Pressable>
+                            </>
+                          );
+                        } else {
+                          deleteCartMutation.mutate(
+                            {
+                              userEmail: userEmail as string,
+                              productId: item.productId,
                             },
-                            onError: () => {
-                              console.log(
-                                "ItemScreen/[id]/: deleteCartMutation error"
-                              );
-                            },
-                          }
-                        );
+                            {
+                              onSuccess: () => {
+                                console.log(
+                                  "ItemScreen/[id]/: deleteCartMutation success"
+                                );
+                              },
+                              onError: () => {
+                                console.log(
+                                  "ItemScreen/[id]/: deleteCartMutation error"
+                                );
+                              },
+                            }
+                          );
+                        }
                       }}
                     >
                       <Ionicons
@@ -201,7 +278,6 @@ export const CartScreen = memo(() => {
                         style={{ borderWidth: 0.5, alignSelf: "center" }}
                       />
                     </Pressable>
-
                     <Text style={{}}>{item.productCartQuantity}</Text>
                     <Pressable
                       onPress={() => {
@@ -286,7 +362,7 @@ export const CartScreen = memo(() => {
           />
         </View>
       </View>
-      {/* <CartFooter /> */}
+      <CartFooter />
     </>
   );
 });
@@ -297,9 +373,15 @@ const deviceWidth = Dimensions.get("window").width;
 const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: "row",
-    paddingBottom: 16,
+    paddingTop: 10,
+    paddingBottom: 32,
     marginBottom: 8,
     backgroundColor: "white",
+  },
+  cartHeaderTextStyle: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "center",
   },
   mainContainer: {
     flex: 1,
@@ -329,6 +411,13 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "space-between",
     marginLeft: 16,
+  },
+  footerContainer: {
+    width: "100%",
+    flexDirection: "row",
+    paddingTop: 10,
+    paddingBottom: 40,
+    backgroundColor: "white",
   },
 });
 export default CartScreen;
