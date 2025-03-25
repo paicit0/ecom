@@ -235,15 +235,15 @@ const ItemScreen = memo(function ItemScreen() {
             </Animated.Text>
           </Pressable>
           <View>
-            {(getCartQuery.data?.length as number) > 0 && (
-              <Text style={styles.cartBadge}>
-                {(getCartQuery.data?.length as number) > 99
-                  ? "99+"
-                  : getCartQuery.data?.length}
-              </Text>
-            )}
             <Link href="/CartScreen" asChild>
               <Pressable>
+                {(getCartQuery.data?.length as number) > 0 && (
+                  <Text style={styles.cartBadge}>
+                    {(getCartQuery.data?.length as number) > 99
+                      ? "99+"
+                      : getCartQuery.data?.length}
+                  </Text>
+                )}
                 <Animated.Text
                   style={[
                     headerIconStyle,

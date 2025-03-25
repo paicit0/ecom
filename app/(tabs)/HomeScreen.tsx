@@ -322,14 +322,15 @@ export const HomeScreen = memo(function HomeScreen() {
           <View style={styles.cartContainer}>
             <Link href="/CartScreen" asChild>
               <Pressable style={{ marginLeft: 10 }}>
-                <Ionicons name="cart-outline" size={28} color="white" />
-                {(getCartQuery.data?.length as number) > 0 && (
+              {(getCartQuery.data?.length as number) > 0 && (
                   <Text style={styles.cartBadge}>
                     {(getCartQuery.data?.length as number) > 99
                       ? "99+"
                       : getCartQuery.data?.length}
                   </Text>
                 )}
+                <Ionicons name="cart-outline" size={28} color="white" />
+
               </Pressable>
             </Link>
 
