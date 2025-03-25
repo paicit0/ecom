@@ -21,7 +21,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { auth, useUserSession } from "../../auth/firebaseAuth";
 import { useGetCart } from "../../hooks/fetch/useGetCart";
 
-export const HomeScreen = memo(function HomeScreen() {
+export const HomeScreen = function HomeScreen() {
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [currentProductNumber, setCurrentProductNumber] = useState<number>(0);
@@ -33,8 +33,8 @@ export const HomeScreen = memo(function HomeScreen() {
   const userEmail = auth.currentUser?.email;
 
   if (!userEmail) {
-    console.error("ItemScreen/[id]: no userEmail");
-    return;
+    console.log("HomeScreen: no userEmail");
+    // return;
   }
   const getCartQuery = useGetCart({ userEmail: userEmail as string });
 
@@ -322,7 +322,7 @@ export const HomeScreen = memo(function HomeScreen() {
           <View style={styles.cartContainer}>
             <Link href="/CartScreen" asChild>
               <Pressable style={{ marginLeft: 10 }}>
-              {(getCartQuery.data?.length as number) > 0 && (
+                {(getCartQuery.data?.length as number) > 0 && (
                   <Text style={styles.cartBadge}>
                     {(getCartQuery.data?.length as number) > 99
                       ? "99+"
@@ -330,7 +330,6 @@ export const HomeScreen = memo(function HomeScreen() {
                   </Text>
                 )}
                 <Ionicons name="cart-outline" size={28} color="white" />
-
               </Pressable>
             </Link>
 
@@ -391,7 +390,7 @@ export const HomeScreen = memo(function HomeScreen() {
       </View>
     </>
   );
-});
+};
 const deviceHeight = Dimensions.get("window").height;
 const deviceWidth = Dimensions.get("window").width;
 
