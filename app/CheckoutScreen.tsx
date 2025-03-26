@@ -152,7 +152,8 @@ function CheckoutScreen() {
         if (!addTransactionUrl) {
           throw new Error("CheckoutScreen: addTransaction url not good.");
         }
-        const fetchTransaction = axios.post(
+        console.log("CheckoutScreen:addTransactionUrl:", addTransactionUrl);
+        const fetchTransaction = await axios.post(
           addTransactionUrl,
           {
             userEmail: userEmail,
@@ -167,7 +168,7 @@ function CheckoutScreen() {
             },
           }
         );
-        const fetchTransactionData = (await fetchTransaction).data;
+        const fetchTransactionData = await fetchTransaction.data;
         console.log("CheckoutScreen: transaction added:", fetchTransactionData);
       } catch (error) {
         console.error("CheckoutScreen: addTransaction error", error);
