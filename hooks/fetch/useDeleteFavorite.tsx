@@ -1,7 +1,7 @@
 // useDeleteFavorite.tsx
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 type fetchDeleteFavoriteType = {
   userEmail: string;
@@ -53,8 +53,13 @@ const fetchDeleteFavorite = async ({
 };
 
 export const useDeleteFavorite = () => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ userEmail, productId }: fetchDeleteFavoriteType) =>
       fetchDeleteFavorite({ userEmail, productId }),
-  });
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ["favorites"] });
+    },
+  })
+  ;
 };

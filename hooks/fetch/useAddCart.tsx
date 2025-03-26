@@ -59,7 +59,7 @@ export const useAddCart = (debounceTime = 500) => {
   const mutation = useMutation({
     mutationFn: fetchAddCart,
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ["Cart"] });
+      return await queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
   });
 

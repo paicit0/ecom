@@ -58,7 +58,7 @@ export const useDeleteCart = () => {
     mutationFn: ({ userEmail, productId }: fetchDeleteCartType) =>
       fetchDeleteCart({ userEmail, productId }),
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ["Cart"] });
+      return await queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
   });
 };

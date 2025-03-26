@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as SecureStore from "expo-secure-store";
 import { Product } from "../../store/store";
 
@@ -73,6 +73,7 @@ const fetchCreateProduct = async ({
 };
 
 export const useCreateProduct = () => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({
       productId,
@@ -96,5 +97,8 @@ export const useCreateProduct = () => {
         productStock,
         productOwner,
       }),
+      onSettled: async () => {
+        return await queryClient.invalidateQueries({ queryKey: ["products"] });
+      },
   });
 };
