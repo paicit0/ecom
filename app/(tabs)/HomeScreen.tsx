@@ -1,12 +1,11 @@
 // HomeScreen.tsx
-import { memo, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   StyleSheet,
   View,
   Text,
   Dimensions,
   Pressable,
-  ScrollView,
   StatusBar,
 } from "react-native";
 import { Image } from "expo-image";
@@ -15,11 +14,12 @@ import { Link } from "expo-router";
 import { FlashList } from "@shopify/flash-list";
 import EmptySearchBar from "../../components/EmptySearchBar";
 import axios from "axios";
-import { useGetProducts } from "../../hooks/fetch/useGetProducts";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { auth, useUserSession } from "../../auth/firebaseAuth";
+import { useUserSession } from "../../auth/firebaseAuth";
+import { useGetProducts } from "../../hooks/fetch/useGetProducts";
 import { useGetCart } from "../../hooks/fetch/useGetCart";
+import { getAuth } from "firebase/auth";
 
 export const HomeScreen = function HomeScreen() {
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
@@ -29,7 +29,7 @@ export const HomeScreen = function HomeScreen() {
   const { userInfo } = useUserSession();
   const numberOfItems = 50;
   const loadMoreProductNumber = 20;
-
+  const auth = getAuth();
   const userEmail = auth.currentUser?.email;
 
   if (!userEmail) {
@@ -56,6 +56,11 @@ export const HomeScreen = function HomeScreen() {
   useEffect(() => {
     setFilteredProduct(getProductsQuery.data);
     console.log("HomeScreen: getProductsQuery.data:", getProductsQuery.data);
+    // console.log("HomeScreen: getCartQuery.data:", getCartQuery.data);
+    // console.log(
+    //   "HomeScreen: getCartQuery.data?.length:",
+    //   getCartQuery.data?.length
+    // );
   }, []);
 
   useEffect(() => {
