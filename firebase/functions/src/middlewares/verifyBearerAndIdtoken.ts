@@ -35,6 +35,7 @@ const verifyBearerAndIdtoken = async function (
       .json({ error: `verifyBearerAndIdtoken: Unauthorized! ${error}` });
     return;
   }
+  console.log("verifyBearerAndIdtoken: verification completed, proceeding.");
   next();
 };
 
