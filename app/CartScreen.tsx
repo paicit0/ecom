@@ -14,7 +14,13 @@ import { Product } from "../store/store";
 import { Image } from "expo-image";
 import { FlashList } from "@shopify/flash-list";
 import { Modal } from "react-native";
-import { getCart } from "../firebase/functions/src";
+
+export type CheckoutProducts = {
+  amount: string;
+  name: string;
+  quantity: number | undefined;
+  productId: string;
+};
 
 export const CartScreen = memo(() => {
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
@@ -22,7 +28,10 @@ export const CartScreen = memo(() => {
     useState<boolean>(false);
   const [selectAllCheckBoxTicked, setSelectAllCheckBoxTicked] =
     useState<boolean>(false);
-  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [selectedProductsId, setSelectedProductsId] = useState<string[]>([]);
+  const [selectedProductsObj, setSelectedProductsObj] = useState<
+    CheckoutProducts[]
+  >([]);
   const auth = getAuth();
   const userAuth = auth.currentUser;
   const router = useRouter();
@@ -53,32 +62,28 @@ export const CartScreen = memo(() => {
   const addCartMutation = useAddCart();
   const deleteCartMutation = useDeleteCart();
 
-  useEffect(() => {
-    console.log("CartScreen: Cart array Length:", getCartQuery.data?.length);
-  }, []);
-
-  useEffect(() => {
-    console.log("CartScreen: selectedProducts useEffect: ", selectedProducts);
-  }, [selectedProducts]);
+  // useEffect(() => {
+  //   console.log(selectedProductsObj);
+  // }, [selectedProductsObj]);
 
   // fix later
-  useEffect(() => {
-    if (getCartQuery.data?.length === selectedProducts.length) {
-      setSelectAllCheckBoxTicked(true);
-    } else {
-      setSelectAllCheckBoxTicked(false);
-    }
-    console.log("CartScreen: selectedProducts useEffect: ", selectedProducts);
-    console.log("getCartQuery.data", getCartQuery.data);
-  }, [selectedProducts, getCartQuery.data]);
+  // useEffect(() => {
+  //   if (getCartQuery.data?.length === selectedProducts.length) {
+  //     setSelectAllCheckBoxTicked(true);
+  //   } else {
+  //     setSelectAllCheckBoxTicked(false);
+  //   }
+  //   console.log("CartScreen: selectedProducts useEffect: ", selectedProducts);
+  //   console.log("getCartQuery.data", getCartQuery.data);
+  // }, [selectedProducts, getCartQuery.data]);
 
-  if (getCartQuery.isLoading) {
-    return (
-      <SafeAreaView style={{ marginTop: 60 }}>
-        <AnimatedLoadingIndicator loading={getCartQuery.isLoading} />
-      </SafeAreaView>
-    );
-  }
+  // if (getCartQuery.isLoading) {
+  //   return (
+  //     <SafeAreaView style={{ marginTop: 60 }}>
+  //       <AnimatedLoadingIndicator loading={getCartQuery.isLoading} />
+  //     </SafeAreaView>
+  //   );
+  // }
 
   if (getCartQuery.isError) {
     console.error("CartScreen: useGetCartQuery.isError", getCartQuery.error);
@@ -116,16 +121,26 @@ export const CartScreen = memo(() => {
     return (
       <View style={styles.headerContainer}>
         <Link href="../(tabs)/HomeScreen" asChild>
-          <Pressable
-            style={{ marginLeft: 8, position: "absolute", paddingTop: 10 }}
-          >
+          <Pressable style={styles.arrowBackStyle}>
             <Ionicons name="arrow-back-outline" size={20} />
           </Pressable>
         </Link>
         <View style={styles.cartHeaderTextStyle}>
-          <Text>Cart </Text>
-          <Text style={{ top: -4 }}>({getCartQuery.data?.length})</Text>
+          <Text style={{ fontSize: 18 }}>Cart </Text>
+          <Text style={{ alignSelf: "center", top: -2 }}>
+            ({getCartQuery.data?.length})
+          </Text>
         </View>
+        {/* <Pressable style={styles.changeButtonStyle}>
+          <Text>Change</Text>
+        </Pressable> */}
+        <Pressable style={styles.chatBubbleStyle}>
+          <Ionicons
+            name="chatbubble-ellipses-outline"
+            size={28}
+            color={"orange"}
+          />
+        </Pressable>
       </View>
     );
   }
@@ -147,7 +162,7 @@ export const CartScreen = memo(() => {
               style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
               onPress={() => {
                 setSelectAllCheckBoxTicked(false);
-                setSelectedProducts([]);
+                setSelectedProductsId([]);
               }}
             >
               <Ionicons name="checkbox" size={24} color={"orange"} />
@@ -158,8 +173,8 @@ export const CartScreen = memo(() => {
               style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
               onPress={() => {
                 setSelectAllCheckBoxTicked(true);
-                setSelectedProducts(
-                  getCartQuery.data?.map((product) => product.productId) ??[]
+                setSelectedProductsId(
+                  getCartQuery.data?.map((product) => product.productId) ?? []
                 );
               }}
             >
@@ -192,9 +207,32 @@ export const CartScreen = memo(() => {
               backgroundColor: "orange",
             }}
           >
-            <Text style={{ color: "white" }}>
-              Checkout ({selectedProducts.length})
-            </Text>
+            {selectedProductsId.length > 0 ? (
+              <Link
+                href={{
+                  pathname: "/CheckoutScreen",
+                  params: { products: JSON.stringify(selectedProductsObj) },
+                }}
+                asChild
+              >
+                <Pressable>
+                  <Text style={{ color: "white" }}>
+                    Checkout ({selectedProductsId.length})
+                  </Text>
+                </Pressable>
+                {/* <Pressable onPress={()=>router.replace({path:"/CheckoutScreen"})}>
+                  <Text style={{ color: "white" }}>
+                    Checkout ({selectedProductsId.length})
+                  </Text>
+                </Pressable> */}
+              </Link>
+            ) : (
+              <Pressable>
+                <Text style={{ color: "white" }}>
+                  Checkout ({selectedProductsId.length})
+                </Text>
+              </Pressable>
+            )}
           </Pressable>
         </View>
       </View>
@@ -209,9 +247,9 @@ export const CartScreen = memo(() => {
           <View style={{ flexDirection: "row", marginLeft: 16, gap: 5 }}>
             <Pressable
               onPress={() => {
-                if (selectedProducts.includes(item.productId)) {
-                  setSelectedProducts(
-                    selectedProducts.filter(
+                if (selectedProductsId.includes(item.productId)) {
+                  setSelectedProductsId(
+                    selectedProductsId.filter(
                       (product) => product !== item.productId
                     )
                   );
@@ -219,14 +257,26 @@ export const CartScreen = memo(() => {
                     "CartScreen: Product found... removing from array"
                   );
                 } else {
-                  setSelectedProducts([...selectedProducts, item.productId]);
+                  setSelectedProductsId([
+                    ...selectedProductsId,
+                    item.productId,
+                  ]);
+                  setSelectedProductsObj([
+                    ...selectedProductsObj,
+                    {
+                      amount: productPriceToBaht.toString().toLocaleString(),
+                      name: item.productName,
+                      quantity: item.productCartQuantity,
+                      productId: item.productId,
+                    },
+                  ]);
                   console.log(
                     "CartScreen: Product not found... adding to array"
                   );
                 }
               }}
             >
-              {selectedProducts.includes(item.productId) ? (
+              {selectedProductsId.includes(item.productId) ? (
                 <Ionicons name="checkbox" size={24} color={"orange"} />
               ) : (
                 <Ionicons name="square-outline" size={24} color={"orange"} />
@@ -363,21 +413,6 @@ export const CartScreen = memo(() => {
               </View>
             </Pressable>
           </Link>
-          <Link
-            href={{
-              pathname: "/CheckoutScreen",
-              params: {
-                amount: productPriceToBaht.toString().toLocaleString(),
-                name: item.productName,
-                quantity: item.productCartQuantity,
-              },
-            }}
-            asChild
-          >
-            <Pressable style={{ alignSelf: "flex-end", marginRight: 16 }}>
-              <Text>Checkout</Text>
-            </Pressable>
-          </Link>
         </View>
       </>
     );
@@ -385,7 +420,6 @@ export const CartScreen = memo(() => {
 
   return (
     <>
-      <SafeAreaView style={{ backgroundColor: "white" }}></SafeAreaView>
       <CartHeader />
       <View style={styles.mainContainer}>
         <View style={styles.flashListContainer}>
@@ -422,21 +456,34 @@ const deviceHeight = Dimensions.get("window").height;
 const deviceWidth = Dimensions.get("window").width;
 
 const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+  },
   headerContainer: {
     flexDirection: "row",
-    paddingTop: 10,
-    paddingBottom: 32,
+    justifyContent: "space-between",
+    paddingTop: 24,
     marginBottom: 8,
     backgroundColor: "white",
   },
   cartHeaderTextStyle: {
-    flex: 1,
     flexDirection: "row",
-    justifyContent: "center",
+    // alignSelf: "center",
   },
-  mainContainer: {
-    flex: 1,
+  arrowBackStyle: {
+    // position: "absolute",
+    // left: 10,
+    // top: 10,
   },
+  changeButtonStyle: {
+    // position:'absolute',
+  },
+  chatBubbleStyle: {
+    // position: "absolute",
+    // right: 10,
+    // top: 10,
+  },
+
   flashListContainer: {
     flex: 1,
   },
