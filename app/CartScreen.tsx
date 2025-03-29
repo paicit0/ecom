@@ -16,10 +16,11 @@ import { FlashList } from "@shopify/flash-list";
 import { Modal } from "react-native";
 
 export type CheckoutProducts = {
-  amount: string;
+  amount: number;
   name: string;
-  quantity: number | undefined;
+  quantity?: number;
   productId: string;
+  productImg: string;
 };
 
 export const CartScreen = memo(() => {
@@ -61,6 +62,10 @@ export const CartScreen = memo(() => {
   const getCartQuery = useGetCart({ userEmail: userEmail as string });
   const addCartMutation = useAddCart();
   const deleteCartMutation = useDeleteCart();
+
+  useEffect(() => {
+    console.log("CartScreen: getCartQuery.data", getCartQuery.data);
+  }, []);
 
   // useEffect(() => {
   //   console.log(selectedProductsObj);
@@ -176,6 +181,8 @@ export const CartScreen = memo(() => {
                 setSelectedProductsId(
                   getCartQuery.data?.map((product) => product.productId) ?? []
                 );
+                // fix 
+                // setSelectedProductsObj(getCartQuery.data?.map((product)=>{product.productId}))
               }}
             >
               <Ionicons name="square-outline" size={24} color={"orange"} />
@@ -215,7 +222,14 @@ export const CartScreen = memo(() => {
                 }}
                 asChild
               >
-                <Pressable>
+                <Pressable
+                  onPress={() => {
+                    console.log(
+                      "CartScreen: checkout payload:",
+                      JSON.stringify(selectedProductsObj)
+                    );
+                  }}
+                >
                   <Text style={{ color: "white" }}>
                     Checkout ({selectedProductsId.length})
                   </Text>
@@ -240,7 +254,7 @@ export const CartScreen = memo(() => {
   }
 
   const render = ({ item }: { item: Product }) => {
-    const productPriceToBaht = item.productPrice * 100;
+    const productPriceToSatang = item.productPrice * 100;
     return (
       <>
         <View key={item.productId} style={styles.itemContainerRender}>
@@ -264,10 +278,11 @@ export const CartScreen = memo(() => {
                   setSelectedProductsObj([
                     ...selectedProductsObj,
                     {
-                      amount: productPriceToBaht.toString().toLocaleString(),
+                      amount: productPriceToSatang,
                       name: item.productName,
                       quantity: item.productCartQuantity,
                       productId: item.productId,
+                      productImg: item.productThumbnailUrl[0]
                     },
                   ]);
                   console.log(
