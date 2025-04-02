@@ -37,8 +37,12 @@ const fetchCart = async ({ userEmail }: fetchCartType): Promise<Product[]> => {
     }
 
     return data.cartProducts;
-  } catch (error) {
-    console.error("useGetCart: ", error);
+  } catch (error: any) {
+    if (error.response) {
+      console.error("useGetCart: error.response.status", error.response.status);
+      throw error.response.status;
+    }
+    console.error("useGetCart: error", error);
     throw error;
   }
 };
