@@ -16,9 +16,9 @@ import { FlashList } from "@shopify/flash-list";
 import { Modal } from "react-native";
 
 export type CheckoutProducts = {
-  amount: number;
-  name: string;
-  quantity?: number;
+  productPrice: number;
+  productName: string;
+  productQuantity?: number;
   productId: string;
   productImg: string;
 };
@@ -92,6 +92,7 @@ export const CartScreen = memo(() => {
 
   if (getCartQuery.isError) {
     console.error("CartScreen: useGetCartQuery.isError", getCartQuery.error);
+
     return (
       <SafeAreaView
         style={{ flex: 1, justifyContent: "center", alignSelf: "center" }}
@@ -278,9 +279,9 @@ export const CartScreen = memo(() => {
                   setSelectedProductsObj([
                     ...selectedProductsObj,
                     {
-                      amount: productPriceToSatang,
-                      name: item.productName,
-                      quantity: item.productCartQuantity,
+                      productPrice: productPriceToSatang,
+                      productName: item.productName,
+                      productQuantity: item.productCartQuantity,
                       productId: item.productId,
                       productImg: item.productThumbnailUrl[0]
                     },
