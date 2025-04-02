@@ -91,7 +91,10 @@ export const CartScreen = memo(() => {
   // }
 
   if (getCartQuery.isError) {
-    console.error("CartScreen: useGetCartQuery.isError", getCartQuery.error);
+    console.error("CartScreen: getCartQuery.error", getCartQuery.error.message);
+    if (getCartQuery.error?.message === "401") {
+      return;
+    }
 
     return (
       <SafeAreaView
@@ -182,7 +185,7 @@ export const CartScreen = memo(() => {
                 setSelectedProductsId(
                   getCartQuery.data?.map((product) => product.productId) ?? []
                 );
-                // fix 
+                // fix
                 // setSelectedProductsObj(getCartQuery.data?.map((product)=>{product.productId}))
               }}
             >
@@ -265,7 +268,12 @@ export const CartScreen = memo(() => {
                 if (selectedProductsId.includes(item.productId)) {
                   setSelectedProductsId(
                     selectedProductsId.filter(
-                      (product) => product !== item.productId
+                      (productId) => productId !== item.productId
+                    )
+                  );
+                  setSelectedProductsObj(
+                    selectedProductsObj.filter(
+                      (productObj) => productObj.productId !== item.productId
                     )
                   );
                   console.log(
@@ -283,7 +291,7 @@ export const CartScreen = memo(() => {
                       productName: item.productName,
                       productQuantity: item.productCartQuantity,
                       productId: item.productId,
-                      productImg: item.productThumbnailUrl[0]
+                      productImg: item.productThumbnailUrl[0],
                     },
                   ]);
                   console.log(
