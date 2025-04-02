@@ -9,6 +9,10 @@ app.get("/", async (req, res) => {
   try {
     console.log("getProducts req.query: ", req.query);
     const numberOfItems = parseInt(req.query.numberOfItems as string, 10);
+    if (numberOfItems > 100) {
+      return res.status(422).json({ error: "too many items requested!" });
+    }
+    
     const currentProductNumber = parseInt(
       req.query.currentProductNumber as string,
       10
