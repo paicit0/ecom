@@ -2,11 +2,10 @@
 // eas build --profile development --platform android
 
 // check suitable dependencies
-// npx expo install --check 
+// npx expo install --check
 
 // check issues
 // npx expo-doctor
-
 
 // Index.tsx
 import { Redirect } from "expo-router";
