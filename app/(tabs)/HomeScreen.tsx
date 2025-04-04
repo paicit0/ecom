@@ -274,7 +274,7 @@ export const HomeScreen = function HomeScreen() {
           <Pressable style={styles.itemContainer}>
             <Image
               style={styles.imageItem}
-              source={{ uri: item.productThumbnailUrl[0] }}
+              source={{ uri: item.productThumbnailUrlArray[0] }}
               contentFit="cover"
               transition={200}
             />
