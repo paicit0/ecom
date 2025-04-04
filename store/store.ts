@@ -61,8 +61,8 @@ export type Product = {
   productDescription: string;
   productCategory: string;
   productPrice: number;
-  productImageUrl: string[];
-  productThumbnailUrl: string[];
+  productImageUrlArray: string[];
+  productThumbnailUrlArray: string[];
   productStock: number;
   productOwner: string;
   productCartQuantity?: number;
@@ -119,4 +119,5 @@ export const useFavorite = create<useFavoriteType>((set, get) => ({
   deleteAllFavorite: () => set({ favoriteItemsArray: [] }),
 }));
 
-export const favoriteItemArray = () => useFavorite(state=>state.favoriteItemsArray)
+export const favoriteItemArray = () =>
+  useFavorite((state) => state.favoriteItemsArray);
