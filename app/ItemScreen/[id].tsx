@@ -267,7 +267,7 @@ const ItemScreen = memo(function ItemScreen() {
       </Animated.View>
       <Animated.ScrollView onScroll={scrollHandler} scrollEventThrottle={16}>
         <View style={styles.imageItem}>
-          {product.productImageUrlArray.map((item, index) => (
+          {product.productImageUrl.map((item, index) => (
             <Image
               style={{ flex: 1, width: "100%" }}
               key={index}
