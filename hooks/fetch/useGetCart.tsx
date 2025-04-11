@@ -29,7 +29,7 @@ const fetchCart = async ({ userEmail }: fetchCartType): Promise<Product[]> => {
         "Content-Type": "application/json",
       },
     });
-    if (data.CartProducts) {
+    if (data.cartProducts) {
       console.log(
         "useGetCart: data.CartProducts[0].id",
         data.cartProducts[0].id
@@ -51,7 +51,6 @@ export const useGetCart = ({ userEmail }: fetchCartType) => {
   return useQuery({
     queryKey: ["cart", userEmail],
     queryFn: () => fetchCart({ userEmail }),
-    enabled: !!userEmail,
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: true,
   });

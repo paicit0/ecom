@@ -33,6 +33,7 @@ const fetchGetProducts = async ({
         "Content-Type": "application/json",
       },
     });
+    console.log("useGetProducts: data.productsData[0]:", data.productsData[0]);
     return data.productsData;
   } catch (error) {
     console.error("useGetProducts: ", error);
