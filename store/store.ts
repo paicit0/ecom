@@ -56,13 +56,14 @@ export const useCart = create<useCartType>((set) => ({
 }));
 
 export type Product = {
+  id?: string;
   productId: string;
   productName: string;
   productDescription: string;
   productCategory: string;
   productPrice: number;
-  productImageUrlArray: string[];
-  productThumbnailUrlArray: string[];
+  productImageUrl: string[];
+  productThumbnailUrl: string[];
   productStock: number;
   productOwner: string;
   productCartQuantity?: number;
