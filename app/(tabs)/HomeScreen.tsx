@@ -16,7 +16,6 @@ import EmptySearchBar from "../../components/EmptySearchBar";
 import axios from "axios";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useUserSession } from "../../auth/firebaseAuth";
 import { useGetProducts } from "../../hooks/fetch/useGetProducts";
 import { useGetCart } from "../../hooks/fetch/useGetCart";
 import { getAuth } from "firebase/auth";
@@ -25,10 +24,8 @@ export const HomeScreen = function HomeScreen() {
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [currentProductNumber, setCurrentProductNumber] = useState<number>(0);
-  const [filteredProduct, setFilteredProduct] = useState<Product[]>();
-  const { userInfo } = useUserSession();
-  const numberOfItems = 50;
-  const loadMoreProductNumber = 20;
+  const [filteredProduct, setFilteredProduct] = useState<Product[]>([]);
+
   const auth = getAuth();
   const userEmail = auth.currentUser?.email;
 
@@ -36,82 +33,46 @@ export const HomeScreen = function HomeScreen() {
     console.log("HomeScreen: no userEmail");
     // return;
   }
-  const getCartQuery = useGetCart({ userEmail: userEmail as string });
 
+  const numberOfItems = 50;
+  const loadMoreProductNumber = 20;
   const getProductsQuery = useGetProducts({
     numberOfItems,
     currentProductNumber,
   });
 
-  const getProductsUrl =
-    process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
-      ? process.env.EXPO_PUBLIC_getProducts_emulator
-      : process.env.EXPO_PUBLIC_getProducts_prod;
-
-  if (!getProductsUrl) {
-    console.log("HomeScreen: url not bussin");
-    return;
-  }
+  const getCartQuery = useGetCart({ userEmail: userEmail as string });
 
   useEffect(() => {
-    setFilteredProduct(getProductsQuery.data);
-    console.log("HomeScreen: getProductsQuery.data:", getProductsQuery.data);
-    // console.log("HomeScreen: getCartQuery.data:", getCartQuery.data);
-    // console.log(
-    //   "HomeScreen: getCartQuery.data?.length:",
-    //   getCartQuery.data?.length
-    // );
-  }, []);
+    if (getProductsQuery.data) {
+      console.log(
+        "HomeScreen: getProductsQuery.data[0]:",
+        getProductsQuery.data[0]
+      );
+      console.log("HomeScreen: getProductsQuery.data:", getProductsQuery.data);
+      console.log("FlashList data type:", typeof getProductsQuery.data);
+    }
+
+    console.log("HomeScreen: filteredProduct:", filteredProduct);
+    console.log(
+      "HomeScreen: filteredProduct is empty:",
+      filteredProduct.length
+    );
+  }, [getProductsQuery.data]);
 
   useEffect(() => {
-    setCurrentProductNumber(0);
     getProductsQuery.refetch();
     if (!getProductsQuery.data) {
       return;
     }
-    const filterProduct = getProductsQuery.data.filter(
+    const filterProductByCategoryArray = getProductsQuery.data.filter(
       (item: Product) => item.productCategory === selectedCategory
     );
-    setFilteredProduct(filterProduct);
+    setCurrentProductNumber(0);
+    setFilteredProduct(filterProductByCategoryArray);
   }, [selectedCategory]);
 
-  const handleCategorySelect = (category: string) => {
-    if (selectedCategory === category) {
-      setSelectedCategory("");
-    } else {
-      setSelectedCategory(category);
-    }
-  };
-
-  const loadMore = async () => {
-    console.log("HomeScreen: loadMore triggered.");
-    setIsLoadingMore(true);
-    try {
-      console.log("HomeScreen.loadMore: getProductsUrl:", getProductsUrl);
-      const loadMoreProducts = await axios.get(getProductsUrl, {
-        params: {
-          numberOfItems: loadMoreProductNumber,
-          currentProductNumber: currentProductNumber + loadMoreProductNumber,
-        },
-
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (loadMoreProducts.status === 200) {
-        const loadMoreProductsData = await loadMoreProducts.data;
-        setCurrentProductNumber((prev) => prev + loadMoreProductNumber);
-        // setFilteredProduct([filteredProduct, ...loadMoreProductsData.productsData]);
-        setIsLoadingMore(false);
-      }
-    } catch (error) {
-      console.log("HomeScreen: loadMore Error:", error);
-      setIsLoadingMore(false);
-      return;
-    }
-  };
-
-  if ((getProductsQuery.isLoading, getProductsQuery.isFetching)) {
+  if (getProductsQuery.isLoading || !getProductsQuery.data) {
     console.log(
       "HomeScreen: getProductsQuery is loading:",
       getProductsQuery.isLoading
@@ -140,6 +101,55 @@ export const HomeScreen = function HomeScreen() {
         </Pressable>
       </SafeAreaView>
     );
+  }
+
+  const handleCategorySelect = (category: string) => {
+    if (selectedCategory === category) {
+      setSelectedCategory("");
+    } else {
+      setSelectedCategory(category);
+    }
+  };
+
+  const loadMore = async () => {
+    const getProductsUrl =
+      process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
+        ? process.env.EXPO_PUBLIC_getProducts_emulator
+        : process.env.EXPO_PUBLIC_getProducts_prod;
+
+    if (!getProductsUrl) {
+      console.log("HomeScreen: url not bussin");
+      return;
+    }
+    console.log("HomeScreen: loadMore triggered.");
+    setIsLoadingMore(true);
+    try {
+      console.log("HomeScreen.loadMore: getProductsUrl:", getProductsUrl);
+      const loadMoreProducts = await axios.get(getProductsUrl, {
+        params: {
+          numberOfItems: loadMoreProductNumber,
+          currentProductNumber: currentProductNumber + loadMoreProductNumber,
+        },
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (loadMoreProducts.status === 200) {
+        const loadMoreProductsData = await loadMoreProducts.data;
+        setCurrentProductNumber((prev) => prev + loadMoreProductNumber);
+        // setFilteredProduct([filteredProduct, ...loadMoreProductsData.productsData]);
+        setIsLoadingMore(false);
+      }
+    } catch (error) {
+      console.log("HomeScreen: loadMore Error:", error);
+      setIsLoadingMore(false);
+      return;
+    }
+  };
+
+  if (!filteredProduct) {
+    console.log("HomeScreen: filteredProduct is undefined/empty");
   }
 
   const header = () => {
@@ -274,7 +284,7 @@ export const HomeScreen = function HomeScreen() {
           <Pressable style={styles.itemContainer}>
             <Image
               style={styles.imageItem}
-              source={{ uri: item.productThumbnailUrlArray[0] }}
+              source={{ uri: item.productThumbnailUrl[0] }}
               contentFit="cover"
               transition={200}
             />
@@ -347,11 +357,34 @@ export const HomeScreen = function HomeScreen() {
         </View>
         <View style={{ flex: 1, backgroundColor: "#F5F5F5" }}>
           <FlashList
-            data={
-              filteredProduct?.length ?? 0 > 0
-                ? filteredProduct
-                : getProductsQuery.data
-            }
+            // this getProductsQuery.data gives ERROR  Warning: TypeError: Cannot convert undefined value to object
+            data={getProductsQuery?.data ?? []} 
+            // data={[
+            //   {
+            //     id: "testId1",
+            //     productId: "231",
+            //     productName: "",
+            //     productDescription: "",
+            //     productCategory: "",
+            //     productPrice: 0,
+            //     productThumbnailUrl: [],
+            //     productStock: 0,
+            //     productOwner: "",
+            //     productImageUrl: []
+            //   },
+            //   {
+            //     id: "testId2",
+            //     productId: "3213",
+            //     productName: "",
+            //     productDescription: "",
+            //     productCategory: "",
+            //     productPrice: 0,
+            //     productThumbnailUrl: [],
+            //     productStock: 0,
+            //     productOwner: "",
+            //     productImageUrl: []
+            //   },
+            // ]}
             renderItem={render}
             keyExtractor={(item) => item.productId}
             // contentContainerStyle={styles.verticalListContainer}
@@ -369,7 +402,6 @@ export const HomeScreen = function HomeScreen() {
             // onEndReachedThreshold={0.5}
             // onEndReached={loadMore}
           />
-
           {isLoadingMore && (
             <Text style={{ textAlign: "center", height: 30 }}>Loading...</Text>
           )}
