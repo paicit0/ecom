@@ -3,7 +3,7 @@ import { memo, useEffect, useState } from "react";
 import { View, StyleSheet, Pressable, Dimensions } from "react-native";
 import { Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Link, useRouter } from "expo-router";
+import { Link } from "expo-router";
 import { getAuth } from "firebase/auth";
 import AnimatedLoadingIndicator from "../components/AnimatedLoadingIndicator";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -35,7 +35,10 @@ export const CartScreen = memo(() => {
   >([]);
   const auth = getAuth();
   const userAuth = auth.currentUser;
-  const router = useRouter();
+
+  const getCartQuery = useGetCart({ userEmail: userAuth?.email as string });
+  const addCartMutation = useAddCart();
+  const deleteCartMutation = useDeleteCart();
 
   if (!userAuth) {
     console.error("CartScreen: no userAuth");
@@ -57,38 +60,41 @@ export const CartScreen = memo(() => {
       </View>
     );
   }
-  const userEmail = userAuth.email;
-
-  const getCartQuery = useGetCart({ userEmail: userEmail as string });
-  const addCartMutation = useAddCart();
-  const deleteCartMutation = useDeleteCart();
 
   useEffect(() => {
-    console.log("CartScreen: getCartQuery.data", getCartQuery.data);
-  }, []);
+    if (getCartQuery.data) {
+      console.log("CartScreen: getCartQuery.data:", getCartQuery.data);
+      // console.log(
+      //   "CartScreen: getCartQuery.data:",
+      //   getCartQuery.data.map((product) => ({
+      //     productId: product.productId,
+      //     productName: product.productName,
+      //   }))
+      // );
+    }
+  }, [getCartQuery.data]);
 
-  // useEffect(() => {
-  //   console.log(selectedProductsObj);
-  // }, [selectedProductsObj]);
+  useEffect(() => {
+    console.log(
+      "CartScreen: getCartQuery.data.length:",
+      getCartQuery.data?.length
+    );
+    console.log("CartScreen: selectedProductsObj:", selectedProductsObj);
+    console.log("CartScreen: selectedProductsId:", selectedProductsId);
+    if (getCartQuery.data?.length === selectedProductsId.length) {
+      setSelectAllCheckBoxTicked(true);
+    } else {
+      setSelectAllCheckBoxTicked(false);
+    }
+  }, [getCartQuery.data, selectedProductsId]);
 
-  // fix later
-  // useEffect(() => {
-  //   if (getCartQuery.data?.length === selectedProducts.length) {
-  //     setSelectAllCheckBoxTicked(true);
-  //   } else {
-  //     setSelectAllCheckBoxTicked(false);
-  //   }
-  //   console.log("CartScreen: selectedProducts useEffect: ", selectedProducts);
-  //   console.log("getCartQuery.data", getCartQuery.data);
-  // }, [selectedProducts, getCartQuery.data]);
-
-  // if (getCartQuery.isLoading) {
-  //   return (
-  //     <SafeAreaView style={{ marginTop: 60 }}>
-  //       <AnimatedLoadingIndicator loading={getCartQuery.isLoading} />
-  //     </SafeAreaView>
-  //   );
-  // }
+  if (getCartQuery.isLoading) {
+    return (
+      <SafeAreaView style={{ marginTop: 60 }}>
+        <AnimatedLoadingIndicator loading={getCartQuery.isLoading} />
+      </SafeAreaView>
+    );
+  }
 
   if (getCartQuery.isError) {
     console.error("CartScreen: getCartQuery.error", getCartQuery.error.message);
@@ -140,9 +146,6 @@ export const CartScreen = memo(() => {
             ({getCartQuery.data?.length})
           </Text>
         </View>
-        {/* <Pressable style={styles.changeButtonStyle}>
-          <Text>Change</Text>
-        </Pressable> */}
         <Pressable style={styles.chatBubbleStyle}>
           <Ionicons
             name="chatbubble-ellipses-outline"
@@ -172,6 +175,7 @@ export const CartScreen = memo(() => {
               onPress={() => {
                 setSelectAllCheckBoxTicked(false);
                 setSelectedProductsId([]);
+                setSelectedProductsObj([]);
               }}
             >
               <Ionicons name="checkbox" size={24} color={"orange"} />
@@ -181,12 +185,30 @@ export const CartScreen = memo(() => {
             <Pressable
               style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
               onPress={() => {
+                if (!getCartQuery.data) return;
                 setSelectAllCheckBoxTicked(true);
                 setSelectedProductsId(
                   getCartQuery.data?.map((product) => product.productId) ?? []
                 );
-                // fix
-                // setSelectedProductsObj(getCartQuery.data?.map((product)=>{product.productId}))
+                // fix asap
+                // setSelectedProductsObj(
+                //   getCartQuery.data?.map((product) => ({
+                //     productId: product.productId,
+                //     productPrice: product.productPrice,
+                //     productImg: product.productImageUrlArray[0],
+                //     productName: product.productName,
+                //     productQuantity: product.productCartQuantity,
+                //   })) ?? []
+                // );
+                setSelectedProductsObj(
+                  getCartQuery.data?.map((product) => ({
+                    productId: product.productId,
+                    productPrice: 10,
+                    productImg: "product.productImageUrlArray[0]",
+                    productName: "product.productName",
+                    productQuantity: 10,
+                  })) ?? []
+                );
               }}
             >
               <Ionicons name="square-outline" size={24} color={"orange"} />
@@ -261,7 +283,7 @@ export const CartScreen = memo(() => {
     const productPriceToSatang = item.productPrice * 100;
     return (
       <>
-        <View key={item.productId} style={styles.itemContainerRender}>
+        <View style={styles.itemContainerRender}>
           <View style={{ flexDirection: "row", marginLeft: 16, gap: 5 }}>
             <Pressable
               onPress={() => {
@@ -280,12 +302,9 @@ export const CartScreen = memo(() => {
                     "CartScreen: Product found... removing from array"
                   );
                 } else {
-                  setSelectedProductsId([
-                    ...selectedProductsId,
-                    item.productId,
-                  ]);
-                  setSelectedProductsObj([
-                    ...selectedProductsObj,
+                  setSelectedProductsId((prev) => [...prev, item.productId]);
+                  setSelectedProductsObj((prev) => [
+                    ...prev,
                     {
                       productPrice: productPriceToSatang,
                       productName: item.productName,
@@ -378,7 +397,7 @@ export const CartScreen = memo(() => {
                         } else {
                           deleteCartMutation.mutate(
                             {
-                              userEmail: userEmail as string,
+                              userEmail: userAuth.email as string,
                               productId: item.productId,
                             },
                             {
@@ -408,7 +427,7 @@ export const CartScreen = memo(() => {
                       onPress={() => {
                         addCartMutation.mutate(
                           {
-                            userEmail: userEmail as string,
+                            userEmail: userAuth.email as string,
                             productId: item.productId,
                           },
                           {
@@ -448,7 +467,32 @@ export const CartScreen = memo(() => {
       <View style={styles.mainContainer}>
         <View style={styles.flashListContainer}>
           <FlashList
-            data={getCartQuery.data}
+            // this getCartQuery.data gives ERROR  Warning: TypeError: Cannot convert undefined value to object
+            data={getCartQuery?.data ?? []}
+            // data={[
+            //   {
+            //     id:"testId1",
+            //     productId: "231",
+            //     productName: "",
+            //     productDescription: "",
+            //     productCategory: "",
+            //     productPrice: 0,
+            //     productThumbnailUrlArray: [],
+            //     productStock: 0,
+            //     productOwner: ""
+            //   },
+            //   {
+            //     id:"testId2",
+            //     productId: "3213",
+            //     productName: "",
+            //     productDescription: "",
+            //     productCategory: "",
+            //     productPrice: 0,
+            //     productThumbnailUrlArray: [],
+            //     productStock: 0,
+            //     productOwner: ""
+            //   },
+            // ]}
             renderItem={render}
             keyExtractor={(item) => item.productId}
             numColumns={1}
@@ -467,7 +511,6 @@ export const CartScreen = memo(() => {
               setIsRefreshing(true);
               getCartQuery.refetch().then(() => setIsRefreshing(false));
             }}
-            // onEndReached={loadMore}
           />
         </View>
       </View>
