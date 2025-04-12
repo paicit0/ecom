@@ -3,7 +3,24 @@ import * as functions from "firebase-functions";
 import { FieldValue } from "firebase-admin/firestore";
 import { db } from "./index";
 import express, { Request, Response } from "express";
+import { v4 as uuidv4 } from "uuid";
 import verifyBearerAndIdtoken from "./middlewares/verifyBearerAndIdtoken";
+
+type CheckoutProducts = {
+  productPrice: number;
+  productName: string;
+  productQuantity?: number;
+  productId: string;
+  productImg: string;
+};
+
+type transactionObjType = {
+  userEmail: string;
+  sellerEmail: string;
+  productsObj: CheckoutProducts[];
+  productPrice: number;
+  location: string;
+};
 
 const app = express();
 
@@ -14,21 +31,31 @@ app.get("/getTransaction", async (req: Request, res: Response) => {
 });
 
 app.post("/addTransaction", async (req: Request, res: Response) => {
-  const { userEmail, productId, productPrice, location } = req.body;
-  console.log("addTransaction: req.body: ", req.body);
-  console.log(
-    "addTransaction: req.headers.authorization:",
+  const {
+    userEmail,
+    sellerEmail,
+    productsObj,
     productPrice,
-    location
-  );
+    location,
+  }: transactionObjType = req.body;
+  console.log("addTransaction: req.body: ", req.body);
 
-  if (!userEmail || !productId) {
-    return res.status(401).json({
-      error: "addTransaction: no/invalid userEmail or productId in body.",
+  if (
+    !userEmail ||
+    !sellerEmail ||
+    !productsObj ||
+    !productPrice ||
+    !location
+  ) {
+    return res.status(400).json({
+      error: "addTransaction: missing required fields in body.",
     });
   }
 
   try {
+    const uuid = uuidv4();
+    const transactionUUID = "transaction" + uuid;
+    console.log("addTransaction: transactionUUID:", transactionUUID);
     await db.runTransaction(async (transaction) => {
       const usersSnapshot = await db
         .collection("users")
@@ -58,9 +85,14 @@ app.post("/addTransaction", async (req: Request, res: Response) => {
           .json({ error: "addTransaction: User data not found." });
       }
       console.log("addTransaction: userDoc updating.");
+
       transaction.update(userDoc.ref, {
-        transactionItemsArray: FieldValue.arrayUnion(productId),
+        transactionItemsArray: FieldValue.arrayUnion({
+          ...req.body,
+          transactionId: transactionUUID,
+        }),
       });
+
       return res.status(201).json({
         message: "addTransaction: Item added to transactionItemsArray",
       });
