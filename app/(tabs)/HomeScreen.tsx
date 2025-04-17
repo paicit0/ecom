@@ -49,8 +49,6 @@ export const HomeScreen = function HomeScreen() {
         "HomeScreen: getProductsQuery.data[0]:",
         getProductsQuery.data[0]
       );
-      console.log("HomeScreen: getProductsQuery.data:", getProductsQuery.data);
-      console.log("FlashList data type:", typeof getProductsQuery.data);
     }
 
     console.log("HomeScreen: filteredProduct:", filteredProduct);
@@ -357,34 +355,7 @@ export const HomeScreen = function HomeScreen() {
         </View>
         <View style={{ flex: 1, backgroundColor: "#F5F5F5" }}>
           <FlashList
-            // this getProductsQuery.data gives ERROR  Warning: TypeError: Cannot convert undefined value to object
-            data={getProductsQuery?.data ?? []} 
-            // data={[
-            //   {
-            //     id: "testId1",
-            //     productId: "231",
-            //     productName: "",
-            //     productDescription: "",
-            //     productCategory: "",
-            //     productPrice: 0,
-            //     productThumbnailUrl: [],
-            //     productStock: 0,
-            //     productOwner: "",
-            //     productImageUrl: []
-            //   },
-            //   {
-            //     id: "testId2",
-            //     productId: "3213",
-            //     productName: "",
-            //     productDescription: "",
-            //     productCategory: "",
-            //     productPrice: 0,
-            //     productThumbnailUrl: [],
-            //     productStock: 0,
-            //     productOwner: "",
-            //     productImageUrl: []
-            //   },
-            // ]}
+            data={getProductsQuery?.data ?? []}
             renderItem={render}
             keyExtractor={(item) => item.productId}
             // contentContainerStyle={styles.verticalListContainer}
