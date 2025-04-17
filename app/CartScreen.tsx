@@ -190,16 +190,15 @@ export const CartScreen = memo(() => {
                 setSelectedProductsId(
                   getCartQuery.data?.map((product) => product.productId) ?? []
                 );
-                // fix asap
-                // setSelectedProductsObj(
-                //   getCartQuery.data?.map((product) => ({
-                //     productId: product.productId,
-                //     productPrice: product.productPrice,
-                //     productImg: product.productImageUrlArray[0],
-                //     productName: product.productName,
-                //     productQuantity: product.productCartQuantity,
-                //   })) ?? []
-                // );
+                setSelectedProductsObj(
+                  getCartQuery.data?.map((product) => ({
+                    productId: product.productId,
+                    productPrice: product.productPrice,
+                    productImg: product.productThumbnailUrl[0],
+                    productName: product.productName,
+                    productQuantity: product.productCartQuantity,
+                  })) ?? []
+                );
                 setSelectedProductsObj(
                   getCartQuery.data?.map((product) => ({
                     productId: product.productId,
