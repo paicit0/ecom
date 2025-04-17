@@ -8,7 +8,21 @@ type fetchCartType = {
   userEmail: string;
 };
 
-const fetchCart = async ({ userEmail }: fetchCartType): Promise<Product[]> => {
+type cartProductArray = {
+  id: string;
+  productId: string;
+  productName: string;
+  productDescription: string;
+  productCategory: string;
+  productPrice: number;
+  productImageUrl: string[];
+  productThumbnailUrl: string[];
+  productStock: number;
+  productOwner: string;
+  productCartQuantity: number;
+}
+
+const fetchCart = async ({ userEmail }: fetchCartType): Promise<cartProductArray[]> => {
   try {
     if (!userEmail) throw new Error("User email is required");
 
