@@ -355,7 +355,11 @@ export const HomeScreen = function HomeScreen() {
         </View>
         <View style={{ flex: 1, backgroundColor: "#F5F5F5" }}>
           <FlashList
-            data={getProductsQuery?.data ?? []}
+            data={
+              selectedCategory === ""
+                ? getProductsQuery?.data ?? []
+                : filteredProduct ?? []
+            }
             renderItem={render}
             keyExtractor={(item) => item.productId}
             // contentContainerStyle={styles.verticalListContainer}
