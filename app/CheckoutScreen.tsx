@@ -1,17 +1,27 @@
 // CheckoutScreen.tsx
-import { Pressable, View, Text, StyleSheet, TextInput } from "react-native";
+import {
+  Pressable,
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  Dimensions,
+} from "react-native";
 import { useEffect, useState } from "react";
 import { useStripe } from "@stripe/stripe-react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { Link, useLocalSearchParams, useRouter } from "expo-router";
 import { getAuth } from "firebase/auth";
 import axios from "axios";
 import { thailandProvinces } from "../assets/db/province";
 import { Dropdown } from "react-native-element-dropdown";
-import { useUserSession } from "../auth/firebaseAuth";
 import * as SecureStore from "expo-secure-store";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { CheckoutProducts } from "./CartScreen";
+import { FlashList } from "@shopify/flash-list";
+import { Image } from "expo-image";
 
 function CheckoutScreen() {
+  const [checkoutProducts, setCheckoutProducts] = useState<CheckoutProducts[]>([]);
   const [loading, setLoading] = useState(false);
   const [customerCity, setCustomerCity] = useState<string>("");
   const [province, setProvince] = useState<string>("");
@@ -19,12 +29,30 @@ function CheckoutScreen() {
   const auth = getAuth();
   const userEmail = auth.currentUser?.email;
   const router = useRouter();
-  const userSession = useUserSession();
 
-  const { amount, name, quantity } = useLocalSearchParams();
-  const total = parseInt(amount as string) * parseInt(quantity as string);
+  const { products } = useLocalSearchParams();
+  const productsObjArray: CheckoutProducts[] = JSON.parse(products as string);
+
+  if (!productsObjArray) {
+    console.error("CheckoutScreen: no productsObj found!");
+    return;
+  }
+  const totalInSatang = productsObjArray[productsObjArray.length - 1].total;
+  if (!totalInSatang) {
+    console.error("CheckoutScreen: no total cost found!");
+    return;
+  }
+  const totalInBaht = totalInSatang / 100;
 
   useEffect(() => {
+    productsObjArray.pop();
+    console.log(productsObjArray);
+    // setCheckoutProducts(productsObjArrayWithoutTotal)
+    console.log(
+      "CheckoutScreen: products received from CartScreen:",
+      productsObjArray
+    );
+    console.log("CheckoutScreen: totalInSatang:", totalInSatang);
     initializePaymentSheet();
   }, []);
 
@@ -38,7 +66,7 @@ function CheckoutScreen() {
         ? process.env.EXPO_PUBLIC_stripePaymentSheet_emulator
         : process.env.EXPO_PUBLIC_stripePaymentSheet_prod;
 
-    console.log("CheckoutScreen: amount cash in สตางค์:", amount);
+    console.log("CheckoutScreen: total cash in สตางค์:", totalInSatang);
     if (!stripePaymentSheetUrl || !usergetUserUrl) {
       console.error("CheckoutScreen: urls not good");
       throw new Error("CheckoutScreen: urls not good");
@@ -68,7 +96,7 @@ function CheckoutScreen() {
 
     console.log(
       "CheckoutScreen: fetchPaymentSheet payload:",
-      amount,
+      totalInSatang,
       userEmail,
       province,
       userEmail,
@@ -78,7 +106,7 @@ function CheckoutScreen() {
       const fetchPaymentSheet = await axios.post(
         `${stripePaymentSheetUrl}/payment-sheet`,
         {
-          amount: total,
+          amount: totalInSatang,
           userEmail: userEmail,
           customerCity: province,
           customerName: userEmail,
@@ -156,10 +184,10 @@ function CheckoutScreen() {
         const fetchTransaction = await axios.post(
           addTransactionUrl,
           {
-            userEmail: userEmail,
-            productId: "abac123123Test",
-            productPrice: parseInt(amount as string) / 100,
-            location: "khon kaen test",
+            buyerEmail: userEmail,
+            productsObj: productsObjArray,
+            totalPrice: totalInSatang / 100,
+            recipientAddress: "khon kaen test",
           },
           {
             headers: {
@@ -177,8 +205,9 @@ function CheckoutScreen() {
       router.replace({
         pathname: "/SucceededPaymentScreen",
         params: {
-          total: total / 100,
-          quantity: quantity,
+          total: totalInSatang / 100,
+          // quantity: productsArray[0].quantity,
+          quantity: 50,
         },
       });
       setLoading(false);
@@ -192,10 +221,43 @@ function CheckoutScreen() {
       </View>
     );
 
-  const amountInBaht =
-    (parseInt(amount as string) / 100) * parseInt(quantity as string);
+  const render = ({ item }: { item: CheckoutProducts }) => {
+    return (
+      <>
+        <Image
+          style={styles.imageItem}
+          source={{ uri: item.productImg }}
+          contentFit="cover"
+          transition={200}
+        />
+        <Text>{item.productName}</Text>
+        <Text>฿{item.productPrice / 100}</Text>
+        <Text>{item.productQuantity}</Text>
+      </>
+    );
+  };
+
   return (
     <SafeAreaView style={styles.mainContainer}>
+      <View style={styles.flashListContainer}>
+        <FlashList
+          data={productsObjArray.slice(0, -1)}
+          renderItem={render}
+          keyExtractor={(item) => item.productId}
+          numColumns={1}
+          showsVerticalScrollIndicator={false}
+          estimatedItemSize={200}
+          horizontal={false}
+          ListEmptyComponent={() => (
+            <>
+              <Text>Empty</Text>
+            </>
+          )}
+          extraData={productsObjArray.slice(0, -1)}
+          onEndReachedThreshold={0.5}
+        />
+      </View>
+
       <View style={styles.infoContainer}>
         <Text>Your Email: {userEmail}</Text>
         <TextInput
@@ -216,16 +278,12 @@ function CheckoutScreen() {
           valueField="value"
         />
         <Pressable
-          // style={{ flex: 1, justifyContent: "center", alignSelf: "center" }}
           disabled={loading}
           onPress={() => {
             openPaymentSheet();
           }}
         >
-          <Text>
-            {quantity}x {name}
-          </Text>
-          <Text>Price: ฿{amountInBaht.toLocaleString()}</Text>
+          <Text>Total: ฿{totalInBaht.toLocaleString()}</Text>
           <Text>PRESS HERE TO OPEN PAYMENT SHEET</Text>
         </Pressable>
       </View>
@@ -236,13 +294,19 @@ function CheckoutScreen() {
     </SafeAreaView>
   );
 }
+
+const deviceHeight = Dimensions.get("window").height;
+const deviceWidth = Dimensions.get("window").width;
+
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    justifyContent: "space-between",
-    alignContent: "center",
+  },
+  flashListContainer: {
+    flex: 1,
   },
   infoContainer: {
+    // flex: 1,
     alignSelf: "center",
   },
   footer: {
@@ -250,6 +314,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingBottom: 20,
     backgroundColor: "black",
+  },
+  imageItem: {
+    height: 100,
+    width: 100,
+    borderRadius: 8,
   },
 });
 
