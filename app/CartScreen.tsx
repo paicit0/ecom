@@ -22,7 +22,7 @@ export type CheckoutProducts = {
   productId: string;
   productImg: string;
   productOwner: string;
-  total?:number;
+  total?: number;
 };
 
 export const CartScreen = memo(() => {
@@ -85,9 +85,13 @@ export const CartScreen = memo(() => {
   }, [getCartQuery.data, selectedProductsId]);
 
   useEffect(() => {
-    const calculateAmount = totalCalculator(selectedProductsObj);
-    setTotalCost(calculateAmount);
-    console.log("CartScreen: Current price amount:", calculateAmount);
+    if (!selectedProductsObj) {
+      return;
+    } else {
+      const calculateAmount = totalCalculator(selectedProductsObj);
+      setTotalCost(calculateAmount);
+      console.log("CartScreen: Current price amount:", calculateAmount);
+    }
   }, [selectedProductsId, selectedProductsObj, getCartQuery.data]);
 
   if (getCartQuery.isLoading) {
@@ -234,7 +238,7 @@ export const CartScreen = memo(() => {
             <Text style={{ alignSelf: "center", fontSize: 12 }}>Amount </Text>
             {
               <Text style={{ color: "orange", fontSize: 18 }}>
-                ฿{totalCost / 100}
+                ฿{(totalCost / 100).toLocaleString()}
               </Text>
             }
           </View>
@@ -252,7 +256,12 @@ export const CartScreen = memo(() => {
               <Link
                 href={{
                   pathname: "/CheckoutScreen",
-                  params: { products: JSON.stringify([...selectedProductsObj,{total:totalCost}]) },
+                  params: {
+                    products: JSON.stringify([
+                      ...selectedProductsObj,
+                      { total: totalCost },
+                    ]),
+                  },
                 }}
                 asChild
               >
@@ -260,7 +269,10 @@ export const CartScreen = memo(() => {
                   onPress={() => {
                     console.log(
                       "CartScreen: to checkout payload:",
-                      JSON.stringify([...selectedProductsObj,{total:totalCost}])
+                      JSON.stringify([
+                        ...selectedProductsObj,
+                        { total: totalCost },
+                      ])
                     );
                   }}
                 >
