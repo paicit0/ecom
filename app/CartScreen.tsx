@@ -18,9 +18,11 @@ import { Modal } from "react-native";
 export type CheckoutProducts = {
   productPrice: number;
   productName: string;
-  productQuantity?: number;
+  productQuantity: number;
   productId: string;
   productImg: string;
+  productOwner: string;
+  total?:number;
 };
 
 export const CartScreen = memo(() => {
@@ -33,6 +35,7 @@ export const CartScreen = memo(() => {
   const [selectedProductsObj, setSelectedProductsObj] = useState<
     CheckoutProducts[]
   >([]);
+  const [totalCost, setTotalCost] = useState<number>(0);
   const auth = getAuth();
   const userAuth = auth.currentUser;
 
@@ -63,14 +66,7 @@ export const CartScreen = memo(() => {
 
   useEffect(() => {
     if (getCartQuery.data) {
-      console.log("CartScreen: getCartQuery.data:", getCartQuery.data);
-      // console.log(
-      //   "CartScreen: getCartQuery.data:",
-      //   getCartQuery.data.map((product) => ({
-      //     productId: product.productId,
-      //     productName: product.productName,
-      //   }))
-      // );
+      console.log("CartScreen: getCartQuery.data[0]:", getCartQuery.data[0]);
     }
   }, [getCartQuery.data]);
 
@@ -87,6 +83,12 @@ export const CartScreen = memo(() => {
       setSelectAllCheckBoxTicked(false);
     }
   }, [getCartQuery.data, selectedProductsId]);
+
+  useEffect(() => {
+    const calculateAmount = totalCalculator(selectedProductsObj);
+    setTotalCost(calculateAmount);
+    console.log("CartScreen: Current price amount:", calculateAmount);
+  }, [selectedProductsId, selectedProductsObj, getCartQuery.data]);
 
   if (getCartQuery.isLoading) {
     return (
@@ -131,6 +133,17 @@ export const CartScreen = memo(() => {
       </SafeAreaView>
     );
   }
+
+  const totalCalculator = (selectedProductsObj: CheckoutProducts[]) => {
+    let currentTotal = 0;
+    for (let i = 0; i < selectedProductsObj.length; i++) {
+      let itemQuantity = selectedProductsObj[i].productQuantity;
+      let itemPrice = selectedProductsObj[i].productPrice;
+      let itemTotal = itemQuantity * itemPrice;
+      currentTotal = currentTotal + itemTotal;
+    }
+    return currentTotal;
+  };
 
   function CartHeader() {
     return (
@@ -197,15 +210,7 @@ export const CartScreen = memo(() => {
                     productImg: product.productThumbnailUrl[0],
                     productName: product.productName,
                     productQuantity: product.productCartQuantity,
-                  })) ?? []
-                );
-                setSelectedProductsObj(
-                  getCartQuery.data?.map((product) => ({
-                    productId: product.productId,
-                    productPrice: 10,
-                    productImg: "product.productImageUrlArray[0]",
-                    productName: "product.productName",
-                    productQuantity: 10,
+                    productOwner: product.productOwner,
                   })) ?? []
                 );
               }}
@@ -227,7 +232,11 @@ export const CartScreen = memo(() => {
         >
           <View style={{ flexDirection: "row", alignSelf: "flex-start" }}>
             <Text style={{ alignSelf: "center", fontSize: 12 }}>Amount </Text>
-            {<Text style={{ color: "orange", fontSize: 18 }}>฿9,999</Text>}
+            {
+              <Text style={{ color: "orange", fontSize: 18 }}>
+                ฿{totalCost / 100}
+              </Text>
+            }
           </View>
           <Pressable
             style={{
@@ -243,15 +252,15 @@ export const CartScreen = memo(() => {
               <Link
                 href={{
                   pathname: "/CheckoutScreen",
-                  params: { products: JSON.stringify(selectedProductsObj) },
+                  params: { products: JSON.stringify([...selectedProductsObj,{total:totalCost}]) },
                 }}
                 asChild
               >
                 <Pressable
                   onPress={() => {
                     console.log(
-                      "CartScreen: checkout payload:",
-                      JSON.stringify(selectedProductsObj)
+                      "CartScreen: to checkout payload:",
+                      JSON.stringify([...selectedProductsObj,{total:totalCost}])
                     );
                   }}
                 >
@@ -259,15 +268,14 @@ export const CartScreen = memo(() => {
                     Checkout ({selectedProductsId.length})
                   </Text>
                 </Pressable>
-                {/* <Pressable onPress={()=>router.replace({path:"/CheckoutScreen"})}>
-                  <Text style={{ color: "white" }}>
-                    Checkout ({selectedProductsId.length})
-                  </Text>
-                </Pressable> */}
               </Link>
             ) : (
-              <Pressable>
-                <Text style={{ color: "white" }}>
+              <Pressable
+                onPress={() => {
+                  console.error("CartScreen: checkout no payload!");
+                }}
+              >
+                <Text style={{ color: "black" }}>
                   Checkout ({selectedProductsId.length})
                 </Text>
               </Pressable>
@@ -307,9 +315,10 @@ export const CartScreen = memo(() => {
                     {
                       productPrice: productPriceToSatang,
                       productName: item.productName,
-                      productQuantity: item.productCartQuantity,
+                      productQuantity: item.productCartQuantity ?? 1,
                       productId: item.productId,
                       productImg: item.productThumbnailUrl[0],
+                      productOwner: item.productOwner,
                     },
                   ]);
                   console.log(
@@ -404,6 +413,33 @@ export const CartScreen = memo(() => {
                                 console.log(
                                   "ItemScreen/[id]/: deleteCartMutation success"
                                 );
+                                setSelectedProductsObj((prev) => {
+                                  const index = prev.findIndex(
+                                    (p) => p.productId === item.productId
+                                  );
+                                  if (index !== -1) {
+                                    return prev.map((p, i) =>
+                                      i === index
+                                        ? {
+                                            ...p,
+                                            productQuantity:
+                                              p.productQuantity - 1,
+                                          }
+                                        : p
+                                    );
+                                  }
+                                  return [
+                                    ...prev,
+                                    {
+                                      productQuantity: 1,
+                                      productPrice: item.productPrice,
+                                      productName: item.productName,
+                                      productId: item.productId,
+                                      productImg: item.productThumbnailUrl[0],
+                                      productOwner: item.productOwner,
+                                    },
+                                  ];
+                                });
                               },
                               onError: () => {
                                 console.log(
@@ -434,6 +470,33 @@ export const CartScreen = memo(() => {
                               console.log(
                                 "ItemScreen/[id]/: addCartMutation success"
                               );
+                              setSelectedProductsObj((prev) => {
+                                const index = prev.findIndex(
+                                  (p) => p.productId === item.productId
+                                );
+                                if (index !== -1) {
+                                  return prev.map((p, i) =>
+                                    i === index
+                                      ? {
+                                          ...p,
+                                          productQuantity:
+                                            p.productQuantity + 1,
+                                        }
+                                      : p
+                                  );
+                                }
+                                return [
+                                  ...prev,
+                                  {
+                                    productQuantity: 1,
+                                    productPrice: item.productPrice,
+                                    productName: item.productName,
+                                    productId: item.productId,
+                                    productImg: item.productThumbnailUrl[0],
+                                    productOwner: item.productOwner,
+                                  },
+                                ];
+                              });
                             },
                             onError: () => {
                               console.log(
@@ -466,32 +529,7 @@ export const CartScreen = memo(() => {
       <View style={styles.mainContainer}>
         <View style={styles.flashListContainer}>
           <FlashList
-            // this getCartQuery.data gives ERROR  Warning: TypeError: Cannot convert undefined value to object
             data={getCartQuery?.data ?? []}
-            // data={[
-            //   {
-            //     id:"testId1",
-            //     productId: "231",
-            //     productName: "",
-            //     productDescription: "",
-            //     productCategory: "",
-            //     productPrice: 0,
-            //     productThumbnailUrlArray: [],
-            //     productStock: 0,
-            //     productOwner: ""
-            //   },
-            //   {
-            //     id:"testId2",
-            //     productId: "3213",
-            //     productName: "",
-            //     productDescription: "",
-            //     productCategory: "",
-            //     productPrice: 0,
-            //     productThumbnailUrlArray: [],
-            //     productStock: 0,
-            //     productOwner: ""
-            //   },
-            // ]}
             renderItem={render}
             keyExtractor={(item) => item.productId}
             numColumns={1}
