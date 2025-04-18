@@ -1,5 +1,5 @@
 // SearchScreen.tsx
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { View, Text, TextInput, Pressable, Dimensions } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import { Link } from "expo-router";
@@ -8,6 +8,7 @@ import { Product } from "../store/store";
 import { Ionicons } from "@expo/vector-icons";
 import { useGetProducts } from "../hooks/fetch/useGetProducts";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useFocusEffect } from "@react-navigation/native";
 
 function SearchScreen() {
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -33,7 +34,14 @@ function SearchScreen() {
     }
   }, [searchQuery]);
 
-  // useEffect(() => {}, []);
+  // clears searchQuery when leaving SearchScreen
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        setSearchQuery("");
+      };
+    }, [])
+  );
 
   const render = ({ item }: { item: Product }) => {
     console.log("SearchScreen: search query: ", searchQuery);
@@ -51,12 +59,15 @@ function SearchScreen() {
           pathname: "/ItemScreen/[id]",
           params: { id: item.productId },
         }}
+        asChild
       >
-        <Text>
-          {beforeMatch}
-          <Text style={{ fontWeight: "bold", color: "black" }}>{match}</Text>
-          {afterMatch}
-        </Text>
+        <Pressable>
+          <Text>
+            {beforeMatch}
+            <Text style={{ fontWeight: "bold", color: "black" }}>{match}</Text>
+            {afterMatch}
+          </Text>
+        </Pressable>
       </Link>
     );
   };
