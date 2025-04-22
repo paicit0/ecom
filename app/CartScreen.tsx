@@ -142,7 +142,7 @@ export const CartScreen = memo(() => {
     let currentTotal = 0;
     for (let i = 0; i < selectedProductsObj.length; i++) {
       let itemQuantity = selectedProductsObj[i].productQuantity;
-      let itemPrice = selectedProductsObj[i].productPrice;
+      let itemPrice = selectedProductsObj[i].productPrice/100;
       let itemTotal = itemQuantity * itemPrice;
       currentTotal = currentTotal + itemTotal;
     }
@@ -202,7 +202,6 @@ export const CartScreen = memo(() => {
             <Pressable
               style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
               onPress={() => {
-                if (!getCartQuery.data) return;
                 setSelectAllCheckBoxTicked(true);
                 setSelectedProductsId(
                   getCartQuery.data?.map((product) => product.productId) ?? []
@@ -210,7 +209,7 @@ export const CartScreen = memo(() => {
                 setSelectedProductsObj(
                   getCartQuery.data?.map((product) => ({
                     productId: product.productId,
-                    productPrice: product.productPrice,
+                    productPrice: product.productPrice * 100,
                     productImg: product.productThumbnailUrl[0],
                     productName: product.productName,
                     productQuantity: product.productCartQuantity,
@@ -238,7 +237,7 @@ export const CartScreen = memo(() => {
             <Text style={{ alignSelf: "center", fontSize: 12 }}>Amount </Text>
             {
               <Text style={{ color: "orange", fontSize: 18 }}>
-                ฿{(totalCost / 100).toLocaleString()}
+                ฿{(totalCost).toLocaleString()}
               </Text>
             }
           </View>
