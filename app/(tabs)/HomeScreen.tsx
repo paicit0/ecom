@@ -18,21 +18,29 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useGetProducts } from "../../hooks/fetch/useGetProducts";
 import { useGetCart } from "../../hooks/fetch/useGetCart";
-import { getAuth } from "firebase/auth";
-
+import { User } from "firebase/auth";
+import { auth } from "../../auth/firebaseAuth";
 export const HomeScreen = function HomeScreen() {
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [currentProductNumber, setCurrentProductNumber] = useState<number>(0);
   const [filteredProduct, setFilteredProduct] = useState<Product[]>([]);
+  const [initializing, setInitializing] = useState<boolean>(true);
+  const [user, setUser] = useState<User | null>(null);
 
-  const auth = getAuth();
-  const userEmail = auth.currentUser?.email;
-
-  if (!userEmail) {
-    console.log("HomeScreen: no userEmail");
-    // return;
+  function onAuthStateChanged(user: User | null) {
+    setUser(user);
+    if (initializing) {
+      setInitializing(false);
+    }
   }
+
+  useEffect(() => {
+    const subscriber = auth.onAuthStateChanged(onAuthStateChanged);
+    return subscriber;
+  }, []);
+
+  const userEmail = auth.currentUser?.email;
 
   const numberOfItems = 50;
   const loadMoreProductNumber = 20;
@@ -69,6 +77,12 @@ export const HomeScreen = function HomeScreen() {
     setCurrentProductNumber(0);
     setFilteredProduct(filterProductByCategoryArray);
   }, [selectedCategory]);
+
+  if (initializing) return null;
+
+  if (!userEmail) {
+    return <Text>Please log in.</Text>;
+  }
 
   if (getProductsQuery.isLoading || !getProductsQuery.data) {
     console.log(
