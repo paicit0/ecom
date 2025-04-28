@@ -16,7 +16,7 @@ import { FlashList } from "@shopify/flash-list";
 import { Modal } from "react-native";
 
 export type CheckoutProducts = {
-  productPrice: number;
+  productPriceSatang: number;
   productName: string;
   productQuantity: number;
   productId: string;
@@ -42,27 +42,6 @@ export const CartScreen = memo(() => {
   const getCartQuery = useGetCart({ userEmail: userAuth?.email as string });
   const addCartMutation = useAddCart();
   const deleteCartMutation = useDeleteCart();
-
-  if (!userAuth) {
-    console.error("CartScreen: no userAuth");
-    return (
-      <View
-        style={{
-          flex: 1,
-          flexDirection: "row",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Text>Please </Text>
-        <Link href="/LoginScreen" asChild>
-          <Pressable style={{}}>
-            <Text style={{ color: "blue" }}>Login</Text>
-          </Pressable>
-        </Link>
-      </View>
-    );
-  }
 
   useEffect(() => {
     if (getCartQuery.data) {
@@ -93,6 +72,27 @@ export const CartScreen = memo(() => {
       console.log("CartScreen: Current price amount:", calculateAmount);
     }
   }, [selectedProductsId, selectedProductsObj, getCartQuery.data]);
+
+  if (!userAuth) {
+    console.error("CartScreen: no userAuth");
+    return (
+      <View
+        style={{
+          flex: 1,
+          flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Text>Please </Text>
+        <Link href="/LoginScreen" asChild>
+          <Pressable style={{}}>
+            <Text style={{ color: "blue" }}>Login</Text>
+          </Pressable>
+        </Link>
+      </View>
+    );
+  }
 
   if (getCartQuery.isLoading) {
     return (
@@ -142,7 +142,7 @@ export const CartScreen = memo(() => {
     let currentTotal = 0;
     for (let i = 0; i < selectedProductsObj.length; i++) {
       let itemQuantity = selectedProductsObj[i].productQuantity;
-      let itemPrice = selectedProductsObj[i].productPrice/100;
+      let itemPrice = selectedProductsObj[i].productPriceSatang / 100;
       let itemTotal = itemQuantity * itemPrice;
       currentTotal = currentTotal + itemTotal;
     }
@@ -209,7 +209,7 @@ export const CartScreen = memo(() => {
                 setSelectedProductsObj(
                   getCartQuery.data?.map((product) => ({
                     productId: product.productId,
-                    productPrice: product.productPrice * 100,
+                    productPriceSatang: product.productPrice * 100,
                     productImg: product.productThumbnailUrl[0],
                     productName: product.productName,
                     productQuantity: product.productCartQuantity,
@@ -237,7 +237,7 @@ export const CartScreen = memo(() => {
             <Text style={{ alignSelf: "center", fontSize: 12 }}>Amount </Text>
             {
               <Text style={{ color: "orange", fontSize: 18 }}>
-                ฿{(totalCost).toLocaleString()}
+                ฿{totalCost.toLocaleString()}
               </Text>
             }
           </View>
@@ -324,7 +324,7 @@ export const CartScreen = memo(() => {
                   setSelectedProductsObj((prev) => [
                     ...prev,
                     {
-                      productPrice: productPriceToSatang,
+                      productPriceSatang: productPriceToSatang,
                       productName: item.productName,
                       productQuantity: item.productCartQuantity ?? 1,
                       productId: item.productId,
@@ -440,15 +440,7 @@ export const CartScreen = memo(() => {
                                     );
                                   }
                                   return [
-                                    ...prev,
-                                    {
-                                      productQuantity: 1,
-                                      productPrice: item.productPrice,
-                                      productName: item.productName,
-                                      productId: item.productId,
-                                      productImg: item.productThumbnailUrl[0],
-                                      productOwner: item.productOwner,
-                                    },
+
                                   ];
                                 });
                               },
@@ -481,6 +473,7 @@ export const CartScreen = memo(() => {
                               console.log(
                                 "ItemScreen/[id]/: addCartMutation success"
                               );
+
                               setSelectedProductsObj((prev) => {
                                 const index = prev.findIndex(
                                   (p) => p.productId === item.productId
@@ -496,17 +489,7 @@ export const CartScreen = memo(() => {
                                       : p
                                   );
                                 }
-                                return [
-                                  ...prev,
-                                  {
-                                    productQuantity: 1,
-                                    productPrice: item.productPrice,
-                                    productName: item.productName,
-                                    productId: item.productId,
-                                    productImg: item.productThumbnailUrl[0],
-                                    productOwner: item.productOwner,
-                                  },
-                                ];
+                                return [];
                               });
                             },
                             onError: () => {
