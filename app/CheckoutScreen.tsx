@@ -37,12 +37,12 @@ function CheckoutScreen() {
     console.error("CheckoutScreen: no productsObj found!");
     return;
   }
-  const totalInSatang = productsObjArray[productsObjArray.length - 1].total;
-  if (!totalInSatang) {
+  const totalCostInBaht = productsObjArray[productsObjArray.length - 1].total;
+  const totalCostInSatang = totalCostInBaht as number * 100
+  if (!totalCostInBaht) {
     console.error("CheckoutScreen: no total cost found!");
     return;
   }
-  const totalInBaht = totalInSatang / 100;
 
   useEffect(() => {
     productsObjArray.pop();
@@ -52,7 +52,7 @@ function CheckoutScreen() {
       "CheckoutScreen: products received from CartScreen:",
       productsObjArray
     );
-    console.log("CheckoutScreen: totalInSatang:", totalInSatang);
+    console.log("CheckoutScreen: totalCostInSatang:", totalCostInSatang);
     initializePaymentSheet();
   }, []);
 
@@ -66,7 +66,7 @@ function CheckoutScreen() {
         ? process.env.EXPO_PUBLIC_stripePaymentSheet_emulator
         : process.env.EXPO_PUBLIC_stripePaymentSheet_prod;
 
-    console.log("CheckoutScreen: total cash in สตางค์:", totalInSatang);
+    console.log("CheckoutScreen: total cash in สตางค์:", totalCostInBaht);
     if (!stripePaymentSheetUrl || !usergetUserUrl) {
       console.error("CheckoutScreen: urls not good");
       throw new Error("CheckoutScreen: urls not good");
@@ -96,7 +96,7 @@ function CheckoutScreen() {
 
     console.log(
       "CheckoutScreen: fetchPaymentSheet payload:",
-      totalInSatang,
+      totalCostInSatang,
       userEmail,
       province,
       userEmail,
@@ -106,7 +106,7 @@ function CheckoutScreen() {
       const fetchPaymentSheet = await axios.post(
         `${stripePaymentSheetUrl}/payment-sheet`,
         {
-          amount: totalInSatang,
+          amount: totalCostInSatang,
           userEmail: userEmail,
           customerCity: province,
           customerName: userEmail,
@@ -186,7 +186,7 @@ function CheckoutScreen() {
           {
             buyerEmail: userEmail,
             productsObj: productsObjArray,
-            totalPrice: totalInSatang / 100,
+            totalPrice: totalCostInBaht / 100,
             recipientAddress: "khon kaen test",
           },
           {
@@ -205,7 +205,7 @@ function CheckoutScreen() {
       router.replace({
         pathname: "/SucceededPaymentScreen",
         params: {
-          total: totalInSatang / 100,
+          total: totalCostInBaht / 100,
           // quantity: productsArray[0].quantity,
           quantity: 50,
         },
@@ -231,7 +231,7 @@ function CheckoutScreen() {
           transition={200}
         />
         <Text>{item.productName}</Text>
-        <Text>฿{item.productPrice / 100}</Text>
+        <Text>฿{item.productPriceSatang / 100}</Text>
         <Text>{item.productQuantity}</Text>
       </>
     );
@@ -239,6 +239,9 @@ function CheckoutScreen() {
 
   return (
     <SafeAreaView style={styles.mainContainer}>
+      <View>
+        <Text>CUSTOMER INFO HERE</Text>
+      </View>
       <View style={styles.flashListContainer}>
         <FlashList
           data={productsObjArray.slice(0, -1)}
@@ -258,7 +261,10 @@ function CheckoutScreen() {
         />
       </View>
 
-      <View style={styles.infoContainer}>
+      <View><Text>PAYING METHODS HERE</Text></View>
+
+
+      {/* <View style={styles.infoContainer}>
         <Text>Your Email: {userEmail}</Text>
         <TextInput
           style={{}}
@@ -286,7 +292,7 @@ function CheckoutScreen() {
           <Text>Total: ฿{totalInBaht.toLocaleString()}</Text>
           <Text>PRESS HERE TO OPEN PAYMENT SHEET</Text>
         </Pressable>
-      </View>
+      </View> */}
 
       <View style={styles.footer}>
         <Text style={{ color: "red" }}>FOOTER</Text>
