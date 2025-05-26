@@ -7,9 +7,9 @@ import { Image } from "expo-image";
 import axios, { AxiosError } from "axios";
 import { Product, useCart } from "../../store/store";
 import AnimatedLoadingIndicator from "../../components/AnimatedLoadingIndicator";
-import { useAddFavorite } from "../../hooks/fetch/useAddFavorite";
+import { useCreateFavorite } from "../../hooks/fetch/useCreateFavorite";
 import { useDeleteFavorite } from "../../hooks/fetch/useDeleteFavorite";
-import { useAddCart } from "../../hooks/fetch/useAddCart";
+import { useCreateCart } from "../../hooks/fetch/useCreateCart";
 import { getAuth } from "firebase/auth";
 import { SafeAreaView } from "react-native-safe-area-context";
 import EmptySearchBar from "../../components/EmptySearchBar";
@@ -37,10 +37,10 @@ const ItemScreen = memo(function ItemScreen() {
 
   const cartItemsArray = useCart((state) => state.cartItemsArray);
 
-  const addFavoriteMutation = useAddFavorite();
+  const createFavoriteMutation = useCreateFavorite();
   const deleteFavoriteMutation = useDeleteFavorite();
 
-  const addCartMutation = useAddCart();
+  const createCartMutation = useCreateCart();
 
   if (!auth.currentUser) {
     console.error("ItemScreen/[id]: no auth.currentUser");
@@ -311,12 +311,12 @@ const ItemScreen = memo(function ItemScreen() {
                   <Pressable
                     onPress={() => {
                       setIsFavorited(true);
-                      addFavoriteMutation.mutate(
+                      createFavoriteMutation.mutate(
                         { userEmail: userEmail, productId: productId },
                         {
                           onError: () => {
                             console.log(
-                              "ItemScreen/[id]/: addFavoriteMutation error"
+                              "ItemScreen/[id]/: createFavoriteMutation error"
                             ),
                               setIsFavorited(false);
                           },
@@ -366,14 +366,14 @@ const ItemScreen = memo(function ItemScreen() {
       <View style={styles.ItemFooter}>
         <Pressable
           onPress={() => {
-            addCartMutation.mutate(
+            createCartMutation.mutate(
               { userEmail: userEmail, productId: productId },
               {
                 onSuccess: () => {
-                  console.log("ItemScreen/[id]/: addCartMutation success");
+                  console.log("ItemScreen/[id]/: createCartMutation success");
                 },
                 onError: () => {
-                  console.log("ItemScreen/[id]/: addCartMutation error");
+                  console.log("ItemScreen/[id]/: createCartMutation error");
                 },
               }
             );
