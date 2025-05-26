@@ -4,7 +4,7 @@ import { Pressable, View, Text } from "react-native";
 
 function SucceededPaymentScreen() {
   const router = useRouter();
-  const {total, quantity} = useLocalSearchParams();
+  const { total } = useLocalSearchParams();
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <Ionicons
