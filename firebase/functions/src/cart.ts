@@ -82,7 +82,7 @@ app.get("/getCart", async (req, res) => {
   }
 });
 
-app.get("/createCart", async (req, res) => {
+app.post("/createCart", async (req, res) => {
   const { userEmail, productId } = req.body;
   const authHeader = req.headers.authorization;
 
@@ -151,7 +151,7 @@ app.get("/createCart", async (req, res) => {
   }
 });
 
-app.get("/deleteCart", async (req, res) => {
+app.post("/deleteCart", async (req, res) => {
   const { userEmail, productId } = req.body;
 
   console.log("deleteCart: req.body:", userEmail, productId);
