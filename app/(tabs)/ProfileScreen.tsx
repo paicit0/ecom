@@ -219,6 +219,7 @@ function ProfileScreen() {
                       style={{
                         justifyContent: "space-between",
                         flexDirection: "row",
+                        paddingLeft: 16
                       }}
                     >
                       <Ionicons
