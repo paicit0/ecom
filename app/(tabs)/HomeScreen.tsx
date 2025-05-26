@@ -82,7 +82,20 @@ export const HomeScreen = function HomeScreen() {
   if (initializing) return null;
 
   if (!userEmail) {
-    return <Text>Please log in.</Text>;
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "row",
+        }}
+      >
+        <StatusBar backgroundColor="orange" barStyle="light-content" />
+        <Text>Please </Text>
+        <Link href={"/LoginScreen"}><Text style={{color:'blue'}}>login</Text></Link>
+      </View>
+    );
   }
 
   if (getProductsQuery.isLoading || !getProductsQuery.data) {
@@ -332,8 +345,9 @@ export const HomeScreen = function HomeScreen() {
 
   return (
     <>
-      <StatusBar backgroundColor="orange" barStyle="light-content" />
+      
       <View style={styles.mainContainer}>
+        <StatusBar backgroundColor="orange" barStyle="light-content" />
         <View style={styles.header}>
           <EmptySearchBar
             placeholderArray={[
