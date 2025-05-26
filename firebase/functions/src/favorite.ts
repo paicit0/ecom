@@ -80,7 +80,7 @@ app.get("/getFavorite", async (req, res) => {
   }
 });
 
-app.get("/createFavorite", async (req, res) => {
+app.post("/createFavorite", async (req, res) => {
   const { userEmail, productId } = req.body;
   console.log("createFavorite: req.body: ", userEmail, productId);
 
@@ -128,7 +128,7 @@ app.get("/createFavorite", async (req, res) => {
   }
 });
 
-app.get("/deleteFavorite", async (req, res) => {
+app.post("/deleteFavorite", async (req, res) => {
   const { userEmail, productId } = req.body;
 
   console.log("deleteFavorite: req.body: ", userEmail, productId);
