@@ -35,7 +35,7 @@ export const CartScreen = memo(() => {
   const [selectedProductsObj, setSelectedProductsObj] = useState<
     CheckoutProducts[]
   >([]);
-  const [totalCost, setTotalCost] = useState<number>(0);
+  const [totalCost, setTotalCost] = useState<number>(0); // in Baht
   const auth = getAuth();
   const userAuth = auth.currentUser;
 
@@ -356,7 +356,7 @@ export const CartScreen = memo(() => {
             href={{
               pathname: "/ItemScreen/[id]",
               params: { id: item.productId },
-            }}
+            }}  
             asChild
           >
             <Pressable style={styles.itemContainer}>
@@ -439,9 +439,7 @@ export const CartScreen = memo(() => {
                                         : p
                                     );
                                   }
-                                  return [
-
-                                  ];
+                                  return [];
                                 });
                               },
                               onError: () => {
