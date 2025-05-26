@@ -1,44 +1,44 @@
-// useAddCart.tsx
+// useCreateCart.tsx
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { debounce } from "lodash";
 
-type fetchAddCartType = {
+type fetchCreateCartType = {
   userEmail: string;
   productId: string;
 };
 
-type fetchAddCartResponseSuccess = {
+type fetchCreateCartResponseSuccess = {
   message: string;
 };
-type fetchAddCartResponseFailed = {
+type fetchCreateCartResponseFailed = {
   error: string;
 };
 
-type fetchAddCartResponseType =
-  | fetchAddCartResponseSuccess
-  | fetchAddCartResponseFailed;
+type fetchCreateCartResponseType =
+  | fetchCreateCartResponseSuccess
+  | fetchCreateCartResponseFailed;
 
-const fetchAddCart = async ({
+const fetchCreateCart = async ({
   userEmail,
   productId,
-}: fetchAddCartType): Promise<fetchAddCartResponseType> => {
+}: fetchCreateCartType): Promise<fetchCreateCartResponseType> => {
   try {
     if (!userEmail) throw new Error("User userEmail is required");
 
     const idToken = await SecureStore.getItemAsync("authToken");
-    const addCartUrl =
+    const createCartUrl =
       process.env.EXPO_PUBLIC_CURRENT_APP_MODE === "dev"
-        ? process.env.EXPO_PUBLIC_addCart_emulator
-        : process.env.EXPO_PUBLIC_addCart_prod;
+        ? process.env.EXPO_PUBLIC_createCart_emulator
+        : process.env.EXPO_PUBLIC_createCart_prod;
 
-    if (!addCartUrl) throw new Error("addCartUrl not found");
-    console.log("useAddCart: payload:", userEmail, productId);
+    if (!createCartUrl) throw new Error("createCartUrl not found");
+    console.log("usecreateCart: payload:", userEmail, productId);
 
     const { data } = await axios.post(
-      addCartUrl,
+      createCartUrl,
       { userEmail, productId },
       {
         headers: {
@@ -49,15 +49,15 @@ const fetchAddCart = async ({
     );
     return data;
   } catch (error) {
-    console.error("useAddCart: ", error);
+    console.error("usecreateCart: ", error);
     throw error;
   }
 };
 
-export const useAddCart = (debounceTime = 500) => {
+export const useCreateCart = (debounceTime = 500) => {
   const queryClient = useQueryClient();
   const mutation = useMutation({
-    mutationFn: fetchAddCart,
+    mutationFn: fetchCreateCart,
     onSettled: async () => {
       return await queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
