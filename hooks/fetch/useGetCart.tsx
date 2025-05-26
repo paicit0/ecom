@@ -34,7 +34,7 @@ const fetchCart = async ({ userEmail }: fetchCartType): Promise<cartProductArray
 
     if (!getCartUrl) throw new Error("API URL not found");
 
-    console.log("useGetCart: payload", userEmail);
+    console.log("useGetCart: payload to getCartUrl", userEmail);
 
     const { data } = await axios.get(getCartUrl, {
       params: { userEmail: userEmail },
@@ -65,6 +65,7 @@ export const useGetCart = ({ userEmail }: fetchCartType) => {
   return useQuery({
     queryKey: ["cart", userEmail],
     queryFn: () => fetchCart({ userEmail }),
+    enabled: !!userEmail,
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: true,
   });
