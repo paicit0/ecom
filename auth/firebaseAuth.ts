@@ -173,9 +173,9 @@ export const useUserSession = create<userSessionType>()(
           console.log("useUserSession.getUserInfo:", error);
         }
       },
-      // refreshToken: async (user: User | null) => {
-      //   saveToken(user);
-      // },
+      refreshToken: async (user: User | null) => {
+        saveToken(user);
+      },
     }),
     {
       name: "storage",
@@ -183,31 +183,32 @@ export const useUserSession = create<userSessionType>()(
     }
   )
 );
-// export async function saveToken(user: User | null) {
-//   try {
-//     if (user) {
-//       console.log("firebaseAuth.saveToken: Attempting to get ID token...");
-//       const token = await user.getIdToken();
-//       console.log("firebaseAuth.saveToken: Generating a tokenID:", token);
-//       console.log(
-//         "firebaseAuth.saveToken: auth.currentUser.email",
-//         auth.currentUser?.email
-//       );
-//       await SecureStore.setItemAsync("authToken", token);
-//     } else {
-//       await SecureStore.deleteItemAsync("authToken");
-//     }
-//   } catch (error) {
-//     console.error("useUserSession.saveToken:", error);
-//   }
-// }
 
-// onIdTokenChanged(auth, async (user) => {
-//   console.log("firebaseAuth: onIdTokenChanged triggered:", user?.email);
-//   await saveToken(user);
-// });
+export async function saveToken(user: User | null) {
+  try {
+    if (user) {
+      console.log("firebaseAuth.saveToken: Attempting to get ID token...");
+      const token = await user.getIdToken();
+      console.log("firebaseAuth.saveToken: Generating a tokenID:", token);
+      console.log(
+        "firebaseAuth.saveToken: auth.currentUser.email",
+        auth.currentUser?.email
+      );
+      await SecureStore.setItemAsync("authToken", token);
+    } else {
+      await SecureStore.deleteItemAsync("authToken");
+    }
+  } catch (error) {
+    console.error("useUserSession.saveToken:", error);
+  }
+}
 
-// onAuthStateChanged(auth, async (user) => {
-//   console.log("firebaseAuth: onAuthStateChanged triggered:", user?.email);
-//   await saveToken(user);
-// });
+onIdTokenChanged(auth, async (user) => {
+  console.log("firebaseAuth: onIdTokenChanged triggered:", user?.email);
+  await saveToken(user);
+});
+
+onAuthStateChanged(auth, async (user) => {
+  console.log("firebaseAuth: onAuthStateChanged triggered:", user?.email);
+  await saveToken(user);
+});
