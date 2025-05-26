@@ -20,6 +20,7 @@ import { useGetProducts } from "../../hooks/fetch/useGetProducts";
 import { useGetCart } from "../../hooks/fetch/useGetCart";
 import { User } from "firebase/auth";
 import { auth } from "../../auth/firebaseAuth";
+
 export const HomeScreen = function HomeScreen() {
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
