@@ -8,7 +8,7 @@ import { getAuth } from "firebase/auth";
 import AnimatedLoadingIndicator from "../components/AnimatedLoadingIndicator";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useGetCart } from "../hooks/fetch/useGetCart";
-import { useAddCart } from "../hooks/fetch/useAddCart";
+import { useCreateCart } from "../hooks/fetch/useCreateCart";
 import { useDeleteCart } from "../hooks/fetch/useDeleteCart";
 import { Product } from "../store/store";
 import { Image } from "expo-image";
@@ -40,7 +40,7 @@ export const CartScreen = memo(() => {
   const userAuth = auth.currentUser;
 
   const getCartQuery = useGetCart({ userEmail: userAuth?.email as string });
-  const addCartMutation = useAddCart();
+  const createCartMutation = useCreateCart();
   const deleteCartMutation = useDeleteCart();
 
   useEffect(() => {
@@ -461,7 +461,7 @@ export const CartScreen = memo(() => {
                     <Text style={{}}>{item.productCartQuantity}</Text>
                     <Pressable
                       onPress={() => {
-                        addCartMutation.mutate(
+                        createCartMutation.mutate(
                           {
                             userEmail: userAuth.email as string,
                             productId: item.productId,
@@ -469,7 +469,7 @@ export const CartScreen = memo(() => {
                           {
                             onSuccess: () => {
                               console.log(
-                                "ItemScreen/[id]/: addCartMutation success"
+                                "ItemScreen/[id]/: createCartMutation success"
                               );
 
                               setSelectedProductsObj((prev) => {
@@ -492,7 +492,7 @@ export const CartScreen = memo(() => {
                             },
                             onError: () => {
                               console.log(
-                                "ItemScreen/[id]/: addCartMutation error"
+                                "ItemScreen/[id]/: createCartMutation error"
                               );
                             },
                           }
