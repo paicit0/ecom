@@ -43,12 +43,8 @@ const fetchCart = async ({ userEmail }: fetchCartType): Promise<cartProductArray
         "Content-Type": "application/json",
       },
     });
-    if (data.cartProducts) {
-      console.log(
-        "useGetCart: data.CartProducts[0].id",
-        data.cartProducts[0].id
-      );
-    }
+
+    console.log("useGetCart: data.cartProducts.length",data.cartProducts.length)
 
     return data.cartProducts;
   } catch (error: any) {
