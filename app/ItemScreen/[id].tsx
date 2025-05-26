@@ -2,7 +2,7 @@
 import { memo, useEffect, useState } from "react";
 import { View, Text, StyleSheet, Pressable, Dimensions } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Link, useLocalSearchParams } from "expo-router";
+import { Link, useLocalSearchParams, useRouter } from "expo-router";
 import { Image } from "expo-image";
 import axios, { AxiosError } from "axios";
 import { Product, useCart } from "../../store/store";
@@ -29,6 +29,8 @@ const ItemScreen = memo(function ItemScreen() {
   const [loading, setLoading] = useState<boolean>(false);
   const [isFavorited, setIsFavorited] = useState<boolean>(false);
   const [productImageNo, setProductImageNo] = useState<number>(0);
+
+  const router = useRouter();
 
   const { id: productId }: { id: string } = useLocalSearchParams();
   const auth = getAuth();
@@ -235,8 +237,7 @@ const ItemScreen = memo(function ItemScreen() {
             </Animated.Text>
           </Pressable>
           <View>
-            <Link href="/CartScreen" asChild>
-              <Pressable>
+            <Pressable onPress={() => router.replace("/CartScreen")}>
                 {(getCartQuery.data?.length as number) > 0 && (
                   <Text style={styles.cartBadge}>
                     {(getCartQuery.data?.length as number) > 99
@@ -253,8 +254,7 @@ const ItemScreen = memo(function ItemScreen() {
                 >
                   <Ionicons name="cart-outline" size={28} />
                 </Animated.Text>
-              </Pressable>
-            </Link>
+            </Pressable>
           </View>
           <Pressable>
             <Animated.Text
