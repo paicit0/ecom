@@ -47,7 +47,7 @@ const fetchDeleteFavorite = async ({
     );
     return data;
   } catch (error) {
-    console.error("usedeleteFavorite: ", error);
+    console.error("useDeleteFavorite: ", error);
     throw error;
   }
 };
