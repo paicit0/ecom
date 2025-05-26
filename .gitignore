@@ -40,7 +40,6 @@ app/auth/firebaseConfig.ts
 WhatToDo.txt
 db/items.tsx
 firebase/functions/src/configs/firebaseConfig.ts
-app/(tabs)/test.tsx
 assets/db/items.tsx
 firebase/functions/src/test.ts
 auth/firebaseConfig.ts
