@@ -40,23 +40,11 @@ export { getProducts };
 import { getTheProduct } from "./getTheProduct";
 export { getTheProduct };
 
-import { getFavorite } from "./getFavorite";
-export { getFavorite };
+import { cart } from "./cart";
+export { cart };
 
-import { addFavorite } from "./addFavorite";
-export { addFavorite };
-
-import { deleteFavorite } from "./deleteFavorite";
-export { deleteFavorite };
-
-import { getCart } from "./getCart";
-export { getCart };
-
-import { addCart } from "./addCart";
-export { addCart };
-
-import { deleteCart } from "./deleteCart";
-export { deleteCart };
+import { favorite } from "./favorite";
+export { favorite };
 
 import { stripePaymentSheet } from "./stripePaymentSheet";
 export { stripePaymentSheet };
