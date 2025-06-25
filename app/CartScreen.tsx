@@ -233,7 +233,7 @@ export const CartScreen = memo(() => {
             alignItems: "center",
           }}
         >
-          <View style={{ flexDirection: "row", alignSelf: "flex-start" }}>
+          <View style={{ flexDirection: "row", alignSelf: "center" }}>
             <Text style={{ alignSelf: "center", fontSize: 12 }}>Amount </Text>
             {
               <Text style={{ color: "orange", fontSize: 18 }}>
@@ -251,6 +251,7 @@ export const CartScreen = memo(() => {
               backgroundColor: "orange",
             }}
           >
+            {/* Checkout Button */}
             {selectedProductsId.length > 0 ? (
               <Link
                 href={{
@@ -607,10 +608,11 @@ const styles = StyleSheet.create({
     marginLeft: 16,
   },
   footerContainer: {
+    height:95,
     width: "100%",
     flexDirection: "row",
-    paddingTop: 10,
-    paddingBottom: 40,
+    // paddingTop: 10,
+    paddingBottom: 20,
     backgroundColor: "white",
   },
 });
